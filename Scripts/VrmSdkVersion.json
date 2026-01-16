@@ -1,4 +1,6 @@
 {
-  "artifactUrl": "https://repo5.example.com/vrm-toolchain/VrmSdk-Win64.zip",
-  "artifactName": "VrmSdk-Win64.zip"
+  "repoOwner": "AlisonLuan",
+  "repoName": "vrm-sdk",
+  "tag": "v1.0.0",
+  "assetName": "vrm-sdk-v1.0.0.zip"
 }

@@ -90,3 +90,6 @@ Shim/libs.rsp
 vrm-toolchain-plugin.zip
 build-plugin.zip
 
+# --- Generated / staged VRM SDK payload (do not commit) ---
+Plugins/VrmToolchain/Source/ThirdParty/VrmSdk/**
+!Plugins/VrmToolchain/Source/ThirdParty/VrmSdk/**/.gitkeep

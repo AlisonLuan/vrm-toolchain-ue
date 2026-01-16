@@ -1,0 +1,37 @@
+cmake_minimum_required(VERSION 3.20)
+project(vrm_sdk_shim LANGUAGES CXX)
+
+set(VRM_SDK_DIR "${CMAKE_SOURCE_DIR}/../../Plugins/VrmToolchain/Source/ThirdParty/VrmSdk")
+set(INC "${VRM_SDK_DIR}/include")
+set(LIB "${VRM_SDK_DIR}/lib/Win64/Release")
+
+if(NOT EXISTS "${INC}")
+  message(FATAL_ERROR "Missing include dir: ${INC}. Run Scripts/FetchVrmSdk.ps1 first.")
+endif()
+if(NOT EXISTS "${LIB}")
+  message(FATAL_ERROR "Missing Release libs dir: ${LIB}.")
+endif()
+
+# Prefer explicit required libs for deterministic diagnostics.
+set(REQUIRED_LIBS vrm_glb_parser.lib vrm_normalizers.lib vrm_validate.lib)
+set(MISSING "")
+set(LIBS_TO_LINK "")
+foreach(r IN LISTS REQUIRED_LIBS)
+  if(EXISTS "${LIB}/${r}")
+    list(APPEND LIBS_TO_LINK "${LIB}/${r}")
+  else()
+    list(APPEND MISSING "${r}")
+  endif()
+endforeach()
+if(MISSING)
+  message(FATAL_ERROR "Missing required libraries in staged Release folder: ${MISSING}")
+endif()
+
+add_executable(vrm_sdk_shim main.cpp)
+target_compile_features(vrm_sdk_shim PRIVATE cxx_std_17)
+target_include_directories(vrm_sdk_shim PRIVATE "${INC}")
+target_link_libraries(vrm_sdk_shim PRIVATE ${LIBS_TO_LINK})
+
+if(MSVC)
+  set_property(TARGET vrm_sdk_shim PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
+endif()

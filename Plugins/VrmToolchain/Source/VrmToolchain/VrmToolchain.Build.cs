@@ -41,13 +41,27 @@ public class VrmToolchain : ModuleRules
         }
 
         PublicLibraryPaths.Add(configurationLibPath);
-        string[] libs = Directory.GetFiles(configurationLibPath, "*.lib");
-        if (libs.Length == 0)
+
+        // Only link the expected VRM SDK libraries; do not reference vrm_avatar_model.lib.
+        string[] requiredLibs = new[] { "vrm_glb_parser.lib", "vrm_normalizers.lib", "vrm_validate.lib" };
+        var missing = new System.Collections.Generic.List<string>();
+        foreach (var lib in requiredLibs)
         {
-            throw new BuildException($"No .lib files were found in '{configurationLibPath}'.");
+            var libPath = Path.Combine(configurationLibPath, lib);
+            if (!File.Exists(libPath))
+            {
+                missing.Add(lib);
+            }
+            else
+            {
+                PublicAdditionalLibraries.Add(libPath);
+            }
         }
 
-        PublicAdditionalLibraries.AddRange(libs);
+        if (missing.Count > 0)
+        {
+            throw new BuildException($"Missing required libraries in VRM SDK Release folder: {string.Join(", ", missing)}");
+        }
     }
 
     private string LocateVrmSdkRoot()
