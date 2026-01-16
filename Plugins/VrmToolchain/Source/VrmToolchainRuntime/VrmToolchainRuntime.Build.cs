@@ -71,31 +71,34 @@ public class VrmToolchainRuntime : ModuleRules
 		if (Target.Platform == UnrealTargetPlatform.Win64)
 		{
 			string LibPath = Path.Combine(VrmSdkPath, "lib", "Win64");
-			if (Directory.Exists(LibPath))
+			string LibFile = Path.Combine(LibPath, "vrm-sdk.lib");
+			if (File.Exists(LibFile))
 			{
-				PublicAdditionalLibraries.Add(Path.Combine(LibPath, "vrm-sdk.lib"));
-				
-				string DllPath = Path.Combine(VrmSdkPath, "bin", "Win64", "vrm-sdk.dll");
-				if (File.Exists(DllPath))
-				{
-					RuntimeDependencies.Add(DllPath);
-				}
+				PublicAdditionalLibraries.Add(LibFile);
+			}
+			
+			string DllPath = Path.Combine(VrmSdkPath, "bin", "Win64", "vrm-sdk.dll");
+			if (File.Exists(DllPath))
+			{
+				RuntimeDependencies.Add(DllPath);
 			}
 		}
 		else if (Target.Platform == UnrealTargetPlatform.Linux)
 		{
 			string LibPath = Path.Combine(VrmSdkPath, "lib", "Linux");
-			if (Directory.Exists(LibPath))
+			string LibFile = Path.Combine(LibPath, "libvrm-sdk.so");
+			if (File.Exists(LibFile))
 			{
-				PublicAdditionalLibraries.Add(Path.Combine(LibPath, "libvrm-sdk.so"));
+				PublicAdditionalLibraries.Add(LibFile);
 			}
 		}
 		else if (Target.Platform == UnrealTargetPlatform.Mac)
 		{
 			string LibPath = Path.Combine(VrmSdkPath, "lib", "Mac");
-			if (Directory.Exists(LibPath))
+			string LibFile = Path.Combine(LibPath, "libvrm-sdk.dylib");
+			if (File.Exists(LibFile))
 			{
-				PublicAdditionalLibraries.Add(Path.Combine(LibPath, "libvrm-sdk.dylib"));
+				PublicAdditionalLibraries.Add(LibFile);
 			}
 		}
 	}

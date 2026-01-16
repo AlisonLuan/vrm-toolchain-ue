@@ -44,5 +44,5 @@ UObject* UVrmImporterFactory::FactoryCreateFile(UClass* InClass, UObject* InPare
 
 bool UVrmImporterFactory::FactoryCanImport(const FString& Filename)
 {
-	return Filename.EndsWith(TEXT(".vrm"));
+	return Filename.EndsWith(TEXT(".vrm"), ESearchCase::IgnoreCase);
 }

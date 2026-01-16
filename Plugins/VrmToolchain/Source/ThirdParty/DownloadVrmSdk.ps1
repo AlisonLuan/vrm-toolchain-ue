@@ -3,7 +3,6 @@
 param(
     [string]$VrmSdkRoot = $env:VRM_SDK_ROOT,
     [string]$ArtifactUrl = "",
-    [string]$Version = "latest",
     [switch]$Force
 )
 
@@ -11,7 +10,7 @@ $ErrorActionPreference = "Stop"
 
 # Get the script directory
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$ThirdPartyDir = Join-Path $ScriptDir ".."
+$ThirdPartyDir = $ScriptDir
 $VrmSdkDir = Join-Path $ThirdPartyDir "VrmSdk"
 
 Write-Host "VRM SDK Download Script" -ForegroundColor Cyan
@@ -88,7 +87,7 @@ This directory should contain the VRM SDK artifacts.
 Directory structure:
 - include/          : Header files
 - lib/Win64/        : Windows 64-bit libraries
-- lib/Linux/        : Linux libraries  
+- lib/Linux/        : Linux libraries
 - lib/Mac/          : macOS libraries
 - bin/Win64/        : Windows 64-bit DLLs
 

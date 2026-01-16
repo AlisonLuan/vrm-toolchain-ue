@@ -1,45 +1,45 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "VrmSdkWrapper.h"
+#include "VrmToolchainRuntime.h"
+#include "HAL/PlatformAtomics.h"
 
-bool FVrmSdkWrapper::bIsInitialized = false;
+static volatile int32 GVrmSdkInitialized = 0;
 
 bool FVrmSdkWrapper::Initialize()
 {
-	if (bIsInitialized)
+	if (FPlatformAtomics::InterlockedCompareExchange(&GVrmSdkInitialized, 1, 0) != 0)
 	{
 		return true;
 	}
 
 	// TODO: Initialize VRM SDK when available
 	// For now, just mark as initialized
-	bIsInitialized = true;
 
-	UE_LOG(LogTemp, Log, TEXT("VRM SDK Wrapper initialized"));
+	UE_LOG(LogVrmToolchain, Log, TEXT("VRM SDK Wrapper initialized"));
 	return true;
 }
 
 void FVrmSdkWrapper::Shutdown()
 {
-	if (!bIsInitialized)
+	if (FPlatformAtomics::InterlockedCompareExchange(&GVrmSdkInitialized, 0, 1) != 1)
 	{
 		return;
 	}
 
 	// TODO: Cleanup VRM SDK resources when available
-	bIsInitialized = false;
 
-	UE_LOG(LogTemp, Log, TEXT("VRM SDK Wrapper shutdown"));
+	UE_LOG(LogVrmToolchain, Log, TEXT("VRM SDK Wrapper shutdown"));
 }
 
 bool FVrmSdkWrapper::IsAvailable()
 {
-	return bIsInitialized;
+	return FPlatformAtomics::AtomicRead(&GVrmSdkInitialized) != 0;
 }
 
 FString FVrmSdkWrapper::GetVersion()
 {
-	if (!bIsInitialized)
+	if (!IsAvailable())
 	{
 		return FString();
 	}
@@ -50,7 +50,7 @@ FString FVrmSdkWrapper::GetVersion()
 
 bool FVrmSdkWrapper::ValidateVrmFile(const FString& FilePath, TArray<FString>& OutErrors)
 {
-	if (!bIsInitialized)
+	if (!IsAvailable())
 	{
 		OutErrors.Add(TEXT("VRM SDK is not initialized"));
 		return false;
@@ -64,7 +64,7 @@ bool FVrmSdkWrapper::ValidateVrmFile(const FString& FilePath, TArray<FString>& O
 		return false;
 	}
 
-	if (!FilePath.EndsWith(TEXT(".vrm")))
+	if (!FilePath.EndsWith(TEXT(".vrm"), ESearchCase::IgnoreCase))
 	{
 		OutErrors.Add(TEXT("File does not have .vrm extension"));
 		return false;

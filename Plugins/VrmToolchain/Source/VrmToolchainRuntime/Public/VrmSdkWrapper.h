@@ -41,7 +41,4 @@ public:
 	 * @return true if the file is a valid VRM file
 	 */
 	static bool ValidateVrmFile(const FString& FilePath, TArray<FString>& OutErrors);
-
-private:
-	static bool bIsInitialized;
 };

@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
 
+DECLARE_LOG_CATEGORY_EXTERN(LogVrmToolchainEditor, Log, All);
+
 /**
  * VRM Toolchain Editor Module
  * Provides editor-time functionality for VRM import/export

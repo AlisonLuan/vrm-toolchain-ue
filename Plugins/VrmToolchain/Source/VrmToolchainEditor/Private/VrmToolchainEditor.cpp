@@ -1,21 +1,19 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "VrmToolchainEditor.h"
-#include "VrmSdkWrapper.h"
 
 #define LOCTEXT_NAMESPACE "FVrmToolchainEditorModule"
+
+DEFINE_LOG_CATEGORY(LogVrmToolchainEditor);
 
 void FVrmToolchainEditorModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
 	
-	// Initialize VRM SDK wrapper
-	FVrmSdkWrapper::Initialize();
-
 	// Register asset tools
 	RegisterAssetTools();
 
-	UE_LOG(LogTemp, Log, TEXT("VrmToolchainEditor module started"));
+	UE_LOG(LogVrmToolchainEditor, Log, TEXT("VrmToolchainEditor module started"));
 }
 
 void FVrmToolchainEditorModule::ShutdownModule()
@@ -26,10 +24,7 @@ void FVrmToolchainEditorModule::ShutdownModule()
 	// Unregister asset tools
 	UnregisterAssetTools();
 
-	// Shutdown VRM SDK wrapper
-	FVrmSdkWrapper::Shutdown();
-
-	UE_LOG(LogTemp, Log, TEXT("VrmToolchainEditor module shutdown"));
+	UE_LOG(LogVrmToolchainEditor, Log, TEXT("VrmToolchainEditor module shutdown"));
 }
 
 void FVrmToolchainEditorModule::RegisterAssetTools()

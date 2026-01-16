@@ -25,8 +25,8 @@ bool FVrmValidator::QuickValidate(const FString& FilePath)
 		return false;
 	}
 
-	// Check if file has .vrm extension
-	if (!FilePath.EndsWith(TEXT(".vrm")))
+	// Check if file has .vrm extension (case-insensitive)
+	if (!FilePath.EndsWith(TEXT(".vrm"), ESearchCase::IgnoreCase))
 	{
 		return false;
 	}
@@ -47,7 +47,7 @@ bool FVrmValidator::DeepValidate(const FString& FilePath, TArray<FString>& OutEr
 
 	// Check file size (warn if too large)
 	int64 FileSize = IFileManager::Get().FileSize(*FilePath);
-	if (FileSize > 100 * 1024 * 1024) // 100 MB
+	if (FileSize >= 0 && FileSize > 100 * 1024 * 1024) // 100 MB
 	{
 		OutWarnings.Add(FString::Printf(TEXT("File is very large (%lld bytes). This may cause performance issues."), FileSize));
 	}

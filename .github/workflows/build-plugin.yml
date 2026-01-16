@@ -5,10 +5,6 @@ on:
     branches: [ main ]
   workflow_dispatch:
     inputs:
-      ue_version:
-        description: 'Unreal Engine version (e.g., 5.0, 5.1, 5.2)'
-        required: false
-        default: '5.0'
       platform:
         description: 'Target platform'
         required: false
@@ -25,7 +21,7 @@ jobs:
     runs-on: self-hosted
     # Only run on self-hosted runners with 'ue5' tag
     # This workflow is optional and requires self-hosted runners to be set up
-    if: contains(github.event.head_commit.message, '[build]') || github.event_name == 'workflow_dispatch'
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && contains(github.event.head_commit.message, '[build]'))
     
     steps:
     - name: Checkout code
@@ -35,9 +31,7 @@ jobs:
       shell: pwsh
       run: |
         Write-Host "Setting up build environment..."
-        $ueVersion = "${{ github.event.inputs.ue_version || '5.0' }}"
         $platform = "${{ github.event.inputs.platform || 'Win64' }}"
-        Write-Host "UE Version: $ueVersion"
         Write-Host "Platform: $platform"
         
     - name: Download VRM SDK
