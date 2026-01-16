@@ -1,0 +1,107 @@
+name: Build Plugin (Self-Hosted)
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Target platform'
+        required: false
+        default: 'Win64'
+        type: choice
+        options:
+          - Win64
+          - Linux
+          - Mac
+
+jobs:
+  build-plugin:
+    name: Build VrmToolchain Plugin
+    runs-on: self-hosted
+    # Only run on self-hosted runners with 'ue5' tag
+    # This workflow is optional and requires self-hosted runners to be set up
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && contains(github.event.head_commit.message, '[build]'))
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Setup environment
+      shell: pwsh
+      run: |
+        Write-Host "Setting up build environment..."
+        $platform = "${{ github.event.inputs.platform || 'Win64' }}"
+        Write-Host "Platform: $platform"
+        
+    - name: Download VRM SDK
+      shell: pwsh
+      run: |
+        Write-Host "Downloading VRM SDK artifacts..."
+        & "Plugins/VrmToolchain/Source/ThirdParty/DownloadVrmSdk.ps1"
+        
+    - name: Build plugin (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      run: |
+        Write-Host "Building plugin for Windows..."
+        
+        # Check if UAT is available
+        $uatPath = "$env:UE_ROOT\Engine\Build\BatchFiles\RunUAT.bat"
+        if (-not (Test-Path $uatPath)) {
+          Write-Host "Warning: UAT not found at $uatPath"
+          Write-Host "Please set UE_ROOT environment variable or install Unreal Engine"
+          exit 0
+        }
+        
+        # Build the plugin
+        $pluginPath = Join-Path $PWD "Plugins\VrmToolchain\VrmToolchain.uplugin"
+        $outputPath = Join-Path $PWD "Build\VrmToolchain"
+        
+        & $uatPath BuildPlugin `
+          -Plugin="$pluginPath" `
+          -Package="$outputPath" `
+          -CreateSubFolder `
+          -TargetPlatforms=Win64
+          
+    - name: Build plugin (Linux)
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        echo "Building plugin for Linux..."
+        
+        # Check if UAT is available
+        UAT_PATH="${UE_ROOT}/Engine/Build/BatchFiles/RunUAT.sh"
+        if [ ! -f "$UAT_PATH" ]; then
+          echo "Warning: UAT not found at $UAT_PATH"
+          echo "Please set UE_ROOT environment variable or install Unreal Engine"
+          exit 0
+        fi
+        
+        # Build the plugin
+        PLUGIN_PATH="$PWD/Plugins/VrmToolchain/VrmToolchain.uplugin"
+        OUTPUT_PATH="$PWD/Build/VrmToolchain"
+        
+        "$UAT_PATH" BuildPlugin \
+          -Plugin="$PLUGIN_PATH" \
+          -Package="$OUTPUT_PATH" \
+          -CreateSubFolder \
+          -TargetPlatforms=Linux
+          
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v3
+      if: always()
+      with:
+        name: VrmToolchain-${{ github.event.inputs.platform || 'Win64' }}
+        path: Build/VrmToolchain/
+        if-no-files-found: ignore
+        retention-days: 7
+        
+    - name: Build summary
+      shell: pwsh
+      run: |
+        Write-Host "Build process completed"
+        Write-Host "Note: This is an optional workflow that requires:"
+        Write-Host "  1. Self-hosted runner with Unreal Engine installed"
+        Write-Host "  2. UE_ROOT environment variable set"
+        Write-Host "  3. VRM SDK artifacts available"

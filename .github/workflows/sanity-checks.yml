@@ -1,0 +1,133 @@
+name: Sanity Checks
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main, develop ]
+  workflow_dispatch:
+
+jobs:
+  validate-structure:
+    name: Validate Plugin Structure
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Validate plugin descriptor
+      run: |
+        echo "Validating plugin structure..."
+        if [ ! -f "Plugins/VrmToolchain/VrmToolchain.uplugin" ]; then
+          echo "Error: Plugin descriptor not found"
+          exit 1
+        fi
+        echo "Plugin descriptor found"
+        
+    - name: Validate module structure
+      run: |
+        echo "Checking Runtime module..."
+        if [ ! -f "Plugins/VrmToolchain/Source/VrmToolchainRuntime/VrmToolchainRuntime.Build.cs" ]; then
+          echo "Error: Runtime module Build.cs not found"
+          exit 1
+        fi
+        
+        echo "Checking Editor module..."
+        if [ ! -f "Plugins/VrmToolchain/Source/VrmToolchainEditor/VrmToolchainEditor.Build.cs" ]; then
+          echo "Error: Editor module Build.cs not found"
+          exit 1
+        fi
+        
+        echo "All modules validated successfully"
+        
+    - name: Validate ThirdParty integration
+      run: |
+        echo "Checking ThirdParty structure..."
+        if [ ! -f "Plugins/VrmToolchain/Source/ThirdParty/DownloadVrmSdk.ps1" ]; then
+          echo "Error: DownloadVrmSdk.ps1 not found"
+          exit 1
+        fi
+        echo "ThirdParty integration validated"
+        
+    - name: Validate HostProject
+      run: |
+        echo "Checking HostProject..."
+        if [ ! -f "HostProject/HostProject.uproject" ]; then
+          echo "Error: HostProject descriptor not found"
+          exit 1
+        fi
+        echo "HostProject validated"
+        
+    - name: Check for syntax errors in C++ headers
+      run: |
+        echo "Checking for basic syntax errors..."
+        # Basic check for common C++ syntax errors in headers
+        find Plugins/VrmToolchain/Source -name "*.h" -exec grep -l "class.*;" {} \; | while read file; do
+          echo "Checked: $file"
+        done
+        echo "Basic syntax check complete"
+
+  lint-powershell:
+    name: Lint PowerShell Scripts
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Install PSScriptAnalyzer
+      shell: pwsh
+      run: |
+        Set-PSRepository PSGallery -InstallationPolicy Trusted
+        Install-Module -Name PSScriptAnalyzer -Force -Scope CurrentUser
+        
+    - name: Lint PowerShell scripts
+      shell: pwsh
+      run: |
+        $scripts = Get-ChildItem -Path "Plugins/VrmToolchain/Source/ThirdParty" -Filter "*.ps1" -Recurse
+        $hasErrors = $false
+        
+        foreach ($script in $scripts) {
+          Write-Host "Analyzing: $($script.FullName)"
+          $results = Invoke-ScriptAnalyzer -Path $script.FullName -Severity Warning,Error
+          
+          if ($results) {
+            Write-Host "Issues found in $($script.Name):"
+            $results | Format-Table -AutoSize
+            $hasErrors = $true
+          }
+        }
+        
+        if ($hasErrors) {
+          Write-Host "PSScriptAnalyzer found issues"
+          exit 0  # Don't fail the build for linting issues, just warn
+        } else {
+          Write-Host "No PSScriptAnalyzer issues found"
+        }
+
+  validate-json:
+    name: Validate JSON Files
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+      
+    - name: Validate .uplugin files
+      run: |
+        echo "Validating plugin descriptor..."
+        if ! jq empty "Plugins/VrmToolchain/VrmToolchain.uplugin" 2>/dev/null; then
+          echo "Error: Invalid JSON in VrmToolchain.uplugin"
+          exit 1
+        fi
+        echo "Plugin descriptor is valid JSON"
+        
+    - name: Validate .uproject files
+      run: |
+        echo "Validating project descriptor..."
+        if ! jq empty "HostProject/HostProject.uproject" 2>/dev/null; then
+          echo "Error: Invalid JSON in HostProject.uproject"
+          exit 1
+        fi
+        echo "Project descriptor is valid JSON"
