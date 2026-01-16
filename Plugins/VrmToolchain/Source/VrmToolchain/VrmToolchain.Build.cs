@@ -60,7 +60,7 @@ public class VrmToolchain : ModuleRules
 
         if (missing.Count > 0)
         {
-            throw new BuildException($"Missing required libraries in VRM SDK Release folder: {string.Join(", ", missing)}");
+            throw new BuildException($"Missing required libraries in VRM SDK {configurationDir} folder: {string.Join(", ", missing)}");
         }
     }
 
