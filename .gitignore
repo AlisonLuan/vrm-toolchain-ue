@@ -74,3 +74,19 @@ Plugins/**/Intermediate/*
 # Cache files for the editor to use
 DerivedDataCache/*
 
+# VRM SDK staged binaries
+Plugins/VrmToolchain/Source/ThirdParty/VrmSdk/lib/Win64/**/*.lib
+Plugins/VrmToolchain/Source/ThirdParty/VrmSdk/lib/Win64/**/*.pdb
+Plugins/VrmToolchain/Source/ThirdParty/VrmSdk/bin/Win64/**/*.dll
+Plugins/VrmToolchain/Source/ThirdParty/VrmSdk/bin/Win64/**/*.pdb
+
+# CI shim artifacts
+Shim/shim.exe
+Shim/*.obj
+Shim/*.pdb
+Shim/libs.rsp
+
+# Workflow outputs
+vrm-toolchain-plugin.zip
+build-plugin.zip
+

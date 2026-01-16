@@ -1,0 +1,45 @@
+name: VRM SDK smoke test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify-sdk:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch VRM SDK
+        shell: pwsh
+        run: Scripts/FetchVrmSdk.ps1
+
+      - name: Verify plugin registration and ThirdParty layout
+        shell: pwsh
+        run: Scripts/VerifyVrmSdkLayout.ps1
+
+      - name: Prepare MSVC shim
+        shell: pwsh
+        run: Scripts/PrepareShimForCi.ps1
+
+      - name: Build MSVC shim
+        shell: cmd
+        run: |
+          call "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+          cl /nologo /I "%SHIM_INCLUDE%" Shim/shim.cpp /Fe:Shim.exe /link /LIBPATH:"%SHIM_LIB_DIR%" @"%SHIM_LIB_RSP%"
+
+      - name: Package VRM Toolchain plugin
+        shell: pwsh
+        run: |
+          $artifact = 'vrm-toolchain-plugin.zip'
+          if (Test-Path $artifact) { Remove-Item $artifact -Force }
+          Compress-Archive -Path 'Plugins/VrmToolchain' -DestinationPath $artifact -Force
+          Write-Host "Packaged plugin to $artifact"
+
+      - name: Upload packaged plugin
+        uses: actions/upload-artifact@v4
+        with:
+          name: vrm-toolchain-plugin
+          path: vrm-toolchain-plugin.zip

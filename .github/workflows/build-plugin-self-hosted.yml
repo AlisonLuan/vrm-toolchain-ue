@@ -1,0 +1,41 @@
+name: Build VRM Toolchain plugin (self-hosted)
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build-plugin:
+    runs-on: [self-hosted, ue-installed]
+    env:
+      UE_ENGINE_PATH: ${{ secrets.UE_ENGINE_PATH }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch VRM SDK
+        shell: pwsh
+        run: Scripts/FetchVrmSdk.ps1
+
+      - name: Build plugin with Unreal Automation Tool
+        shell: cmd
+        run: |
+          if not defined UE_ENGINE_PATH (
+            echo UE_ENGINE_PATH environment variable must point to the Unreal Engine root.
+            exit /b 1
+          )
+          call "%UE_ENGINE_PATH%\Engine\Build\BatchFiles\RunUAT.bat" BuildPlugin -Plugin="Plugins/VrmToolchain/VrmToolchain.uplugin" -Package="Build/VrmToolchain" -TargetPlatforms=Win64 -CreateSubFolder
+
+      - name: Package built plugin
+        shell: pwsh
+        run: |
+          $artifact = 'build-plugin.zip'
+          if (Test-Path $artifact) { Remove-Item $artifact -Force }
+          Compress-Archive -Path 'Build/VrmToolchain' -DestinationPath $artifact -Force
+          Write-Host "Packaged plugin output to $artifact"
+
+      - name: Upload packaged plugin
+        uses: actions/upload-artifact@v4
+        with:
+          name: vrm-toolchain-plugin-ue
+          path: build-plugin.zip
