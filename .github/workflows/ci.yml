@@ -1,0 +1,30 @@
+name: ci
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  fetch-and-shim:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Fetch VRM SDK (private release)
+        shell: pwsh
+        env:
+          VRM_SDK_TOKEN: ${{ secrets.VRM_SDK_TOKEN }}
+        run: .\Scripts\FetchVrmSdk.ps1
+
+      - name: Configure shim
+        shell: pwsh
+        run: cmake -S .\Tests\Shim -B .\build\shim -G Ninja -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build shim
+        shell: pwsh
+        run: cmake --build .\build\shim --config Release
+
+      - name: Run shim
+        shell: pwsh
+        run: .\build\shim\vrm_sdk_shim.exe
