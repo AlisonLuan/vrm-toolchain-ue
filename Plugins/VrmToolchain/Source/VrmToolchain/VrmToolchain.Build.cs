@@ -40,8 +40,6 @@ public class VrmToolchain : ModuleRules
             throw new BuildException($"Could not find VRM SDK libraries for {configurationDir} at '{configurationLibPath}'.");
         }
 
-        PublicLibraryPaths.Add(configurationLibPath);
-
         // Only link the expected VRM SDK libraries; do not reference vrm_avatar_model.lib.
         string[] requiredLibs = new[] { "vrm_glb_parser.lib", "vrm_normalizers.lib", "vrm_validate.lib" };
         var missing = new System.Collections.Generic.List<string>();
