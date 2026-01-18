@@ -31,6 +31,8 @@ public class VrmToolchainEditor : ModuleRules
             "UnrealEd",
             "Slate",
             "SlateCore",
+            // Needed for IPluginManager & plugin discovery at editor startup
+            "Projects",
         });
 
         PrivateDependencyModuleNames.AddRange(new string[]
