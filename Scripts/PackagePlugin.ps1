@@ -20,31 +20,32 @@ Remove-Item -Recurse -Force $OutPkg -ErrorAction SilentlyContinue | Out-Null
 & $UAT BuildPlugin -Plugin="$Uplugin" -Package="$OutPkg" -TargetPlatforms=Win64 -Rocket
 if ($LASTEXITCODE -ne 0) { throw "BuildPlugin failed (exit $LASTEXITCODE)" }
 
-# 2) Strip dev-only tool from packaged output (remove ALL copies)
-$devExeName = "vrm_validate.exe"
-
-$found = Get-ChildItem $OutPkg -Recurse -Filter $devExeName -ErrorAction SilentlyContinue
-if ($found) {
-  $found | ForEach-Object {
-    # Clear ReadOnly if needed
-    if ($_.Attributes -band [IO.FileAttributes]::ReadOnly) {
-      $_.Attributes = $_.Attributes -bxor [IO.FileAttributes]::ReadOnly
+# 2) Strip dev-only tools from packaged output (remove all .exe under VrmSdk/bin)
+$PkgBinRoot = Join-Path $OutPkg "Source\ThirdParty\VrmSdk\bin"
+if (Test-Path $PkgBinRoot) {
+  Get-ChildItem -Path $PkgBinRoot -Recurse -Filter "*.exe" -File -ErrorAction SilentlyContinue |
+    ForEach-Object {
+      # Clear ReadOnly if needed
+      if ($_.Attributes -band [IO.FileAttributes]::ReadOnly) {
+        $_.Attributes = $_.Attributes -bxor [IO.FileAttributes]::ReadOnly
+      }
+      Remove-Item -Force $_.FullName
     }
-    Remove-Item -Force $_.FullName
-  }
 }
 
-# Optional: also strip PDB if you ever ship it
-$foundPdb = Get-ChildItem $OutPkg -Recurse -Filter "vrm_validate.pdb" -ErrorAction SilentlyContinue
-if ($foundPdb) {
-  $foundPdb | ForEach-Object { Remove-Item -Force $_.FullName }
+# Optional cleanup: remove empty bin folder after stripping
+if (Test-Path $PkgBinRoot) {
+  $remaining = Get-ChildItem $PkgBinRoot -Recurse -File -ErrorAction SilentlyContinue
+  if (-not $remaining) { Remove-Item -Recurse -Force $PkgBinRoot }
 }
 
-# 3) Verify no leak
-$leaks = Get-ChildItem $OutPkg -Recurse -Filter $devExeName -ErrorAction SilentlyContinue
+# 3) Verify no leak: no .exe under Source/ThirdParty/VrmSdk
+$leaks = Get-ChildItem $OutPkg -Recurse -Filter "*.exe" -File -ErrorAction SilentlyContinue |
+  Where-Object { $_.FullName -like "*\Source\ThirdParty\VrmSdk\*" }
+
 if ($leaks) {
   $leaks | Select-Object FullName | Format-Table -AutoSize
-  throw "Packaging leak: $devExeName is present in the distribution output."
+  throw "Packaging leak: SDK executables are present in the distribution output."
 }
 
 Write-Host "OK: Packaged plugin built and vrm_validate.exe stripped successfully." -ForegroundColor Green

@@ -84,6 +84,18 @@ jobs:
           UE_ENGINE_PATH: ${{ secrets.UE_ENGINE_PATH }}
         run: .\Scripts\PackagePlugin.ps1 -UE "$env:UE_ENGINE_PATH" -RepoRoot "$PWD" -PluginName "VrmToolchain"
 
+      - name: Verify packaged output contains no SDK executables
+        shell: pwsh
+        run: |
+          $out = Join-Path $PWD 'build\Package\VrmToolchain'
+          $leaks = Get-ChildItem $out -Recurse -Filter "*.exe" -File -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -like "*\Source\ThirdParty\VrmSdk\*" }
+          if ($leaks) {
+            $leaks | ForEach-Object { Write-Error "LEAK: $($_.FullName)" }
+            throw "SDK executable leak detected in packaged output."
+          }
+          Write-Host "OK: No SDK executables in packaged output."
+
       - name: Zip packaged output
         shell: pwsh
         run: |
