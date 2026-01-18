@@ -20,11 +20,6 @@ public class VrmToolchainEditor : ModuleRules
                 // Stage as NonUFS so it ships as a loose file
                 RuntimeDependencies.Add(exePath, StagedFileType.NonUFS);
             }
-            else
-            {
-                // Do not fail the build if the developer-only exe is missing; warn so tooling remains optional at build time.
-                System.Console.WriteLine($"Warning: VrmToolchainEditor: vrm_validate.exe not found at '{exePath}'. Validation tool will be unavailable in editor; run Scripts/FetchVrmSdk.ps1 to install.");
-            }
         }
 
         PublicDependencyModuleNames.AddRange(new string[]
