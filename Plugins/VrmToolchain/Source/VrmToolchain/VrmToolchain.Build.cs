@@ -12,8 +12,13 @@ public class VrmToolchain : ModuleRules
         {
             "Core",
             "CoreUObject",
-            "Kismet",
         });
+
+n        // Kismet provides BlueprintFunctionLibrary support; only link it for editor builds to avoid requiring editor-only modules
+        if (Target.bBuildEditor)
+        {
+            PublicDependencyModuleNames.Add("Kismet");
+        }
 
         PrivateDependencyModuleNames.AddRange(new string[]
         {
