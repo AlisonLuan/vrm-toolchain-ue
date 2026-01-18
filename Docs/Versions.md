@@ -11,8 +11,8 @@ Third-party components and other notable inputs:
 - No other binary third-party artifacts are shipped in the package. Refer to `Plugins/VrmToolchain/Config/FilterPlugin.ini` and `Scripts/PackagePlugin.ps1` for packaging rules.
 
 Release artifacts:
-- (To be filled by release automation) Packaged plugin ZIP URL: <TO_BE_ADDED>
-- SHA256: <TO_BE_ADDED>
+- Packaged plugin ZIP (local build): `build/Package/VrmToolchain-v0.1.0-freeze.zip`
+- SHA256: `02CA61D06E0A3F462DEAD4375042EB14C9E61D343FD53E368512E6DF16F5DE10`
 
 Notes:
 - If release artifacts are used in CI or downstream consumption, add the artifact URL and SHA256 here.
