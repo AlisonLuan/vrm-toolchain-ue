@@ -5,6 +5,12 @@
 
 #if WITH_DEV_AUTOMATION_TESTS
 
+// Helper function to get temp file path for tests
+static FString GetTestTempFilePath(const FString& Filename)
+{
+	return FPaths::ProjectSavedDir() / TEXT("Temp") / Filename;
+}
+
 // Helper function to create a minimal GLB file in memory
 static TArray<uint8> CreateSyntheticGlb(const FString& JsonContent)
 {
@@ -96,7 +102,7 @@ bool FVrmParserVrm0DetectionTest::RunTest(const FString& Parameters)
 	FJsonSerializer::Deserialize(Reader, JsonObject);
 
 	// Create a temp file to test file-based API
-	FString TempFilePath = FPaths::ProjectSavedDir() / TEXT("Temp") / TEXT("test_vrm0.glb");
+	FString TempFilePath = GetTestTempFilePath(TEXT("test_vrm0.glb"));
 	FFileHelper::SaveArrayToFile(GlbData, *TempFilePath);
 
 	EVrmVersion DetectedVersion = FVrmParser::DetectVrmVersion(TempFilePath);
@@ -130,7 +136,7 @@ bool FVrmParserVrm1DetectionTest::RunTest(const FString& Parameters)
 	TArray<uint8> GlbData = CreateSyntheticGlb(Vrm1Json);
 
 	// Create a temp file to test file-based API
-	FString TempFilePath = FPaths::ProjectSavedDir() / TEXT("Temp") / TEXT("test_vrm1.glb");
+	FString TempFilePath = GetTestTempFilePath(TEXT("test_vrm1.glb"));
 	FFileHelper::SaveArrayToFile(GlbData, *TempFilePath);
 
 	EVrmVersion DetectedVersion = FVrmParser::DetectVrmVersion(TempFilePath);
@@ -165,7 +171,7 @@ bool FVrmParserMetadataVrm0Test::RunTest(const FString& Parameters)
 	TArray<uint8> GlbData = CreateSyntheticGlb(Vrm0Json);
 
 	// Create a temp file
-	FString TempFilePath = FPaths::ProjectSavedDir() / TEXT("Temp") / TEXT("test_vrm0_meta.glb");
+	FString TempFilePath = GetTestTempFilePath(TEXT("test_vrm0_meta.glb"));
 	FFileHelper::SaveArrayToFile(GlbData, *TempFilePath);
 
 	// Extract metadata
@@ -212,7 +218,7 @@ bool FVrmParserMetadataVrm1Test::RunTest(const FString& Parameters)
 	TArray<uint8> GlbData = CreateSyntheticGlb(Vrm1Json);
 
 	// Create a temp file
-	FString TempFilePath = FPaths::ProjectSavedDir() / TEXT("Temp") / TEXT("test_vrm1_meta.glb");
+	FString TempFilePath = GetTestTempFilePath(TEXT("test_vrm1_meta.glb"));
 	FFileHelper::SaveArrayToFile(GlbData, *TempFilePath);
 
 	// Extract metadata
@@ -267,7 +273,7 @@ bool FVrmParserNoExtensionsTest::RunTest(const FString& Parameters)
 	TArray<uint8> GlbData = CreateSyntheticGlb(PlainGltfJson);
 
 	// Create a temp file
-	FString TempFilePath = FPaths::ProjectSavedDir() / TEXT("Temp") / TEXT("test_plain.glb");
+	FString TempFilePath = GetTestTempFilePath(TEXT("test_plain.glb"));
 	FFileHelper::SaveArrayToFile(GlbData, *TempFilePath);
 
 	EVrmVersion DetectedVersion = FVrmParser::DetectVrmVersion(TempFilePath);

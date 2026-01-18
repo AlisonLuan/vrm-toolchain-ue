@@ -67,7 +67,7 @@ bool FVrmParser::ReadGlbJsonChunkFromMemory(const uint8* Data, int64 DataSize, F
 
 		// Check for bounds - ensure chunk doesn't exceed file size
 		uint32 ChunkLength = ChunkHeader->Length;
-		if (ChunkLength > static_cast<uint64>(DataSize) - Offset)
+		if (Offset > DataSize || ChunkLength > static_cast<uint64>(DataSize) - Offset)
 		{
 			UE_LOG(LogVrmToolchain, Warning, TEXT("Invalid GLB chunk: length (%u) exceeds remaining file size"), ChunkLength);
 			return false;
