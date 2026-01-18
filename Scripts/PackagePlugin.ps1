@@ -20,22 +20,31 @@ Remove-Item -Recurse -Force $OutPkg -ErrorAction SilentlyContinue | Out-Null
 & $UAT BuildPlugin -Plugin="$Uplugin" -Package="$OutPkg" -TargetPlatforms=Win64 -Rocket
 if ($LASTEXITCODE -ne 0) { throw "BuildPlugin failed (exit $LASTEXITCODE)" }
 
-# 2) Strip dev-only tool from packaged output
-$PkgExe = Join-Path $OutPkg "Source\ThirdParty\VrmSdk\bin\Win64\vrm_validate.exe"
-if (Test-Path $PkgExe) { Remove-Item -Force $PkgExe }
+# 2) Strip dev-only tool from packaged output (remove ALL copies)
+$devExeName = "vrm_validate.exe"
 
-# Optional cleanup of empty bin folder
-$PkgBin = Split-Path $PkgExe -Parent
-if (Test-Path $PkgBin) {
-  $files = Get-ChildItem $PkgBin -Recurse -File -ErrorAction SilentlyContinue
-  if (-not $files) { Remove-Item -Recurse -Force $PkgBin }
+$found = Get-ChildItem $OutPkg -Recurse -Filter $devExeName -ErrorAction SilentlyContinue
+if ($found) {
+  $found | ForEach-Object {
+    # Clear ReadOnly if needed
+    if ($_.Attributes -band [IO.FileAttributes]::ReadOnly) {
+      $_.Attributes = $_.Attributes -bxor [IO.FileAttributes]::ReadOnly
+    }
+    Remove-Item -Force $_.FullName
+  }
+}
+
+# Optional: also strip PDB if you ever ship it
+$foundPdb = Get-ChildItem $OutPkg -Recurse -Filter "vrm_validate.pdb" -ErrorAction SilentlyContinue
+if ($foundPdb) {
+  $foundPdb | ForEach-Object { Remove-Item -Force $_.FullName }
 }
 
 # 3) Verify no leak
-$leaks = Get-ChildItem $OutPkg -Recurse -Filter "vrm_validate.exe" -ErrorAction SilentlyContinue
+$leaks = Get-ChildItem $OutPkg -Recurse -Filter $devExeName -ErrorAction SilentlyContinue
 if ($leaks) {
   $leaks | Select-Object FullName | Format-Table -AutoSize
-  throw "Packaging leak: vrm_validate.exe is present in the distribution output."
+  throw "Packaging leak: $devExeName is present in the distribution output."
 }
 
 Write-Host "OK: Packaged plugin built and vrm_validate.exe stripped successfully." -ForegroundColor Green
