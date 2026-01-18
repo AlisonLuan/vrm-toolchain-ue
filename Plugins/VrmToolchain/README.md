@@ -36,6 +36,8 @@ To avoid accidental leakage of developer-only tooling and to make packaging dete
 
 Developer tooling (for example, `vrm_validate.exe`) is kept in the repository for contributors, but CI packaging enforces that these binaries are removed from packaged artifacts.
 
+**Engineering note:** Pinned inputs and freeze metadata are recorded at the repository root `Docs/Versions.md` (create a `freeze/YYYY-MM-DD` branch and tag when advancing the pinned inputs).
+
 ## Developer validation tool (optional)
 
 The plugin supports an optional command-line validation tool (`vrm_validate.exe`) used by developers to validate VRM assets locally. This tool is **not** shipped with packaged plugin artifacts.
