@@ -8,6 +8,9 @@ public class VrmToolchain : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
+        // Some third-party code uses C++ exceptions; enable exceptions for this module so try/catch compiles (/EHsc).
+        bEnableExceptions = true;
+
         PublicDependencyModuleNames.AddRange(new string[]
         {
             "Core",
