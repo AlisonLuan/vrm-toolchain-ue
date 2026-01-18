@@ -36,6 +36,16 @@ To avoid accidental leakage of developer-only tooling and to make packaging dete
 
 Developer tooling (for example, `vrm_validate.exe`) is kept in the repository for contributors, but CI packaging enforces that these binaries are removed from packaged artifacts.
 
+## Developer validation tool (optional)
+
+The plugin supports an optional command-line validation tool (`vrm_validate.exe`) used by developers to validate VRM assets locally. This tool is **not** shipped with packaged plugin artifacts.
+
+How to obtain the developer tools:
+- Set `VRM_SDK_ROOT` to a local SDK staging directory that contains `include/` and `lib/` (preferred for CI-like testing).
+- Or, install the developer tools from a separate developer ZIP distribution (do not add executables to the plugin zip).
+
+If `vrm_validate.exe` is not present, the editor will disable CLI-based validation features and log a message guiding developers how to install the tools.
+
 ## Runtime API
 `FVrmSdkFacade` exposes simple helpers:
 ```cpp

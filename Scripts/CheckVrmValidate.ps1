@@ -12,7 +12,7 @@ $RepoRoot = (Resolve-Path (Join-Path $PSScriptRoot '..')).ProviderPath
 $Exe = Join-Path $RepoRoot 'Plugins\VrmToolchain\Source\ThirdParty\VrmSdk\bin\Win64\vrm_validate.exe'
 
 if (-not (Test-Path $Exe)) {
-  Write-Host "vrm_validate.exe not found at $Exe. To install developer tools, run FetchVrmSdk.ps1 in the toolchain repo or set VRM_SDK_ROOT to a local SDK install. Skipping check." -ForegroundColor Yellow
+  Write-Host "vrm_validate.exe not found. Editor validation via CLI is disabled. To enable, install the VRM SDK developer tools and set VRM_SDK_ROOT or place vrm_validate.exe under Source/ThirdParty/VrmSdk/bin/Win64 (developer only). Skipping check." -ForegroundColor Yellow
   exit 0
 }
 

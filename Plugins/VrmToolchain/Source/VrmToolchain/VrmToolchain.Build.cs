@@ -12,6 +12,7 @@ public class VrmToolchain : ModuleRules
         {
             "Core",
             "CoreUObject",
+            "Kismet",
         });
 
         PrivateDependencyModuleNames.AddRange(new string[]
