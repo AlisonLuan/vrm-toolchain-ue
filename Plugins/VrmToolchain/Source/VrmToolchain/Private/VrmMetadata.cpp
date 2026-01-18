@@ -55,12 +55,22 @@ bool FVrmParser::ReadGlbJsonChunkFromMemory(const uint8* Data, int64 DataSize, F
 	int64 Offset = sizeof(FGlbHeader);
 	while (Offset + sizeof(FGlbChunkHeader) <= DataSize)
 	{
+		// Ensure proper alignment for chunk header (GLB chunks should be 4-byte aligned)
+		if (Offset % 4 != 0)
+		{
+			UE_LOG(LogVrmToolchain, Warning, TEXT("Invalid GLB chunk alignment at offset %lld"), Offset);
+			return false;
+		}
+
 		const FGlbChunkHeader* ChunkHeader = reinterpret_cast<const FGlbChunkHeader*>(Data + Offset);
 		Offset += sizeof(FGlbChunkHeader);
 
-		if (Offset + ChunkHeader->Length > DataSize)
+		// Check for integer overflow and bounds
+		uint32 ChunkLength = ChunkHeader->Length;
+		if (ChunkLength > static_cast<uint64>(DataSize) || 
+		    Offset > DataSize - ChunkLength)
 		{
-			UE_LOG(LogVrmToolchain, Warning, TEXT("Invalid GLB chunk: length exceeds file size"));
+			UE_LOG(LogVrmToolchain, Warning, TEXT("Invalid GLB chunk: length (%u) exceeds file size"), ChunkLength);
 			return false;
 		}
 
@@ -68,12 +78,17 @@ bool FVrmParser::ReadGlbJsonChunkFromMemory(const uint8* Data, int64 DataSize, F
 		{
 			// Found JSON chunk
 			const uint8* JsonData = Data + Offset;
-			OutJsonString = FString(ChunkHeader->Length, UTF8_TO_TCHAR(reinterpret_cast<const char*>(JsonData)));
+			OutJsonString = FString(ChunkLength, UTF8_TO_TCHAR(reinterpret_cast<const char*>(JsonData)));
 			return true;
 		}
 
-		// Skip to next chunk
-		Offset += ChunkHeader->Length;
+		// Skip to next chunk - check for overflow before advancing
+		if (Offset > DataSize - ChunkLength)
+		{
+			UE_LOG(LogVrmToolchain, Warning, TEXT("Invalid GLB chunk: would overflow when advancing offset"));
+			return false;
+		}
+		Offset += ChunkLength;
 	}
 
 	UE_LOG(LogVrmToolchain, Warning, TEXT("GLB file does not contain a JSON chunk"));
