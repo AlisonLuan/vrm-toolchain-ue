@@ -22,6 +22,20 @@ Plugins/VrmToolchain/Source/
   - VrmToolchainEditor.Build.cs
 ```
 
+## Distribution contract
+
+To avoid accidental leakage of developer-only tooling and to make packaging deterministic, the plugin package follows this contract:
+
+- The packaged plugin ships:
+  - `Source/ThirdParty/VrmSdk/include/**`
+  - `Source/ThirdParty/VrmSdk/lib/**`
+
+- The packaged plugin does NOT ship:
+  - `Source/ThirdParty/VrmSdk/bin/**` (developer tools & executables)
+  - Any `*.exe` or `*.pdb` (these are stripped and leak-gated by `Scripts/PackagePlugin.ps1` and CI)
+
+Developer tooling (for example, `vrm_validate.exe`) is kept in the repository for contributors, but CI packaging enforces that these binaries are removed from packaged artifacts.
+
 ## Runtime API
 `FVrmSdkFacade` exposes simple helpers:
 ```cpp
