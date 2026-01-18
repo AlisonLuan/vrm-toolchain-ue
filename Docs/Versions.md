@@ -12,6 +12,7 @@ Third-party components and other notable inputs:
 
 Release artifacts:
 - Packaged plugin ZIP (local build): `build/Package/VrmToolchain-v0.1.0-freeze.zip`
+- Release: https://github.com/AlisonLuan/vrm-toolchain-ue/releases/tag/v0.1.0-freeze
 - SHA256: `02CA61D06E0A3F462DEAD4375042EB14C9E61D343FD53E368512E6DF16F5DE10`
 
 Notes:
