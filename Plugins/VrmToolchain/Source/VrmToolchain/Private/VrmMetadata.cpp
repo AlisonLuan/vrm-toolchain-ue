@@ -8,7 +8,7 @@
 static const uint32 GLB_MAGIC = 0x46546C67; // "glTF" in little-endian
 static const uint32 GLB_VERSION_2 = 2;
 static const uint32 GLB_CHUNK_TYPE_JSON = 0x4E4F534A; // "JSON" in little-endian
-static const uint32 GLB_CHUNK_TYPE_BIN = 0x004E4942;  // "BIN\0" in little-endian
+// GLB_CHUNK_TYPE_BIN not used in current implementation (0x004E4942) but defined for completeness
 
 struct FGlbHeader
 {
@@ -65,12 +65,11 @@ bool FVrmParser::ReadGlbJsonChunkFromMemory(const uint8* Data, int64 DataSize, F
 		const FGlbChunkHeader* ChunkHeader = reinterpret_cast<const FGlbChunkHeader*>(Data + Offset);
 		Offset += sizeof(FGlbChunkHeader);
 
-		// Check for integer overflow and bounds
+		// Check for bounds - ensure chunk doesn't exceed file size
 		uint32 ChunkLength = ChunkHeader->Length;
-		if (ChunkLength > static_cast<uint64>(DataSize) || 
-		    Offset > DataSize - ChunkLength)
+		if (ChunkLength > static_cast<uint64>(DataSize) - Offset)
 		{
-			UE_LOG(LogVrmToolchain, Warning, TEXT("Invalid GLB chunk: length (%u) exceeds file size"), ChunkLength);
+			UE_LOG(LogVrmToolchain, Warning, TEXT("Invalid GLB chunk: length (%u) exceeds remaining file size"), ChunkLength);
 			return false;
 		}
 
@@ -82,12 +81,7 @@ bool FVrmParser::ReadGlbJsonChunkFromMemory(const uint8* Data, int64 DataSize, F
 			return true;
 		}
 
-		// Skip to next chunk - check for overflow before advancing
-		if (Offset > DataSize - ChunkLength)
-		{
-			UE_LOG(LogVrmToolchain, Warning, TEXT("Invalid GLB chunk: would overflow when advancing offset"));
-			return false;
-		}
+		// Skip to next chunk
 		Offset += ChunkLength;
 	}
 
