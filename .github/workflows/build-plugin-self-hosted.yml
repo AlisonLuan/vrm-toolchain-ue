@@ -1,41 +1,100 @@
-name: Build VRM Toolchain plugin (self-hosted)
+name: Build plugin (self-hosted)
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
 
+concurrency:
+  group: build-plugin-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-plugin:
-    runs-on: [self-hosted, ue-installed]
-    env:
-      UE_ENGINE_PATH: ${{ secrets.UE_ENGINE_PATH }}
+    runs-on: [self-hosted, windows, ue-5.7]
     steps:
       - uses: actions/checkout@v4
 
       - name: Fetch VRM SDK
         shell: pwsh
-        run: Scripts/FetchVrmSdk.ps1
+        env:
+          VRM_SDK_TOKEN: ${{ secrets.VRM_SDK_TOKEN }}
+        run: .\Scripts\FetchVrmSdk.ps1
 
-      - name: Build plugin with Unreal Automation Tool
-        shell: cmd
-        run: |
-          if not defined UE_ENGINE_PATH (
-            echo UE_ENGINE_PATH environment variable must point to the Unreal Engine root.
-            exit /b 1
-          )
-          call "%UE_ENGINE_PATH%\Engine\Build\BatchFiles\RunUAT.bat" BuildPlugin -Plugin="Plugins/VrmToolchain/VrmToolchain.uplugin" -Package="Build/VrmToolchain" -TargetPlatforms=Win64 -CreateSubFolder
-
-      - name: Package built plugin
+      - name: Verify SDK lib layout (Debug/Release present)
         shell: pwsh
         run: |
-          $artifact = 'build-plugin.zip'
-          if (Test-Path $artifact) { Remove-Item $artifact -Force }
-          Compress-Archive -Path 'Build/VrmToolchain' -DestinationPath $artifact -Force
-          Write-Host "Packaged plugin output to $artifact"
+          $root = Join-Path $PWD 'Plugins\VrmToolchain\Source\ThirdParty\VrmSdk'
+          $req = @(
+            'lib\Win64\Release\vrm_glb_parser.lib',
+            'lib\Win64\Release\vrm_normalizers.lib',
+            'lib\Win64\Release\vrm_validate.lib',
+            'lib\Win64\Debug\vrm_glb_parser.lib',
+            'lib\Win64\Debug\vrm_normalizers.lib',
+            'lib\Win64\Debug\vrm_validate.lib'
+          )
+          foreach ($r in $req) {
+            $p = Join-Path $root $r
+            if (-not (Test-Path $p)) { throw "Missing required SDK file: $p" }
+          }
 
-      - name: Upload packaged plugin
+          # Heuristic: Debug libs should usually be larger than Release.
+          $pairs = @(
+            @{ name = 'vrm_glb_parser.lib'; dbg = 'lib\Win64\Debug\vrm_glb_parser.lib'; rel = 'lib\Win64\Release\vrm_glb_parser.lib' },
+            @{ name = 'vrm_normalizers.lib'; dbg = 'lib\Win64\Debug\vrm_normalizers.lib'; rel = 'lib\Win64\Release\vrm_normalizers.lib' },
+            @{ name = 'vrm_validate.lib'; dbg = 'lib\Win64\Debug\vrm_validate.lib'; rel = 'lib\Win64\Release\vrm_validate.lib' }
+          )
+
+          $mirrored = @()
+          foreach ($p in $pairs) {
+            $dbg = Get-Item (Join-Path $root $p.dbg)
+            $rel = Get-Item (Join-Path $root $p.rel)
+
+            if ($dbg.Length -le $rel.Length) {
+              $mirrored += "$($p.name) (Debug=$($dbg.Length) Release=$($rel.Length))"
+            }
+          }
+
+          # Fail only if *all* look mirrored (strong signal).
+          if ($mirrored.Count -eq $pairs.Count) {
+            throw "All Debug libs are <= Release size; this strongly suggests Release->Debug mirroring: $($mirrored -join '; ')"
+          }
+
+          # Otherwise: warn, but don't fail (keeps CI robust).
+          if ($mirrored.Count -gt 0) {
+            Write-Warning "Some Debug libs are <= Release size (may be acceptable, but review): $($mirrored -join '; ')"
+          }
+
+      - name: Verify vrm_validate contract-smoke
+        shell: pwsh
+        run: .\Scripts\CheckVrmValidate.ps1
+
+      - name: Verify UE_ENGINE_PATH
+        shell: pwsh
+        env:
+          UE_ENGINE_PATH: ${{ secrets.UE_ENGINE_PATH }}
+        run: |
+          if (-not $env:UE_ENGINE_PATH) { throw "UE_ENGINE_PATH secret is not set." }
+          if (-not (Test-Path $env:UE_ENGINE_PATH)) { throw "UE_ENGINE_PATH does not exist: $env:UE_ENGINE_PATH" }
+          Write-Host "UE_ENGINE_PATH OK: $env:UE_ENGINE_PATH"
+
+      - name: Package plugin (BuildPlugin + strip dev exe + leak gate)
+        shell: pwsh
+        env:
+          UE_ENGINE_PATH: ${{ secrets.UE_ENGINE_PATH }}
+        run: .\Scripts\PackagePlugin.ps1 -UE "$env:UE_ENGINE_PATH" -RepoRoot "$PWD" -PluginName "VrmToolchain"
+
+      - name: Zip packaged output
+        shell: pwsh
+        run: |
+          $out = Join-Path $PWD 'build\Package\VrmToolchain'
+          if (-not (Test-Path $out)) { throw "Expected package output not found: $out" }
+          $zip = Join-Path $PWD 'VrmToolchain-Package.zip'
+          if (Test-Path $zip) { Remove-Item $zip -Force }
+          Compress-Archive -Path $out -DestinationPath $zip -Force
+
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: vrm-toolchain-plugin-ue
-          path: build-plugin.zip
+          name: VrmToolchain-Package
+          path: VrmToolchain-Package.zip

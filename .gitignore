@@ -101,3 +101,16 @@ HostProject/Saved/
 
 # If HostProject is only for local testing, ignore its Plugins folder too (junction/symlink)
 HostProject/Plugins/
+
+# Local editor settings
+.vscode/
+
+# Local build outputs
+BuildOutput/
+build/
+
+# Unreal build artifacts
+**/Binaries/
+**/Intermediate/
+**/Saved/
+**/DerivedDataCache/
