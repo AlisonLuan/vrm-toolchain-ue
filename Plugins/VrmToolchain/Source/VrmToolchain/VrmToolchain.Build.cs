@@ -25,7 +25,9 @@ public class VrmToolchain : ModuleRules
 
         PrivateDependencyModuleNames.AddRange(new string[]
         {
-            "Engine"
+            "Engine",
+            "Json",
+            "JsonUtilities"
         });
 
         string sdkRoot = LocateVrmSdkRoot();
