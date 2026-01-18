@@ -104,7 +104,7 @@ jobs:
             throw "Packaged plugin missing SDK include files at $inc"
           }
 
-n          $lib = Join-Path $out 'Source\ThirdParty\VrmSdk\lib'
+          $lib = Join-Path $out 'Source\ThirdParty\VrmSdk\lib'
           $libFiles = Get-ChildItem $lib -Recurse -Filter '*.lib' -File -ErrorAction SilentlyContinue
           if (-not $libFiles) { throw "Packaged plugin missing SDK library files under $lib" }
 
