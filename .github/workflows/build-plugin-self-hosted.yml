@@ -84,18 +84,31 @@ jobs:
           UE_ENGINE_PATH: ${{ secrets.UE_ENGINE_PATH }}
         run: .\Scripts\PackagePlugin.ps1 -UE "$env:UE_ENGINE_PATH" -RepoRoot "$PWD" -PluginName "VrmToolchain"
 
-      - name: Verify packaged output contains no SDK executables
+      - name: Verify packaged output contains no SDK binaries and includes headers/libs
         shell: pwsh
         run: |
           $out = Join-Path $PWD 'build\Package\VrmToolchain'
-          $leaks = Get-ChildItem $out -Recurse -Filter "*.exe" -File -ErrorAction SilentlyContinue |
+          if (-not (Test-Path $out)) { throw "Expected package output not found: $out" }
+
+          # Leak check: no .exe or .pdb under the staged SDK
+          $leaks = Get-ChildItem $out -Recurse -Include "*.exe","*.pdb" -File -ErrorAction SilentlyContinue |
             Where-Object { $_.FullName -like "*\Source\ThirdParty\VrmSdk\*" }
           if ($leaks) {
             $leaks | ForEach-Object { Write-Error "LEAK: $($_.FullName)" }
-            throw "SDK executable leak detected in packaged output."
+            throw "SDK binary leak detected in packaged output."
           }
-          Write-Host "OK: No SDK executables in packaged output."
 
+          # Ensure include and lib are present and non-empty
+          $inc = Join-Path $out 'Source\ThirdParty\VrmSdk\include'
+          if (-not (Test-Path $inc) -or -not (Get-ChildItem $inc -Recurse -File -ErrorAction SilentlyContinue)) {
+            throw "Packaged plugin missing SDK include files at $inc"
+          }
+
+n          $lib = Join-Path $out 'Source\ThirdParty\VrmSdk\lib'
+          $libFiles = Get-ChildItem $lib -Recurse -Filter '*.lib' -File -ErrorAction SilentlyContinue
+          if (-not $libFiles) { throw "Packaged plugin missing SDK library files under $lib" }
+
+          Write-Host "OK: Packaged output audit passed (no SDK binaries; include/lib present)."
       - name: Zip packaged output
         shell: pwsh
         run: |
