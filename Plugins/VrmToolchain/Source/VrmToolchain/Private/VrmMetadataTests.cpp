@@ -285,4 +285,71 @@ bool FVrmParserNoExtensionsTest::RunTest(const FString& Parameters)
 	return true;
 }
 
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmParserNonNullTerminatedJsonTest, "VrmToolchain.VrmParser.NonNullTerminatedJson", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter)
+
+bool FVrmParserNonNullTerminatedJsonTest::RunTest(const FString& Parameters)
+{
+	// Create a GLB with JSON chunk followed immediately by a BIN chunk (no null terminator)
+	TArray<uint8> GlbData;
+
+	// JSON content without null terminator
+	FString JsonContent = TEXT(R"({"asset":{"version":"2.0"},"extensions":{"VRM":{"meta":{"title":"Test"}}}})");
+	FTCHARToUTF8 JsonUtf8(*JsonContent);
+	TArray<uint8> JsonBytes;
+	JsonBytes.Append(reinterpret_cast<const uint8*>(JsonUtf8.Get()), JsonUtf8.Length());
+
+	// Pad JSON chunk to 4-byte alignment
+	while (JsonBytes.Num() % 4 != 0)
+	{
+		JsonBytes.Add(' ');
+	}
+
+	// Create BIN chunk data (dummy binary data)
+	TArray<uint8> BinBytes;
+	for (int32 i = 0; i < 16; ++i)
+	{
+		BinBytes.Add(static_cast<uint8>(i));
+	}
+
+	// GLB constants
+	const uint32 GLB_MAGIC = 0x46546C67; // "glTF"
+	const uint32 GLB_VERSION = 2;
+	const uint32 GLB_CHUNK_TYPE_JSON = 0x4E4F534A; // "JSON"
+	const uint32 GLB_CHUNK_TYPE_BIN = 0x004E4942;  // "BIN\0"
+
+	// Calculate total file length
+	const uint32 HeaderSize = 12;
+	const uint32 ChunkHeaderSize = 8;
+	const uint32 TotalLength = HeaderSize + ChunkHeaderSize + JsonBytes.Num() + ChunkHeaderSize + BinBytes.Num();
+
+	// Write GLB header
+	GlbData.Reserve(TotalLength);
+	GlbData.Append(reinterpret_cast<const uint8*>(&GLB_MAGIC), sizeof(uint32));
+	GlbData.Append(reinterpret_cast<const uint8*>(&GLB_VERSION), sizeof(uint32));
+	GlbData.Append(reinterpret_cast<const uint8*>(&TotalLength), sizeof(uint32));
+
+	// Write JSON chunk header and data
+	uint32 JsonChunkLength = JsonBytes.Num();
+	GlbData.Append(reinterpret_cast<const uint8*>(&JsonChunkLength), sizeof(uint32));
+	GlbData.Append(reinterpret_cast<const uint8*>(&GLB_CHUNK_TYPE_JSON), sizeof(uint32));
+	GlbData.Append(JsonBytes);
+
+	// Write BIN chunk header and data (immediately following JSON)
+	uint32 BinChunkLength = BinBytes.Num();
+	GlbData.Append(reinterpret_cast<const uint8*>(&BinChunkLength), sizeof(uint32));
+	GlbData.Append(reinterpret_cast<const uint8*>(&GLB_CHUNK_TYPE_BIN), sizeof(uint32));
+	GlbData.Append(BinBytes);
+
+	// Test reading JSON chunk from memory
+	FString ExtractedJson;
+	bool bSuccess = FVrmParser::ReadGlbJsonChunkFromMemory(GlbData.GetData(), GlbData.Num(), ExtractedJson);
+
+	TestTrue(TEXT("JSON chunk extraction should succeed with BIN chunk following"), bSuccess);
+	TestTrue(TEXT("Extracted JSON should contain asset version"), ExtractedJson.Contains(TEXT("asset")));
+	TestTrue(TEXT("Extracted JSON should contain VRM extension"), ExtractedJson.Contains(TEXT("VRM")));
+	TestFalse(TEXT("Extracted JSON should not contain binary data from BIN chunk"), ExtractedJson.Contains(TEXT("BIN")));
+
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

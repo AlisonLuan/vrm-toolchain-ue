@@ -53,7 +53,8 @@ bool FVrmParser::ReadGlbJsonChunkFromMemory(const uint8* Data, int64 DataSize, F
 
 	// Read chunks
 	int64 Offset = sizeof(FGlbHeader);
-	while (Offset + sizeof(FGlbChunkHeader) <= DataSize)
+	while (Offset + sizeof(FGlbChunkHeader) <= Header->Length &&
+		   Offset + sizeof(FGlbChunkHeader) <= DataSize)
 	{
 		// Ensure proper alignment for chunk header (GLB chunks should be 4-byte aligned)
 		if (Offset % 4 != 0)
@@ -65,9 +66,9 @@ bool FVrmParser::ReadGlbJsonChunkFromMemory(const uint8* Data, int64 DataSize, F
 		const FGlbChunkHeader* ChunkHeader = reinterpret_cast<const FGlbChunkHeader*>(Data + Offset);
 		Offset += sizeof(FGlbChunkHeader);
 
-		// Check for bounds - ensure chunk doesn't exceed file size
+		// Check for bounds - ensure chunk doesn't exceed file size or declared GLB length
 		uint32 ChunkLength = ChunkHeader->Length;
-		if (Offset > DataSize || ChunkLength > static_cast<uint64>(DataSize) - Offset)
+		if (Offset > DataSize || Offset > Header->Length || ChunkLength > static_cast<uint64>(Header->Length) - Offset)
 		{
 			UE_LOG(LogVrmToolchain, Warning, TEXT("Invalid GLB chunk: length (%u) exceeds remaining file size"), ChunkLength);
 			return false;
@@ -75,13 +76,19 @@ bool FVrmParser::ReadGlbJsonChunkFromMemory(const uint8* Data, int64 DataSize, F
 
 		if (ChunkHeader->Type == GLB_CHUNK_TYPE_JSON)
 		{
-			// Found JSON chunk
+			// Found JSON chunk - use explicit length conversion to handle non-null-terminated strings
 			const uint8* JsonData = Data + Offset;
-			OutJsonString = FString(ChunkLength, UTF8_TO_TCHAR(reinterpret_cast<const char*>(JsonData)));
+			FUTF8ToTCHAR Converter(reinterpret_cast<const ANSICHAR*>(JsonData), ChunkLength);
+			OutJsonString = FString(Converter.Length(), Converter.Get());
 			return true;
 		}
 
-		// Skip to next chunk
+		// Skip to next chunk - check for overflow before advancing
+		if (ChunkLength > static_cast<uint64>(INT64_MAX) - Offset)
+		{
+			UE_LOG(LogVrmToolchain, Warning, TEXT("Invalid GLB chunk: offset overflow for chunk length (%u)"), ChunkLength);
+			return false;
+		}
 		Offset += ChunkLength;
 	}
 
@@ -251,7 +258,7 @@ FVrmMetadata FVrmParser::ExtractVrmMetadata(const FString& FilePath)
 				Metadata.Authors.Add(Author);
 			}
 
-			// Contact Information (as additional author info)
+			// Contact information (stored in the Copyright metadata field)
 			FString ContactInfo;
 			if ((*MetaObject)->TryGetStringField(TEXT("contactInformation"), ContactInfo))
 			{

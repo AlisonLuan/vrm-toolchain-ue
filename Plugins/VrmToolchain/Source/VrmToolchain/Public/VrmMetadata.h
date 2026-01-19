@@ -18,7 +18,7 @@ enum class EVrmVersion : uint8
  * VRM metadata structure containing core metadata fields
  */
 USTRUCT(BlueprintType)
-struct FVrmMetadata
+struct VRMTOOLCHAIN_API FVrmMetadata
 {
 	GENERATED_BODY()
 
