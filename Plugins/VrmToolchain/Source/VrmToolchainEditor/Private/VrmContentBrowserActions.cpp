@@ -155,14 +155,10 @@ bool FVrmContentBrowserActions::GetSourceFilePathFromAsset(const FAssetData& Ass
 	}
 
 	// Ensure it's a valid absolute path
-	if (!FPaths::IsRelative(SourceFilePath))
+	if (FPaths::IsRelative(SourceFilePath))
 	{
+		// Convert relative path to absolute
 		SourceFilePath = FPaths::ConvertRelativePathToFull(SourceFilePath);
-	}
-	else
-	{
-		// If relative, we can't reliably validate it
-		return false;
 	}
 
 	// Validate the file exists and has the right extension
