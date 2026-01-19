@@ -38,7 +38,9 @@ public class VrmToolchainEditor : ModuleRules
         PrivateDependencyModuleNames.AddRange(new string[]
         {
             "LevelEditor",
-            "ToolMenus"
+            "ToolMenus",
+            "AssetRegistry",
+            "EditorSubsystem"
         });
     }
 }
