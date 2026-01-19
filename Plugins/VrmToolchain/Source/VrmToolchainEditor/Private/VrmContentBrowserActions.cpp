@@ -170,7 +170,8 @@ void FVrmContentBrowserActions::ExecuteNormalizeVrm(const TArray<FAssetData>& Se
 
 	// Perform normalization
 	FVrmNormalizationOptions Options;
-	Options.bOverwrite = true; // Will respect settings for prompting
+	// Note: bOverwrite=true allows the service to check settings and handle overwrite policy internally
+	Options.bOverwrite = true;
 
 	FVrmNormalizationResult Result = FVrmNormalizationService::NormalizeVrmFile(SourcePath, Options);
 

@@ -103,7 +103,7 @@ bool FVrmNormalizationService::WriteReportFile(const FString& ReportPath, const 
 // Perform the actual normalization using SDK library
 bool FVrmNormalizationService::PerformNormalization(const FString& InPath, const FString& OutPath, TSharedPtr<FJsonObject>& OutReport, FString& OutErrorMessage)
 {
-	OutReport = MakeShareable(new FJsonObject());
+	OutReport = MakeShared<FJsonObject>();
 	OutErrorMessage.Reset();
 
 	// Read source file
@@ -114,7 +114,12 @@ bool FVrmNormalizationService::PerformNormalization(const FString& InPath, const
 		return false;
 	}
 
-	// TODO(Issue #4): Integrate vrm_normalizers.lib when SDK headers are fully available.
+	// TODO(Issue #4): Integrate vrm_normalizers.lib to perform actual normalization.
+	// Expected integration points:
+	// 1. Parse VRM/GLB using vrm_glb_parser API
+	// 2. Apply normalization rules via vrm_normalizers API
+	// 3. Serialize normalized output back to VRM/GLB format
+	// 4. Populate OutReport with detailed change descriptions
 	// For now, implement a basic stub that copies the file and generates a report.
 	// The stub serves as a working placeholder demonstrating the end-to-end flow.
 	
