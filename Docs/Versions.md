@@ -1,0 +1,20 @@
+# Pinned Build Inputs (freeze/2026-01-18)
+
+This file records the deterministic inputs for the plugin at the time of the freeze.
+
+- Date: 2026-01-18
+- Project commit: 9374449db7bd2db73b30239d334bfc112cdc2f7d (HEAD of default branch at freeze)
+- Unreal Engine: 5.7
+- VRM SDK: repo "AlisonLuan/vrm-sdk" tag `v1.0.3` (see `Scripts/VrmSdkVersion.json`)
+
+Third-party components and other notable inputs:
+- No other binary third-party artifacts are shipped in the package. Refer to `Plugins/VrmToolchain/Config/FilterPlugin.ini` and `Scripts/PackagePlugin.ps1` for packaging rules.
+
+Release artifacts:
+- Packaged plugin ZIP (local build): `build/Package/VrmToolchain-v0.1.0-freeze.zip`
+- Release: https://github.com/AlisonLuan/vrm-toolchain-ue/releases/tag/v0.1.0-freeze
+- SHA256: `02CA61D06E0A3F462DEAD4375042EB14C9E61D343FD53E368512E6DF16F5DE10`
+
+Notes:
+- If release artifacts are used in CI or downstream consumption, add the artifact URL and SHA256 here.
+- Do not redistribute developer-only executables (for example `vrm_validate.exe`).
