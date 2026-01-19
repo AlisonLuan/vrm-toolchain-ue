@@ -87,13 +87,23 @@ bool FVrmContentBrowserActions::CanNormalizeVrm(const TArray<FAssetData>& Select
 
 	const FAssetData& AssetData = SelectedAssets[0];
 
-	// Check if this is a skeletal mesh
+	// Check if this is a skeletal mesh (without loading the asset)
 	if (AssetData.AssetClassPath != USkeletalMesh::StaticClass()->GetClassPathName())
 	{
 		return false;
 	}
 
-	// Check if we can resolve the source file path
+	// Check if import data exists by reading asset registry tags
+	// This avoids loading the full asset and potentially freezing the UI
+	FString ImportDataJson;
+	if (AssetData.GetTagValue(UAssetImportData::SourceFileTagName(), ImportDataJson))
+	{
+		// If import data tag exists, assume we can normalize (detailed validation happens in ExecuteNormalizeVrm)
+		return !ImportDataJson.IsEmpty();
+	}
+
+	// Fall back to full validation if tag is not available
+	// This may load the asset but ensures we don't miss valid meshes
 	FString SourcePath;
 	return GetSourceFilePathFromAsset(AssetData, SourcePath);
 }
@@ -122,15 +132,36 @@ bool FVrmContentBrowserActions::GetSourceFilePathFromAsset(const FAssetData& Ass
 		return false;
 	}
 
-	// Get the first source file path
+	// Get the first source file path (with exception handling for malformed import data)
 	if (ImportData->GetSourceFileCount() == 0)
 	{
 		return false;
 	}
 
-	FString SourceFilePath = ImportData->GetSourceFile(0);
+	FString SourceFilePath;
+	try
+	{
+		SourceFilePath = ImportData->GetSourceFile(0);
+	}
+	catch (...)
+	{
+		UE_LOG(LogVrmToolchainEditor, Warning, TEXT("Exception caught while reading source file from import data"));
+		return false;
+	}
+
 	if (SourceFilePath.IsEmpty())
 	{
+		return false;
+	}
+
+	// Ensure it's a valid absolute path
+	if (!FPaths::IsRelative(SourceFilePath))
+	{
+		SourceFilePath = FPaths::ConvertRelativePathToFull(SourceFilePath);
+	}
+	else
+	{
+		// If relative, we can't reliably validate it
 		return false;
 	}
 
@@ -170,8 +201,7 @@ void FVrmContentBrowserActions::ExecuteNormalizeVrm(const TArray<FAssetData>& Se
 
 	// Perform normalization
 	FVrmNormalizationOptions Options;
-	// Note: bOverwrite=true allows the service to check settings and handle overwrite policy internally
-	Options.bOverwrite = true;
+	Options.bAllowOverwrite = true;
 
 	FVrmNormalizationResult Result = FVrmNormalizationService::NormalizeVrmFile(SourcePath, Options);
 

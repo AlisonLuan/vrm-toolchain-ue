@@ -12,18 +12,18 @@ bool FVrmNormalizationService::ValidateSourceFile(const FString& FilePath, FStri
 {
 	OutErrorMessage.Reset();
 
-	// Check file exists
-	if (!FPaths::FileExists(FilePath))
-	{
-		OutErrorMessage = FString::Printf(TEXT("Source file does not exist: %s"), *FilePath);
-		return false;
-	}
-
-	// Check extension
+	// Check extension first (before file existence check)
 	const FString Extension = FPaths::GetExtension(FilePath, false).ToLower();
 	if (Extension != TEXT("vrm") && Extension != TEXT("glb"))
 	{
 		OutErrorMessage = FString::Printf(TEXT("Unsupported file extension: .%s (expected .vrm or .glb)"), *Extension);
+		return false;
+	}
+
+	// Check file exists
+	if (!FPaths::FileExists(FilePath))
+	{
+		OutErrorMessage = FString::Printf(TEXT("Source file does not exist: %s"), *FilePath);
 		return false;
 	}
 
@@ -122,6 +122,8 @@ bool FVrmNormalizationService::PerformNormalization(const FString& InPath, const
 	// 4. Populate OutReport with detailed change descriptions
 	// For now, implement a basic stub that copies the file and generates a report.
 	// The stub serves as a working placeholder demonstrating the end-to-end flow.
+	// NOTE: This stub loads the entire file into memory, which is acceptable for the placeholder.
+	// The actual SDK integration will handle large files more efficiently.
 	
 	// Ensure output directory exists
 	const FString OutDir = FPaths::GetPath(OutPath);
@@ -188,13 +190,23 @@ FVrmNormalizationResult FVrmNormalizationService::NormalizeVrmFile(const FString
 	}
 
 	// Check if output already exists and handle overwrite policy
-	if (FPaths::FileExists(OutputPath) && !Options.bOverwrite)
+	if (FPaths::FileExists(OutputPath))
 	{
+		// Only allow overwrite if explicitly enabled via options AND settings permit it
+		if (!Options.bAllowOverwrite)
+		{
+			Result.bSuccess = false;
+			Result.ErrorMessage = FString::Printf(TEXT("Output file already exists: %s (overwrite not allowed by options)"), *OutputPath);
+			UE_LOG(LogVrmToolchainEditor, Warning, TEXT("VRM normalization skipped: %s"), *Result.ErrorMessage);
+			return Result;
+		}
+
+		// Check settings to see if user has enabled overwriting
 		const UVrmNormalizationSettings* Settings = GetDefault<UVrmNormalizationSettings>();
 		if (!Settings || !Settings->bOverwriteWithoutPrompt)
 		{
 			Result.bSuccess = false;
-			Result.ErrorMessage = FString::Printf(TEXT("Output file already exists: %s (overwrite not allowed)"), *OutputPath);
+			Result.ErrorMessage = FString::Printf(TEXT("Output file already exists: %s (enable 'Overwrite Without Prompt' in settings to allow)"), *OutputPath);
 			UE_LOG(LogVrmToolchainEditor, Warning, TEXT("VRM normalization skipped: %s"), *Result.ErrorMessage);
 			return Result;
 		}

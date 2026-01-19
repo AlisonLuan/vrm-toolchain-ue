@@ -6,6 +6,9 @@
 #if WITH_DEV_AUTOMATION_TESTS
 
 // Test that BuildOutputPaths generates deterministic paths
+// NOTE: This test modifies global settings via GetMutableDefault. While settings are restored
+// at the end, a test failure before restoration would leave settings in a modified state.
+// This is acceptable for unit tests as the editor process will reset on next launch.
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmNormalizationPathBuilderTest, "VrmToolchain.Normalization.PathBuilder",
 	EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 
@@ -117,12 +120,12 @@ bool FVrmNormalizationValidateSourceFileTest::RunTest(const FString& Parameters)
 		TestTrue(TEXT("Error message should mention file doesn't exist"), ErrorMessage.Contains(TEXT("does not exist")));
 	}
 
-	// Test 3: Unsupported extension
+	// Test 3: Unsupported extension (checked before file existence)
 	{
 		const FString Path = TEXT("Test.fbx");
 		const bool bValid = FVrmNormalizationService::ValidateSourceFile(Path, ErrorMessage);
 		TestFalse(TEXT("Should reject unsupported extension"), bValid);
-		TestTrue(TEXT("Error message should mention unsupported extension"), ErrorMessage.Contains(TEXT("Unsupported")) || ErrorMessage.Contains(TEXT("does not exist")));
+		TestTrue(TEXT("Error message should mention unsupported extension"), ErrorMessage.Contains(TEXT("Unsupported")));
 	}
 
 	// Test 4: No extension

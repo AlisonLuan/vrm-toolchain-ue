@@ -34,8 +34,13 @@ struct FVrmNormalizationOptions
 	/** Where to write the report file (if empty, auto-determined) */
 	FString ReportPath;
 
-	/** Whether to overwrite existing files */
-	bool bOverwrite = false;
+	/** 
+	 * Whether to allow overwriting existing files.
+	 * When true, respects the bOverwriteWithoutPrompt setting.
+	 * When false, never overwrites existing files.
+	 */
+	bool bAllowOverwrite = false;
+};
 };
 
 /**

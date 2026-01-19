@@ -2,7 +2,7 @@
 
 UVrmNormalizationSettings::UVrmNormalizationSettings()
 	: OutputLocation(EVrmNormalizationOutputLocation::NextToSource)
-	, bOverwriteWithoutPrompt(false)
+	, bOverwriteWithoutPrompt(true)
 	, NormalizedSuffix(TEXT(".normalized"))
 {
 }
