@@ -15,6 +15,7 @@ public class VrmToolchain : ModuleRules
         {
             "Core",
             "CoreUObject",
+            "VRM4U"
         });
 
         // Kismet provides BlueprintFunctionLibrary support; only link it for editor builds to avoid requiring editor-only modules
@@ -30,36 +31,47 @@ public class VrmToolchain : ModuleRules
             "JsonUtilities"
         });
 
-        string sdkRoot = LocateVrmSdkRoot();
+string sdkRoot = LocateVrmSdkRoot();
+        
+        // 1. Fixed Include Path (Matches your C:\VRM_SDK\include)
         string includePath = Path.Combine(sdkRoot, "include");
         if (!Directory.Exists(includePath))
         {
             throw new BuildException($"VRM SDK include directory '{includePath}' does not exist.");
         }
-
         PublicSystemIncludePaths.Add(includePath);
 
-        string libsRoot = Path.Combine(sdkRoot, "lib", "Win64");
-        string configurationDir = Target.Configuration == UnrealTargetConfiguration.Debug ||
-                                  Target.Configuration == UnrealTargetConfiguration.DebugGame
-            ? "Debug"
-            : "Release";
+        // 2. Updated Library Path (Removed "Win64" and handled the flat structure)
+        string libsRoot = Path.Combine(sdkRoot, "lib");
 
-        string configurationLibPath = Path.Combine(libsRoot, configurationDir);
-        if (!Directory.Exists(configurationLibPath))
+        // Determine if we use the root lib folder (for Release) or the Debug subfolder
+        string configurationLibPath;
+        if (Target.Configuration == UnrealTargetConfiguration.Debug || 
+            Target.Configuration == UnrealTargetConfiguration.DebugGame)
         {
-            throw new BuildException($"Could not find VRM SDK libraries for {configurationDir} at '{configurationLibPath}'.");
+            configurationLibPath = Path.Combine(libsRoot, "Debug");
+        }
+        else
+        {
+            // Your 'dir' showed release libs are directly in \lib\
+            configurationLibPath = libsRoot; 
         }
 
-        // Only link the expected VRM SDK libraries; do not reference vrm_avatar_model.lib.
+        if (!Directory.Exists(configurationLibPath))
+        {
+            throw new BuildException($"Could not find VRM SDK libraries at '{configurationLibPath}'.");
+        }
+
+        // Only link the expected VRM SDK libraries.
         string[] requiredLibs = new[] { "vrm_glb_parser.lib", "vrm_normalizers.lib", "vrm_validate.lib" };
         var missing = new System.Collections.Generic.List<string>();
+
         foreach (var lib in requiredLibs)
         {
             var libPath = Path.Combine(configurationLibPath, lib);
             if (!File.Exists(libPath))
             {
-                missing.Add(lib);
+                missing.Add(libPath); // Changed to show the full path if missing
             }
             else
             {
@@ -69,7 +81,8 @@ public class VrmToolchain : ModuleRules
 
         if (missing.Count > 0)
         {
-            throw new BuildException($"Missing required libraries in VRM SDK {configurationDir} folder: {string.Join(", ", missing)}");
+            // Changed "configurationDir" to "configurationLibPath" to fix the CS0103 error
+            throw new BuildException($"Missing required libraries in VRM SDK folder '{configurationLibPath}': {string.Join(", ", missing)}");
         }
     }
 

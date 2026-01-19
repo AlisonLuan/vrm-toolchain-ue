@@ -5,9 +5,9 @@
 #include "Dom/JsonObject.h"
 
 // GLB file format constants
-static const uint32 GLB_MAGIC = 0x46546C67; // "glTF" in little-endian
+static const uint32 Test_GLB_MAGIC = 0x46546C67; // "glTF" in little-endian
 static const uint32 GLB_VERSION_2 = 2;
-static const uint32 GLB_CHUNK_TYPE_JSON = 0x4E4F534A; // "JSON" in little-endian
+static const uint32 Test_GLB_CHUNK_TYPE_JSON = 0x4E4F534A; // "JSON" in little-endian
 // GLB_CHUNK_TYPE_BIN not used in current implementation (0x004E4942) but defined for completeness
 
 struct FGlbHeader
@@ -33,7 +33,7 @@ bool FVrmParser::ReadGlbJsonChunkFromMemory(const uint8* Data, int64 DataSize, F
 
 	// Read and validate GLB header
 	const FGlbHeader* Header = reinterpret_cast<const FGlbHeader*>(Data);
-	if (Header->Magic != GLB_MAGIC)
+	if (Header->Magic != Test_GLB_MAGIC)
 	{
 		UE_LOG(LogVrmToolchain, Warning, TEXT("Invalid GLB file: incorrect magic number"));
 		return false;
@@ -54,7 +54,7 @@ bool FVrmParser::ReadGlbJsonChunkFromMemory(const uint8* Data, int64 DataSize, F
 	// Read chunks
 	int64 Offset = sizeof(FGlbHeader);
 	while (Offset + sizeof(FGlbChunkHeader) <= Header->Length &&
-		   Offset + sizeof(FGlbChunkHeader) <= DataSize)
+		(uint32)(Offset + sizeof(FGlbChunkHeader)) <= (uint32)DataSize)
 	{
 		// Ensure proper alignment for chunk header (GLB chunks should be 4-byte aligned)
 		if (Offset % 4 != 0)
@@ -74,7 +74,7 @@ bool FVrmParser::ReadGlbJsonChunkFromMemory(const uint8* Data, int64 DataSize, F
 			return false;
 		}
 
-		if (ChunkHeader->Type == GLB_CHUNK_TYPE_JSON)
+		if (ChunkHeader->Type == Test_GLB_CHUNK_TYPE_JSON)
 		{
 			// Found JSON chunk - use explicit length conversion to handle non-null-terminated strings
 			const uint8* JsonData = Data + Offset;

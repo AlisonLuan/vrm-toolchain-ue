@@ -54,7 +54,7 @@ static TArray<uint8> CreateSyntheticGlb(const FString& JsonContent)
 	return GlbData;
 }
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmParserJsonChunkTest, "VrmToolchain.VrmParser.ReadJsonChunk", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmParserJsonChunkTest, "VrmToolchain.VrmParser.ReadJsonChunk", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 
 bool FVrmParserJsonChunkTest::RunTest(const FString& Parameters)
 {
@@ -72,7 +72,7 @@ bool FVrmParserJsonChunkTest::RunTest(const FString& Parameters)
 	return true;
 }
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmParserVrm0DetectionTest, "VrmToolchain.VrmParser.DetectVRM0", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmParserVrm0DetectionTest, "VrmToolchain.VrmParser.DetectVRM0", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 
 bool FVrmParserVrm0DetectionTest::RunTest(const FString& Parameters)
 {
@@ -114,7 +114,7 @@ bool FVrmParserVrm0DetectionTest::RunTest(const FString& Parameters)
 	return true;
 }
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmParserVrm1DetectionTest, "VrmToolchain.VrmParser.DetectVRM1", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmParserVrm1DetectionTest, "VrmToolchain.VrmParser.DetectVRM1", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 
 bool FVrmParserVrm1DetectionTest::RunTest(const FString& Parameters)
 {
@@ -148,7 +148,7 @@ bool FVrmParserVrm1DetectionTest::RunTest(const FString& Parameters)
 	return true;
 }
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmParserMetadataVrm0Test, "VrmToolchain.VrmParser.ExtractMetadata.VRM0", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmParserMetadataVrm0Test, "VrmToolchain.VrmParser.ExtractMetadata.VRM0", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 
 bool FVrmParserMetadataVrm0Test::RunTest(const FString& Parameters)
 {
@@ -194,7 +194,7 @@ bool FVrmParserMetadataVrm0Test::RunTest(const FString& Parameters)
 	return true;
 }
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmParserMetadataVrm1Test, "VrmToolchain.VrmParser.ExtractMetadata.VRM1", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmParserMetadataVrm1Test, "VrmToolchain.VrmParser.ExtractMetadata.VRM1", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 
 bool FVrmParserMetadataVrm1Test::RunTest(const FString& Parameters)
 {
@@ -242,7 +242,7 @@ bool FVrmParserMetadataVrm1Test::RunTest(const FString& Parameters)
 	return true;
 }
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmParserInvalidGlbTest, "VrmToolchain.VrmParser.InvalidGLB", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmParserInvalidGlbTest, "VrmToolchain.VrmParser.InvalidGLB", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 
 bool FVrmParserInvalidGlbTest::RunTest(const FString& Parameters)
 {
@@ -260,7 +260,7 @@ bool FVrmParserInvalidGlbTest::RunTest(const FString& Parameters)
 	return true;
 }
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmParserNoExtensionsTest, "VrmToolchain.VrmParser.NoExtensions", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmParserNoExtensionsTest, "VrmToolchain.VrmParser.NoExtensions", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 
 bool FVrmParserNoExtensionsTest::RunTest(const FString& Parameters)
 {
@@ -285,7 +285,7 @@ bool FVrmParserNoExtensionsTest::RunTest(const FString& Parameters)
 	return true;
 }
 
-IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmParserNonNullTerminatedJsonTest, "VrmToolchain.VrmParser.NonNullTerminatedJson", EAutomationTestFlags::ApplicationContextMask | EAutomationTestFlags::ProductFilter)
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmParserNonNullTerminatedJsonTest, "VrmToolchain.VrmParser.NonNullTerminatedJson", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 
 bool FVrmParserNonNullTerminatedJsonTest::RunTest(const FString& Parameters)
 {
