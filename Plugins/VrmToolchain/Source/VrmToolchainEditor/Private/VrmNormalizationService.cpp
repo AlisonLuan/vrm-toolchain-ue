@@ -114,8 +114,9 @@ bool FVrmNormalizationService::PerformNormalization(const FString& InPath, const
 		return false;
 	}
 
-	// TODO: Call vrm_normalizers.lib when SDK headers are available
-	// For now, implement a basic stub that copies the file and generates a report
+	// TODO(Issue #4): Integrate vrm_normalizers.lib when SDK headers are fully available.
+	// For now, implement a basic stub that copies the file and generates a report.
+	// The stub serves as a working placeholder demonstrating the end-to-end flow.
 	
 	// Ensure output directory exists
 	const FString OutDir = FPaths::GetPath(OutPath);

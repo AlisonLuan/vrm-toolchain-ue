@@ -1,4 +1,4 @@
-﻿#include "VrmToolchainEditor.h"
+#include "VrmToolchainEditor.h"
 #include "VrmContentBrowserActions.h"
 #include "Misc/Paths.h"
 #include "Interfaces/IPluginManager.h"

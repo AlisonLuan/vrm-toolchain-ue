@@ -31,9 +31,10 @@ void FVrmContentBrowserActions::UnregisterMenuExtensions()
 		if (ContentBrowserModule)
 		{
 			TArray<FContentBrowserMenuExtender_SelectedAssets>& CBMenuExtenderDelegates = ContentBrowserModule->GetAllAssetViewContextMenuExtenders();
-			CBMenuExtenderDelegates.RemoveAll([](const FContentBrowserMenuExtender_SelectedAssets& Delegate)
+			FDelegateHandle HandleToRemove = ContentBrowserExtenderHandle;
+			CBMenuExtenderDelegates.RemoveAll([HandleToRemove](const FContentBrowserMenuExtender_SelectedAssets& Delegate)
 			{
-				return Delegate.GetHandle() == ContentBrowserExtenderHandle;
+				return Delegate.GetHandle() == HandleToRemove;
 			});
 		}
 
