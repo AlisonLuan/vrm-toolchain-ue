@@ -15,7 +15,6 @@ public class VrmToolchain : ModuleRules
         {
             "Core",
             "CoreUObject",
-            "VRM4U"
         });
 
         // Kismet provides BlueprintFunctionLibrary support; only link it for editor builds to avoid requiring editor-only modules

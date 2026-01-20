@@ -2,6 +2,9 @@
 #include "Misc/AutomationTest.h"
 #include "Serialization/JsonSerializer.h"
 #include "Dom/JsonObject.h"
+#include "Misc/Paths.h"
+#include "Misc/FileHelper.h"
+#include "HAL/FileManager.h"
 
 #if WITH_DEV_AUTOMATION_TESTS
 
