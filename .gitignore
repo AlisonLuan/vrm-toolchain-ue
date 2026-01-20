@@ -114,3 +114,8 @@ build/
 **/Intermediate/
 **/Saved/
 **/DerivedDataCache/
+
+# Local release artifacts
+/releases/
+*.zip
+
