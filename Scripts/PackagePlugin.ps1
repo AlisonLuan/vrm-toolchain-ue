@@ -51,3 +51,13 @@ if ($finalCheck) {
 }
 
 Write-Host "OK: Package is fully sanitized (No .exe or .pdb found)." -ForegroundColor Green
+
+# Add this to the end of PackagePlugin.ps1
+Write-Host "Auditing build for forbidden binaries..."
+$Forbidden = Get-ChildItem $PackagePath -Recurse -File | Where-Object { $_.Name -match '\.(exe|pdb)$' }
+if ($Forbidden) {
+    Write-Warning "Found forbidden files in package!"
+    $Forbidden.FullName
+} else {
+    Write-Host "Audit passed: No .exe or .pdb files found." -ForegroundColor Green
+}
