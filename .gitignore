@@ -119,3 +119,6 @@ build/
 /releases/
 *.zip
 
+build_log.txt
+_codeql_detected_source_root
+
