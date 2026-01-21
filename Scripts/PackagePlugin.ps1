@@ -29,11 +29,11 @@ $exeFiles = Get-ChildItem $OutPkg -Recurse -Include "*.exe" -File -ErrorAction S
 $pdbFiles = Get-ChildItem $OutPkg -Recurse -Include "*.pdb" -File -ErrorAction SilentlyContinue
 
 foreach ($file in @($exeFiles + $pdbFiles)) {
-    Remove-Item -Force $file.FullName
+    Remove-Item -Force $file.FullName -ErrorAction Continue
     Write-Host "  Removed: $($file.Name)" -ForegroundColor Gray
 }
 
-# Delete temporary build folders
+# Delete temporary build folders (if they are not locked)
 $tempDirs = @(
     (Join-Path $OutPkg "Intermediate"),
     (Join-Path $OutPkg "Saved")
@@ -41,8 +41,12 @@ $tempDirs = @(
 
 foreach ($dir in $tempDirs) {
     if (Test-Path $dir) {
-        Remove-Item -Recurse -Force $dir
-        Write-Host "  Removed dir: $(Split-Path -Leaf $dir)" -ForegroundColor Gray
+        try {
+            Remove-Item -Recurse -Force $dir
+            Write-Host "  Removed dir: $(Split-Path -Leaf $dir)" -ForegroundColor Gray
+        } catch {
+            Write-Host "  Warning: Could not remove $dir (may be in use): $($_.Exception.Message)" -ForegroundColor Yellow
+        }
     }
 }
 
