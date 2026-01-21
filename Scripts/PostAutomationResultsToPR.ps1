@@ -39,7 +39,10 @@ $failing = @()
 if ($report.Results -ne $null) {
     foreach ($r in $report.Results) {
         $state = $null
-        if ($r.Passed -ne $null) { $state = ($r.Passed -eq $true) ? 'Passed' : 'Fail' }
+        if ($r.Passed -ne $null) { 
+            if ($r.Passed -eq $true) { $state = 'Passed' } 
+            else { $state = 'Fail' } 
+        }
         if (-not $state) { $state = $r.State -or $r.Status -or $r.Result -or '' }
         if ($state -match 'Fail|Failed|Error') {
             $entry = [pscustomobject]@{
@@ -63,6 +66,7 @@ if ($report.Summary -ne $null -and $report.Summary.Failed -ne $null) {
 # Prepare run URL for linking back to the workflow run
 $runUrl = $null
 if ($env:GITHUB_RUN_ID) {
+    $repo = $env:GITHUB_REPOSITORY
     if ($env:GITHUB_SERVER_URL) { $runUrl = "$($env:GITHUB_SERVER_URL)/$repo/actions/runs/$($env:GITHUB_RUN_ID)" }
     else { $runUrl = "https://github.com/$repo/actions/runs/$($env:GITHUB_RUN_ID)" }
 }
@@ -86,7 +90,7 @@ if ($failedCount -eq 0) {
         $state = ($row.State -replace '\|','\|')
         $msg = ($row.Message -replace '\r?\n',' ' )
         if ($msg.Length -gt 400) { $msg = $msg.Substring(0,400) + '...' }
-        $md += "| `$test` | `$state` | `$msg` |`n"
+        $md += "| $test | $state | $msg |`n"
     }
 
     if ($failing.Count -gt $rows.Count) {
