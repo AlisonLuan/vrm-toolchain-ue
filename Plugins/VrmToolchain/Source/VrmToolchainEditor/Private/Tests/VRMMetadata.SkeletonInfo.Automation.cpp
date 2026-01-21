@@ -36,7 +36,7 @@ bool FVrmSkeletonInfoTest::RunTest(const FString& Parameters)
     TestNotNull(TEXT("Transient mesh created"), TestMesh);
 
     FVrmMetadata InitialMetadata;
-    InitialMetadata.Title = TEXT("SkeletonTest");
+    InitialMetadata.Name = TEXT("SkeletonTest");
 
     UVrmMetadataAsset* Asset1 = FVrmSdkFacadeEditor::UpsertVrmMetadata(TestMesh, InitialMetadata);
     TestNotNull(TEXT("Metadata created on first upsert"), Asset1);
@@ -46,7 +46,7 @@ bool FVrmSkeletonInfoTest::RunTest(const FString& Parameters)
 
     // Second upsert
     FVrmMetadata Updated;
-    Updated.Title = TEXT("SkeletonTestUpdated");
+    Updated.Name = TEXT("SkeletonTestUpdated");
     UVrmMetadataAsset* Asset2 = FVrmSdkFacadeEditor::UpsertVrmMetadata(TestMesh, Updated);
     TestNotNull(TEXT("Metadata returned on second upsert"), Asset2);
 
