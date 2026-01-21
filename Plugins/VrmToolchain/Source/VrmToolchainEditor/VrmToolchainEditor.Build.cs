@@ -39,8 +39,12 @@ public class VrmToolchainEditor : ModuleRules
         {
             "LevelEditor",
             "ToolMenus",
+            "ContentBrowser",
+            "AssetTools",
             "AssetRegistry",
-            "EditorSubsystem"
+            "EditorSubsystem",
+            "IKRig",
+            "IKRigEditor"
         });
     }
 }
