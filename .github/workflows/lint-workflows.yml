@@ -15,10 +15,23 @@ jobs:
       - name: Forbid -AllowBinaries in workflows
         shell: pwsh
         run: |
-          $hits = Select-String -Path ".github/workflows/*.yml" -Pattern "-AllowBinaries" -SimpleMatch -CaseSensitive:$false -ErrorAction SilentlyContinue |
-            Where-Object { $_.Line -notmatch '^\s*#' -and $_.Line -match 'PackagePlugin\.ps1' }
-          if ($hits) {
-            $hits | ForEach-Object { Write-Error $_.Line }
-            throw "CI must never call PackagePlugin.ps1 with -AllowBinaries (policy: no binaries in distributed plugin)."
+          # Fail if PackagePlugin.ps1 is called with -AllowBinaries (violates CI policy)
+          $violations = @()
+          foreach ($file in Get-ChildItem ".github/workflows/*.yml") {
+            $lines = @(Get-Content $file -Encoding UTF8)
+            $inRunBlock = $false
+            for ($i = 0; $i -lt $lines.Count; $i++) {
+              $line = $lines[$i]
+              if ($line -match '^\s+run:\s*[\|\>]') { $inRunBlock = $true }
+              if ($inRunBlock -and $line -match '^\s+- ') { $inRunBlock = $false }
+              # Only flag actual script invocation lines that call PackagePlugin.ps1 with -AllowBinaries
+              if ($inRunBlock -and $line -match '^\s+\.\\\Scripts\\PackagePlugin\.ps1.*-AllowBinaries') {
+                $violations += "$($file.Name):$($i+1)"
+              }
+            }
           }
-          Write-Host "OK: no -AllowBinaries usage in workflows."
+          if ($violations) {
+            $violations | ForEach-Object { Write-Error "Forbidden: $_" }
+            throw "CI forbids PackagePlugin.ps1 with -AllowBinaries"
+          }
+          Write-Host "OK: Workflows do not call PackagePlugin.ps1 with -AllowBinaries"
