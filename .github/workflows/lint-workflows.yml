@@ -15,7 +15,8 @@ jobs:
       - name: Forbid -AllowBinaries in workflows
         shell: pwsh
         run: |
-          $hits = Select-String -Path ".github/workflows/*.yml" -Pattern "-AllowBinaries" -SimpleMatch -CaseSensitive:$false -ErrorAction SilentlyContinue
+          $hits = Select-String -Path ".github/workflows/*.yml" -Pattern "-AllowBinaries" -SimpleMatch -CaseSensitive:$false -ErrorAction SilentlyContinue |
+            Where-Object { $_.Line -notmatch '^\s*#' -and $_.Line -match 'PackagePlugin\.ps1' }
           if ($hits) {
             $hits | ForEach-Object { Write-Error $_.Line }
             throw "CI must never call PackagePlugin.ps1 with -AllowBinaries (policy: no binaries in distributed plugin)."
