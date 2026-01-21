@@ -4,7 +4,7 @@
 #include "Engine/SkeletalMesh.h"
 #include "VrmSdkFacadeEditor.h"
 #include "VrmToolchain/VrmMetadataAsset.h"
-#include "VrmToolchain/Public/VrmMetadata.h"
+#include "VrmToolchain/VrmMetadata.h"
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmMetadataUpsertTest, "VrmToolchain.Metadata.UpsertIdempotency", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 
