@@ -37,13 +37,21 @@ public class VrmToolchain : ModuleRules
 
         PublicSystemIncludePaths.Add(includePath);
 
-        string libsRoot = Path.Combine(sdkRoot, "lib", "Win64");
-        string configurationDir = Target.Configuration == UnrealTargetConfiguration.Debug ||
-                                  Target.Configuration == UnrealTargetConfiguration.DebugGame
+        // 1. Define the configuration string FIRST
+        string configurationDir = (Target.Configuration == UnrealTargetConfiguration.Debug ||
+                                  Target.Configuration == UnrealTargetConfiguration.DebugGame)
             ? "Debug"
             : "Release";
 
-        string configurationLibPath = Path.Combine(libsRoot, configurationDir);
+        // 2. Point to the base lib folder
+        string libsRoot = Path.Combine(sdkRoot, "lib");
+
+        // 3. Match your specific folder structure: 
+        // Debug libs are in \lib\Debug, Release libs are directly in \lib\
+        string configurationLibPath = (configurationDir == "Debug") 
+            ? Path.Combine(libsRoot, "Debug") 
+            : libsRoot;
+
         if (!Directory.Exists(configurationLibPath))
         {
             throw new BuildException($"Could not find VRM SDK libraries for {configurationDir} at '{configurationLibPath}'.");
