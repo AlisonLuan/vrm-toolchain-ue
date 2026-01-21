@@ -16,7 +16,7 @@ Warning: Plugin 'VrmToolchain' does not list plugin 'IKRig' as a dependency, but
 UHT compiled-in object format Default
 Parsing headers for UnrealEditor
   Running Internal UnrealHeaderTool C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\HostProject.uproject C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Intermediate\Build\Win64\UnrealEditor\Development\UnrealEditor.uhtmanifest -WarningsAsErrors -installed
-UHT processed UnrealEditor in 2.0173063 seconds (12 files written)
+UHT processed UnrealEditor in 2.0758683 seconds (12 files written)
 Writing manifest to C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Saved\Manifest-UnrealEditor-Win64-Development.xml
 Building UnrealEditor...
 Using Visual Studio 2022 14.44.35222 toolchain (C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207) and Windows 10.0.22621.0 SDK (C:\Program Files (x86)\Windows Kits\10).
@@ -60,10 +60,10 @@ Using Visual Studio 2022 14.44.35222 toolchain (C:\Program Files\Microsoft Visua
 [Adaptive Build] Excluded from CaptureProtocolStack unity file: CaptureProtocolStack.cpp, ControlMessenger.cpp, ControlCommunication.cpp, ControlPacket.cpp, Constants.cpp, ControlJsonUtilities.cpp, ControlMessage.cpp, ControlRequest.cpp, ControlResponse.cpp, ControlUpdate.cpp, DiscoveryMessenger.cpp, DiscoveryCommunication.cpp, DiscoveryPacket.cpp, DiscoveryNotify.cpp, DiscoveryRequest.cpp, DiscoveryResponse.cpp, ExportClient.cpp, ExportWorker.cpp, ExportCommunication.cpp, ExportHeader.cpp, ExportRequest.cpp, ExportResponse.cpp, TestControlJsonUtilities.cpp, TestControlMessage.cpp, TestControlPacket.cpp, TestControlRequest.cpp, TestControlResponse.cpp, TestControlUpdate.cpp, TestDiscoveryNotify.cpp, TestDiscoveryPacket.cpp, TestDiscoveryRequest.cpp, TestDiscoveryResponse.cpp, TestExportHeader.cpp, TestExportRequest.cpp, TestExportResponse.cpp
 Determining max actions to execute in parallel (20 physical cores, 28 logical cores)
   Executing up to 20 processes, one per physical core
-  Requested 1.5 GB memory per action, 11.76 GB available: limiting max parallel actions to 7
+  Requested 1.5 GB memory per action, 8.26 GB available: limiting max parallel actions to 5
 Using Unreal Build Accelerator local executor to run 27 action(s)
   Storage capacity 40Gb
----- Starting trace: 260121_183012 ----
+---- Starting trace: 260121_183136 ----
 UbaServer - Listening on 0.0.0.0:1345
 [1/27] Resource Default.rc2
 [2/27] Resource Default.rc2
@@ -96,8 +96,50 @@ C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostPro
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Private\VrmSdkFacadeHelpers.cpp(63,37): error C2065: "Metadata": nichtdeklarierter Bezeichner
             NewMetadata->Metadata = Metadata;
                                     ^
-[5/27] Compile [x64] Module.VrmToolchainEditor.cpp
-[6/27] Compile [x64] VRMMetadata.SkeletonInfo.Automation.cpp
+[5/27] Compile [x64] Module.VrmToolchain.cpp
+[6/27] Compile [x64] VrmToolchainBPLibrary.cpp
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(21,61): error C2061: Syntaxfehler: Bezeichner "FVrmMetadata"
+    static bool ExtractVrmMetadata(const FString& FilePath, FVrmMetadata& OutMetadata)
+                                                            ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(24,72): error C4430: Fehlender Typspezifizierer - int wird angenommen. Hinweis: "default-int" wird von C++ nicht unterstützt.
+    static class UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata)
+                                                                       ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(24,90): error C2143: Syntaxfehler: Es fehlt "," vor "&"
+    static class UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata)
+                                                                                         ^
+[7/27] Compile [x64] Module.VrmToolchainEditor.cpp
+[8/27] Compile [x64] VrmToolchain.cpp
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(21,61): error C2061: Syntaxfehler: Bezeichner "FVrmMetadata"
+    static bool ExtractVrmMetadata(const FString& FilePath, FVrmMetadata& OutMetadata)
+                                                            ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(24,72): error C4430: Fehlender Typspezifizierer - int wird angenommen. Hinweis: "default-int" wird von C++ nicht unterstützt.
+    static class UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata)
+                                                                       ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(24,90): error C2143: Syntaxfehler: Es fehlt "," vor "&"
+    static class UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata)
+                                                                                         ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Private\VrmToolchain.cpp(104,65): error C2061: Syntaxfehler: Bezeichner "FVrmMetadata"
+bool FVrmSdkFacade::ExtractVrmMetadata(const FString& FilePath, FVrmMetadata& OutMetadata
+                                                                ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Private\VrmToolchain.cpp(124,9): error C2065: "OutMetadata": nichtdeklarierter Bezeichner
+        OutMetadata.Title = TEXT("VRM Model")
+        ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Private\VrmToolchain.cpp(125,9): error C2065: "OutMetadata": nichtdeklarierter Bezeichner
+        OutMetadata.Version = TEXT("1.0")
+        ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Private\VrmToolchain.cpp(126,9): error C2065: "OutMetadata": nichtdeklarierter Bezeichner
+        OutMetadata.Author = TEXT("Unknown")
+        ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Private\VrmToolchain.cpp(127,9): error C2065: "OutMetadata": nichtdeklarierter Bezeichner
+        OutMetadata.ContactInformation = TEXT("")
+        ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Private\VrmToolchain.cpp(128,9): error C2065: "OutMetadata": nichtdeklarierter Bezeichner
+        OutMetadata.Reference = TEXT("")
+        ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Private\VrmToolchain.cpp(129,9): error C2065: "OutMetadata": nichtdeklarierter Bezeichner
+        OutMetadata.LicenseName = TEXT("")
+        ^
+[9/27] Compile [x64] VRMMetadata.SkeletonInfo.Automation.cpp
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(21,61): error C2061: Syntaxfehler: Bezeichner "FVrmMetadata"
     static bool ExtractVrmMetadata(const FString& FilePath, FVrmMetadata& OutMetadata)
                                                             ^
@@ -133,7 +175,9 @@ C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostPro
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.SkeletonInfo.Automation.cpp(49,76): error C2065: "Updated": nichtdeklarierter Bezeichner
     UVrmMetadataAsset* Asset2 = FVrmSdkFacade::UpsertVrmMetadata(TestMesh, Updated);
                                                                            ^
-[7/27] Compile [x64] VRMMetadata.Upsert.Automation.cpp
+[10/27] Compile [x64] VrmMetadataTests.cpp
+[11/27] Compile [x64] VrmMetadata.cpp
+[12/27] Compile [x64] VRMMetadata.Upsert.Automation.cpp
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(21,61): error C2061: Syntaxfehler: Bezeichner "FVrmMetadata"
     static bool ExtractVrmMetadata(const FString& FilePath, FVrmMetadata& OutMetadata)
                                                             ^
@@ -254,49 +298,8 @@ C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostPro
     TestEqual(TEXT("Title should be updated in-place"), FinalMetadata->Metadata.Title, UpdatedData.Title);
     ^
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(55,5): note: bei Anpassung der Argumentliste "(const wchar_t [33], const FString)"
-[8/27] Compile [x64] Module.VrmToolchain.cpp
-[9/27] Compile [x64] VrmToolchainBPLibrary.cpp
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(21,61): error C2061: Syntaxfehler: Bezeichner "FVrmMetadata"
-    static bool ExtractVrmMetadata(const FString& FilePath, FVrmMetadata& OutMetadata)
-                                                            ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(24,72): error C4430: Fehlender Typspezifizierer - int wird angenommen. Hinweis: "default-int" wird von C++ nicht unterstützt.
-    static class UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata)
-                                                                       ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(24,90): error C2143: Syntaxfehler: Es fehlt "," vor "&"
-    static class UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata)
-                                                                                         ^
-[10/27] Compile [x64] VrmToolchain.cpp
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(21,61): error C2061: Syntaxfehler: Bezeichner "FVrmMetadata"
-    static bool ExtractVrmMetadata(const FString& FilePath, FVrmMetadata& OutMetadata)
-                                                            ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(24,72): error C4430: Fehlender Typspezifizierer - int wird angenommen. Hinweis: "default-int" wird von C++ nicht unterstützt.
-    static class UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata)
-                                                                       ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(24,90): error C2143: Syntaxfehler: Es fehlt "," vor "&"
-    static class UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata)
-                                                                                         ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Private\VrmToolchain.cpp(104,65): error C2061: Syntaxfehler: Bezeichner "FVrmMetadata"
-bool FVrmSdkFacade::ExtractVrmMetadata(const FString& FilePath, FVrmMetadata& OutMetadata
-                                                                ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Private\VrmToolchain.cpp(124,9): error C2065: "OutMetadata": nichtdeklarierter Bezeichner
-        OutMetadata.Title = TEXT("VRM Model")
-        ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Private\VrmToolchain.cpp(125,9): error C2065: "OutMetadata": nichtdeklarierter Bezeichner
-        OutMetadata.Version = TEXT("1.0")
-        ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Private\VrmToolchain.cpp(126,9): error C2065: "OutMetadata": nichtdeklarierter Bezeichner
-        OutMetadata.Author = TEXT("Unknown")
-        ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Private\VrmToolchain.cpp(127,9): error C2065: "OutMetadata": nichtdeklarierter Bezeichner
-        OutMetadata.ContactInformation = TEXT("")
-        ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Private\VrmToolchain.cpp(128,9): error C2065: "OutMetadata": nichtdeklarierter Bezeichner
-        OutMetadata.Reference = TEXT("")
-        ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Private\VrmToolchain.cpp(129,9): error C2065: "OutMetadata": nichtdeklarierter Bezeichner
-        OutMetadata.LicenseName = TEXT("")
-        ^
-[11/27] Compile [x64] VrmImportHooks.cpp
+[13/27] Compile [x64] VrmNormalizationSettings.cpp
+[14/27] Compile [x64] VrmImportHooks.cpp
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(21,61): error C2061: Syntaxfehler: Bezeichner "FVrmMetadata"
     static bool ExtractVrmMetadata(const FString& FilePath, FVrmMetadata& OutMetadata)
                                                             ^
@@ -319,25 +322,13 @@ C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostPro
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(124,87): error C2065: "Metadata": nichtdeklarierter Bezeichner
     UVrmMetadataAsset* MetadataAsset = FVrmSdkFacade::UpsertVrmMetadata(SkeletalMesh, Metadata)
                                                                                       ^
-[12/27] Compile [x64] VrmNormalizationService.cpp
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmNormalizationService.h(44,1): error C2059: Syntaxfehler: "}"
-};
-^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmNormalizationService.h(44,1): error C2143: Syntaxfehler: Es fehlt ";" vor "}"
-[13/27] Compile [x64] VrmImportHooksTest.cpp
-[14/27] Compile [x64] VrmNormalizationTests.cpp
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmNormalizationService.h(44,1): error C2059: Syntaxfehler: "}"
-};
-^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmNormalizationService.h(44,1): error C2143: Syntaxfehler: Es fehlt ";" vor "}"
-[15/27] Compile [x64] VrmNormalizationSettings.cpp
-[16/27] Compile [x64] VrmMetadataTests.cpp
-[17/27] Compile [x64] VrmRetargetScaffoldGenerator.cpp
+[15/27] Compile [x64] VrmImportHooksTest.cpp
+[16/27] Compile [x64] VrmRetargetScaffoldGenerator.cpp
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmRetargetScaffoldGenerator.cpp(7,1): fatal error C1083: Datei (Include) kann nicht geöffnet werden: "IKRigDefinition.h": No such file or directory
 #include "IKRigDefinition.h"
 ^
-[18/27] Compile [x64] VrmMetadata.cpp
-[19/27] Compile [x64] VrmRetargetScaffoldGeneratorTest.cpp
+[17/27] Compile [x64] VrmNormalizationTests.cpp
+[18/27] Compile [x64] VrmRetargetScaffoldGeneratorTest.cpp
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmRetargetScaffoldGeneratorTest.cpp(42,50): error C2248: "FVrmRetargetScaffoldGenerator::FindRootBone": Kein Zugriff auf private Member, dessen Deklaration in der FVrmRetargetScaffoldGenerator-Klasse erfolgte.
 	FName RootBone = FVrmRetargetScaffoldGenerator::FindRootBone(TestBoneNames);
 	                                                ^
@@ -464,75 +455,23 @@ C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostPro
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmRetargetScaffoldGenerator.h(17,30): note: Siehe Deklaration von "FVrmRetargetScaffoldGenerator"
 class VRMTOOLCHAINEDITOR_API FVrmRetargetScaffoldGenerator
                              ^
+[19/27] Compile [x64] VrmNormalizationService.cpp
 [20/27] Compile [x64] VrmToolchainEditor.cpp
 [21/27] Compile [x64] VrmContentBrowserActions.cpp
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmNormalizationService.h(44,1): error C2059: Syntaxfehler: "}"
-};
-^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmNormalizationService.h(44,1): error C2143: Syntaxfehler: Es fehlt ";" vor "}"
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmContentBrowserActions.cpp(67,24): error C2664: "TDelegate<void (void),FDefaultDelegateUserPolicy> TDelegate<void (void),FDefaultDelegateUserPolicy>::CreateStatic<const TArray<FAssetData,FDefaultAllocator>&>(void (__cdecl *)(TArray<FAssetData,FDefaultAllocator>),const TArray<FAssetData,FDefaultAllocator> &)" : Konvertierung von Argument 1 von "void (__cdecl *)(const TArray<FAssetData,FDefaultAllocator> &)" in "void (__cdecl *)(TArray<FAssetData,FDefaultAllocator>)" nicht möglich
-							FExecuteAction::CreateStatic(&FVrmContentBrowserActions::ExecuteNormalizeVrm, SelectedAssets),
-							                ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmContentBrowserActions.cpp(67,37): note: Diese Konvertierung erfordert eine reinterpret_cast-Umwandlung, eine C-Stil-Umwandlung oder eine in Klammern gesetzte Umwandlung im Funktionsstil.
-							FExecuteAction::CreateStatic(&FVrmContentBrowserActions::ExecuteNormalizeVrm, SelectedAssets),
-							                             ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\Core\Public\Delegates\DelegateSignatureImpl.inl(365,79): note: Siehe Deklaration von "TDelegate<void (void),FDefaultDelegateUserPolicy>::CreateStatic"
-	[[nodiscard]] inline static TDelegate<RetValType(ParamTypes...), UserPolicy> CreateStatic(TIdentity_T<RetValType (*)(ParamTypes..., std::decay_t<VarTypes>...)> InFunc, VarTypes&&... Vars)
-	                                                                             ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmContentBrowserActions.cpp(67,24): note: bei Anpassung der Argumentliste "(void (__cdecl *)(const TArray<FAssetData,FDefaultAllocator> &), const TArray<FAssetData,FDefaultAllocator>)"
-							FExecuteAction::CreateStatic(&FVrmContentBrowserActions::ExecuteNormalizeVrm, SelectedAssets),
-							                ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmContentBrowserActions.cpp(68,27): error C2664: "TDelegate<bool (void),FDefaultDelegateUserPolicy> TDelegate<bool (void),FDefaultDelegateUserPolicy>::CreateStatic<const TArray<FAssetData,FDefaultAllocator>&>(bool (__cdecl *)(TArray<FAssetData,FDefaultAllocator>),const TArray<FAssetData,FDefaultAllocator> &)" : Konvertierung von Argument 1 von "bool (__cdecl *)(const TArray<FAssetData,FDefaultAllocator> &)" in "bool (__cdecl *)(TArray<FAssetData,FDefaultAllocator>)" nicht möglich
-							FCanExecuteAction::CreateStatic(&FVrmContentBrowserActions::CanNormalizeVrm, SelectedAssets)
-							                   ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmContentBrowserActions.cpp(68,40): note: Diese Konvertierung erfordert eine reinterpret_cast-Umwandlung, eine C-Stil-Umwandlung oder eine in Klammern gesetzte Umwandlung im Funktionsstil.
-							FCanExecuteAction::CreateStatic(&FVrmContentBrowserActions::CanNormalizeVrm, SelectedAssets)
-							                                ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\Core\Public\Delegates\DelegateSignatureImpl.inl(365,79): note: Siehe Deklaration von "TDelegate<bool (void),FDefaultDelegateUserPolicy>::CreateStatic"
-	[[nodiscard]] inline static TDelegate<RetValType(ParamTypes...), UserPolicy> CreateStatic(TIdentity_T<RetValType (*)(ParamTypes..., std::decay_t<VarTypes>...)> InFunc, VarTypes&&... Vars)
-	                                                                             ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmContentBrowserActions.cpp(68,27): note: bei Anpassung der Argumentliste "(bool (__cdecl *)(const TArray<FAssetData,FDefaultAllocator> &), const TArray<FAssetData,FDefaultAllocator>)"
-							FCanExecuteAction::CreateStatic(&FVrmContentBrowserActions::CanNormalizeVrm, SelectedAssets)
-							                   ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmContentBrowserActions.cpp(62,18): error C2665: "FBaseMenuBuilder::AddMenuEntry": Keine überladene Funktion konnte alle Argumenttypen konvertieren
-					MenuBuilder.AddMenuEntry(
-					            ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\Slate\Public\Framework\MultiBox\MultiBoxBuilder.h(295,17): note: kann "void FBaseMenuBuilder::AddMenuEntry(const FUIAction &,const TSharedRef<SWidget,ESPMode::ThreadSafe>,const FName &,const TAttribute<FText> &,const EUserInterfaceActionType,FName,const TAttribute<EVisibility> &)" sein
-	SLATE_API void AddMenuEntry( const FUIAction& UIAction, const TSharedRef< SWidget > Contents, const FName& InExtensionHook = NAME_None, const TAttribute<FText>& InToolTip = TAttribute<FText>(), const EUserInterfaceActionType UserInterfaceActionType = EUserInterfaceActionType::Button, FName InTutorialHighlightName = NAME_None, const TAttribute<EVisibility>& InVisibility = TAttribute<EVisibility>());
-	               ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmContentBrowserActions.cpp(62,18): note: "void FBaseMenuBuilder::AddMenuEntry(const FUIAction &,const TSharedRef<SWidget,ESPMode::ThreadSafe>,const FName &,const TAttribute<FText> &,const EUserInterfaceActionType,FName,const TAttribute<EVisibility> &)" : Konvertierung von Argument 1 von "FText" in "const FUIAction &" nicht möglich
-					MenuBuilder.AddMenuEntry(
-					            ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmContentBrowserActions.cpp(63,7): note: Ursache: Konvertierung von "FText" in "const FUIAction" nicht möglich
-						NSLOCTEXT("VrmToolchain", "NormalizeSourceVRM", "Normalize Source VRM"),
-						^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmContentBrowserActions.cpp(63,7): note: Kein benutzerdefinierter Konvertierungsoperator verfügbar, der diese Konvertierung durchführen kann, oder der Operator kann nicht aufgerufen werden
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\Slate\Public\Framework\MultiBox\MultiBoxBuilder.h(267,17): note: oder "void FBaseMenuBuilder::AddMenuEntry(const TSharedPtr<const FUICommandInfo,ESPMode::ThreadSafe>,FName,const TAttribute<FText> &,const TAttribute<FText> &,const FSlateIcon &,FName,const TAttribute<EVisibility> &)"
-	SLATE_API void AddMenuEntry( const TSharedPtr< const FUICommandInfo > InCommand, FName InExtensionHook = NAME_None, const TAttribute<FText>& InLabelOverride = TAttribute<FText>(), const TAttribute<FText>& InToolTipOverride = TAttribute<FText>(), const FSlateIcon& InIconOverride = FSlateIcon(), FName InTutorialHighlightName = NAME_None, const TAttribute<EVisibility>& InVisibility = TAttribute<EVisibility>());
-	               ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmContentBrowserActions.cpp(62,18): note: "void FBaseMenuBuilder::AddMenuEntry(const TSharedPtr<const FUICommandInfo,ESPMode::ThreadSafe>,FName,const TAttribute<FText> &,const TAttribute<FText> &,const FSlateIcon &,FName,const TAttribute<EVisibility> &)" : Konvertierung von Argument 1 von "FText" in "const TSharedPtr<const FUICommandInfo,ESPMode::ThreadSafe>" nicht möglich
-					MenuBuilder.AddMenuEntry(
-					            ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmContentBrowserActions.cpp(63,7): note: Kein benutzerdefinierter Konvertierungsoperator verfügbar, der diese Konvertierung durchführen kann, oder der Operator kann nicht aufgerufen werden
-						NSLOCTEXT("VrmToolchain", "NormalizeSourceVRM", "Normalize Source VRM"),
-						^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmContentBrowserActions.cpp(62,18): note: bei Anpassung der Argumentliste "(FText, FText, FSlateIcon)"
-					MenuBuilder.AddMenuEntry(
-					            ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmContentBrowserActions.cpp(144,32): error C2039: "GetSourceFile" ist kein Member von "UAssetImportData".
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmContentBrowserActions.cpp(145,32): error C2039: "GetSourceFile" ist kein Member von "UAssetImportData".
 		SourceFilePath = ImportData->GetSourceFile(0);
 		                             ^
 C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\Engine\Classes\EditorFramework\AssetImportData.h(71,7): note: Siehe Deklaration von "UAssetImportData"
 class UAssetImportData : public UObject
       ^
 [22/27] Compile [x64] VrmRetargetActions.cpp
-Trace written to file C:/Users/Aliso/AppData/Roaming/Unreal Engine/AutomationTool/Logs/C+Program+Files+Epic+Games+UE_5.7/UBA-UnrealEditor-Win64-Development.uba with size 61.5kb
-Total time in Unreal Build Accelerator local executor: 28.97 seconds
+Trace written to file C:/Users/Aliso/AppData/Roaming/Unreal Engine/AutomationTool/Logs/C+Program+Files+Epic+Games+UE_5.7/UBA-UnrealEditor-Win64-Development.uba with size 51.4kb
+Total time in Unreal Build Accelerator local executor: 28.96 seconds
 
 Result: Failed (OtherCompilationError)
-Total execution time: 38.98 seconds
-Took 39.27s to run dotnet.exe, ExitCode=6
+Total execution time: 39.89 seconds
+Took 40.17s to run dotnet.exe, ExitCode=6
 UnrealBuildTool failed. See log for more details. (C:\Users\Aliso\AppData\Roaming\Unreal Engine\AutomationTool\Logs\C+Program+Files+Epic+Games+UE_5.7\UBA-UnrealEditor-Win64-Development.txt)
-AutomationTool executed for 0h 0m 39s
+AutomationTool executed for 0h 0m 40s
 AutomationTool exiting with ExitCode=6 (6)
 BUILD FAILED

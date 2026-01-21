@@ -122,4 +122,9 @@ private:
 	 * Get a deterministic output path for retarget assets
 	 */
 	static FString GetRetargetOutputPath(USkeletalMesh* SourceMesh);
+
+#if WITH_AUTOMATION_TESTS
+	// Allow test harness to access private helper methods for deterministic testing
+	friend class FVrmRetargetScaffoldGeneratorTest;
+#endif
 };
