@@ -4,39 +4,46 @@
 Successfully fixed all compiler errors preventing the VRM Toolchain plugin from building with Unreal Engine 5.7.0. The fixes are organized into three phases: (1) Core compiler error resolution, (2) CI-safe packaging, and (3) Module boundary cleanup.
 
 ## Phase 1: Compiler Error Resolution (13 commits)
-Addressed API changes, enum types, includes, and module dependencies introduced in UE 5.7.
+Addressed include path changes, deprecated APIs, and module dependencies. Each fix is tied to a specific source file and line change.
 
 ### Key Compiler Errors Fixed
 
 #### 1. **IKRig Include Path Change**
-- **Error**: `IKRigDefinition.h` not found
-- **Root Cause**: UE 5.7 reorganized IKRig headers into `Rig/` subdirectory
-- **Fix**: Updated include path to `#include "Rig/IKRigDefinition.h"`
+- **File**: [Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/VrmRetargetScaffoldGenerator.cpp](Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/VrmRetargetScaffoldGenerator.cpp#L7)
+- **Change**: Line 7 — `#include "IKRigDefinition.h"` → `#include "Rig/IKRigDefinition.h"`
+- **Reason**: UE 5.7 reorganized IKRig headers into subdirectory
 
 #### 2. **UIKRetargeter API Changes**
-- **Error**: Deprecated `GetSkeleton()` and `GetSourceSkeleton()` methods
-- **Root Cause**: UE 5.7 changed IK retargeting API
-- **Fix**: Replaced with `GetSkelMeshComponent()->GetSkeletalMeshAsset()` and equivalent accessors
+- **File**: [Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/VrmRetargetScaffoldGenerator.cpp](Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/VrmRetargetScaffoldGenerator.cpp)
+- **Changes**:
+  - Removed deprecated `GetSkeleton()` call (line ~180)
+  - Replaced with `GetSkelMeshComponent()->GetSkeletalMeshAsset()` 
+  - Removed deprecated `GetSourceSkeleton()` calls
+  - Replaced with equivalent property accessors
+- **Reason**: UE 5.7 refactored IK retargeting public API
 
 #### 3. **UIAssetImportData API Changes**
-- **Error**: Deprecated `GetSourceData()` method
-- **Root Cause**: API reorganization in UE 5.7
-- **Fix**: Updated to use `GetAllAssetImportData()` with appropriate parameter passing
+- **File**: [Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/VrmImportHooks.cpp](Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/VrmImportHooks.cpp#L45)
+- **Change**: Removed deprecated `GetSourceData()` method
+- **Replaced with**: `GetAllAssetImportData()` with proper index parameter
+- **Reason**: UE 5.7 changed asset import metadata API structure
 
-#### 4. **Enum Type Mismatch**
-- **Error**: `EVrmVersion` (uint8) incompatible with `EVrmSpecVersion` (also uint8)
-- **Root Cause**: Over-scoped editor-specific enum while maintaining duplicates
-- **Fix**: Consolidated to single `EVrmVersion` enum in runtime module
+#### 4. **Enum Type Consolidation**
+- **Files Changed**: 
+  - [Plugins/VrmToolchain/Source/VrmToolchain/Public/VrmMetadata.h](Plugins/VrmToolchain/Source/VrmToolchain/Public/VrmMetadata.h#L10) (EVrmVersion definition)
+  - [Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/VrmImportHooks.cpp](Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/VrmImportHooks.cpp#L135) (usage site)
+- **Change**: Removed duplicate `EVrmSpecVersion` enum; unified to `EVrmVersion`
+- **Impact**: Single enum used everywhere; eliminated cast logic
 
 #### 5. **Menu Entry API Changes**
-- **Error**: `FToolMenuEntry` constructor signature changed
-- **Root Cause**: UE 5.7 updated menu API
-- **Fix**: Updated to use new constructor with proper parameters
+- **File**: [Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/VrmContentBrowserActions.cpp](Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/VrmContentBrowserActions.cpp)
+- **Change**: Updated `FToolMenuEntry` constructor call with proper parameters
+- **Reason**: UE 5.7 changed menu API signature
 
 #### 6. **Module Dependencies**
-- **Error**: Missing `DeveloperSettings` module for `UVrmNormalizationSettings`
-- **Root Cause**: Editor code needs DeveloperSettings module
-- **Fix**: Added `DeveloperSettings` to `VrmToolchainEditor.Build.cs`
+- **File**: [Plugins/VrmToolchain/Source/VrmToolchainEditor/VrmToolchainEditor.Build.cs](Plugins/VrmToolchain/Source/VrmToolchainEditor/VrmToolchainEditor.Build.cs)
+- **Change**: Added `"DeveloperSettings"` to PublicDependencyModuleNames
+- **Reason**: Required for `UVrmNormalizationSettings` UPROPERTY declarations
 
 ### Code Quality Improvements
 - Added runtime-only wrappers to separate editor-only concerns
@@ -76,32 +83,35 @@ if ($ForbiddenFiles.Count -gt 0) { throw "Packaging failed: forbidden binaries f
 - ✅ CI workflows can use the script unmodified
 - ✅ No forbidden binaries in package output (verified: 0 .exe/.pdb files remain)
 
-## Phase 3: Module Boundary Cleanup (1 commit)
+## Phase 3: Module Boundary Cleanup (2 commits)
 
 ### Problem
 Over-scoped refactoring moved `UVrmMetadataAsset` to editor module, but the type is runtime-safe and should be accessible from both modules.
 
 ### Solution: Restore Runtime Module Ownership
 **Changes**:
-1. **Moved UVrmMetadataAsset to Runtime**: 
-   - New file: `Plugins/VrmToolchain/Source/VrmToolchain/Public/VrmMetadataAsset.h`
-   - Includes `VrmMetadata.h` for `EVrmVersion`
+1. **New File**: [Plugins/VrmToolchain/Source/VrmToolchain/Public/VrmMetadataAsset.h](Plugins/VrmToolchain/Source/VrmToolchain/Public/VrmMetadataAsset.h)
+   - Contains full `UVrmMetadataAsset` class definition
+   - Includes `VrmMetadata.h` for `EVrmVersion` 
+   - Uses `VRMTOOLCHAIN_API` macro for export
 
-2. **Editor Module Re-Export**:
-   - File: `Plugins/VrmToolchain/Source/VrmToolchainEditor/Public/VrmMetadataAsset.h`
-   - Now a simple re-export wrapper for backward compatibility
-   - `#include "VrmToolchain/Public/VrmMetadataAsset.h"`
+2. **Deleted File**: `Plugins/VrmToolchain/Source/VrmToolchainEditor/Public/VrmMetadataAsset.h` (wrapper, no longer needed)
+   - Removed to eliminate confusion about canonical type location
+   - Editor code now uses runtime header directly
 
-3. **Consolidated Enums**:
-   - Removed `EVrmSpecVersion` (editor-only duplicate)
-   - Use single `EVrmVersion` everywhere
-   - Updated `VrmImportHooks.cpp` to use unified enum
+3. **Updated Includes** (3 files):
+   - [Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/VrmSdkFacadeEditor.cpp](Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/VrmSdkFacadeEditor.cpp#L2) — Changed to `#include "VrmToolchain/Public/VrmMetadataAsset.h"`
+   - [Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/Tests/VRMMetadata.SkeletonInfo.Automation.cpp](Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/Tests/VRMMetadata.SkeletonInfo.Automation.cpp#L6) — Changed to runtime header
+   - [Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/Tests/VRMMetadata.Upsert.Automation.cpp](Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/Tests/VRMMetadata.Upsert.Automation.cpp#L6) — Changed to runtime header
+
+4. **Enum Consolidation**:
+   - [Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/VrmImportHooks.cpp](Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/VrmImportHooks.cpp#L135) — Direct assignment `MetadataAsset->SpecVersion = VrmVersion;` (no cast needed)
 
 ### Design Rationale
 - **Runtime Asset Type**: `UAssetUserData` is not editor-only; metadata can be read at runtime
-- **Proper Layering**: Runtime module provides types; editor module provides mutation operations
+- **Proper Layering**: Runtime module provides types; editor module provides mutation operations only
 - **Reduced Complexity**: Single enum prevents type confusion and casting errors
-- **Backward Compatible**: Editor code can still include the type via re-export
+- **No Wrapper Pattern**: Editor code uses runtime header directly (avoids re-export anti-pattern)
 
 ## Dependency Verification
 
