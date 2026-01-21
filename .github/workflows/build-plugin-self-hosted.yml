@@ -27,15 +27,15 @@ jobs:
               $line = $lines[$i]
               if ($line -match '^\s+run:\s*[\|\>]') { $inRunBlock = $true }
               if ($inRunBlock -and $line -match '^\s+- ') { $inRunBlock = $false }
-              # Only check lines that actually run PackagePlugin (no Write-Error/Host/throw messages)
-              if ($inRunBlock -and $line -match '^\s+\.\\\Scripts\\PackagePlugin\.ps1.*-AllowBinaries') {
+              # Only check invocation lines: starts with .\ and actual PackagePlugin.ps1 call
+              if ($inRunBlock -and $line -match '^\s+\.\\\Scripts\\PackagePlugin' -and $line -match '-AllowBinaries') {
                 $violations += "$($file.Name):$($i+1)"
               }
             }
           }
           if ($violations) {
             $violations | ForEach-Object { Write-Error "Forbidden -AllowBinaries: $_" }
-            throw "CI forbids PackagePlugin.ps1 with -AllowBinaries (policy: no binaries in packages)"
+            throw "CI forbids PackagePlugin.ps1 with -AllowBinaries"
           }
           Write-Host "OK: Workflows do not call PackagePlugin.ps1 with -AllowBinaries"
 

@@ -24,8 +24,8 @@ jobs:
               $line = $lines[$i]
               if ($line -match '^\s+run:\s*[\|\>]') { $inRunBlock = $true }
               if ($inRunBlock -and $line -match '^\s+- ') { $inRunBlock = $false }
-              # Only flag actual script invocation lines that call PackagePlugin.ps1 with -AllowBinaries
-              if ($inRunBlock -and $line -match '^\s+\.\\\Scripts\\PackagePlugin\.ps1.*-AllowBinaries') {
+              # Only check actual invocation lines (starts with .\Scripts)
+              if ($inRunBlock -and $line -match '^\s+\.\\\Scripts\\PackagePlugin' -and $line -match '-AllowBinaries') {
                 $violations += "$($file.Name):$($i+1)"
               }
             }
