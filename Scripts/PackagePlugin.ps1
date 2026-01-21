@@ -24,13 +24,24 @@ if ($LASTEXITCODE -ne 0) { throw "BuildPlugin failed (exit $LASTEXITCODE)" }
 # 2) Strip forbidden binaries and temporary build artifacts
 Write-Host "Stripping forbidden binaries and temporary build artifacts..." -ForegroundColor Cyan
 
-# Delete all .exe and .pdb files recursively
+# Scan and report forbidden files
 $exeFiles = Get-ChildItem $OutPkg -Recurse -Include "*.exe" -File -ErrorAction SilentlyContinue
 $pdbFiles = Get-ChildItem $OutPkg -Recurse -Include "*.pdb" -File -ErrorAction SilentlyContinue
 
+if ($exeFiles -or $pdbFiles) {
+    Write-Host "Found forbidden files (will be removed):" -ForegroundColor Yellow
+    foreach ($file in @($exeFiles + $pdbFiles)) {
+        Write-Host "  - $($file.Name)" -ForegroundColor Yellow
+    }
+}
+
+# Remove the files
 foreach ($file in @($exeFiles + $pdbFiles)) {
     Remove-Item -Force $file.FullName -ErrorAction Continue
-    Write-Host "  Removed: $($file.Name)" -ForegroundColor Gray
+}
+
+if ($exeFiles -or $pdbFiles) {
+    Write-Host "  Removed: $(($exeFiles.Count ?? 0) + ($pdbFiles.Count ?? 0)) file(s)" -ForegroundColor Green
 }
 
 # Delete temporary build folders (if they are not locked)
