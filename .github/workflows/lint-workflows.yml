@@ -1,0 +1,23 @@
+name: Lint workflows (forbidden packaging flags)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Forbid -AllowBinaries in workflows
+        shell: pwsh
+        run: |
+          $hits = Select-String -Path ".github/workflows/*.yml" -Pattern "-AllowBinaries" -SimpleMatch -CaseSensitive:$false -ErrorAction SilentlyContinue
+          if ($hits) {
+            $hits | ForEach-Object { Write-Error $_.Line }
+            throw "CI must never call PackagePlugin.ps1 with -AllowBinaries (policy: no binaries in distributed plugin)."
+          }
+          Write-Host "OK: no -AllowBinaries usage in workflows."
