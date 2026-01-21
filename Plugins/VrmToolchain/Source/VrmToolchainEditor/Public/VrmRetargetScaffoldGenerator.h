@@ -67,36 +67,43 @@ public:
 	 */
 	static void InferBoneChains(const USkeleton* Skeleton, TArray<FChainInfo>& OutChains);
 
-private:
 	/**
 	 * Find a bone by name (case-insensitive, handles common naming variants)
+	 * (Public for test access; internal utility)
 	 */
 	static FName FindBoneByName(const TArray<FName>& BoneNames, const TArray<FString>& SearchNames);
 
 	/**
 	 * Find the root bone (pelvis or hips)
+	 * (Public for test access; internal utility)
 	 */
 	static FName FindRootBone(const TArray<FName>& BoneNames);
 
 	/**
 	 * Find spine chain bones
+	 * (Public for test access; internal utility)
 	 */
 	static bool FindSpineChain(const TArray<FName>& BoneNames, FName& OutStart, FName& OutEnd);
 
 	/**
 	 * Find arm chain bones (left or right)
+	 * (Public for test access; internal utility)
 	 */
 	static bool FindArmChain(const TArray<FName>& BoneNames, bool bLeftSide, FName& OutStart, FName& OutEnd);
 
 	/**
 	 * Find leg chain bones (left or right)
+	 * (Public for test access; internal utility)
 	 */
 	static bool FindLegChain(const TArray<FName>& BoneNames, bool bLeftSide, FName& OutStart, FName& OutEnd);
 
 	/**
 	 * Find head/neck bone
+	 * (Public for test access; internal utility)
 	 */
 	static FName FindHeadBone(const TArray<FName>& BoneNames);
+
+private:
 
 	/**
 	 * Create or update an IKRig asset
@@ -122,9 +129,4 @@ private:
 	 * Get a deterministic output path for retarget assets
 	 */
 	static FString GetRetargetOutputPath(USkeletalMesh* SourceMesh);
-
-#if WITH_AUTOMATION_TESTS
-	// Allow test harness to access private helper methods for deterministic testing
-	friend class FVrmRetargetChainInferenceTest;
-#endif
 };
