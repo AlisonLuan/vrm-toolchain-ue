@@ -125,6 +125,6 @@ private:
 
 #if WITH_AUTOMATION_TESTS
 	// Allow test harness to access private helper methods for deterministic testing
-	friend class FVrmRetargetScaffoldGeneratorTest;
+	friend class FVrmRetargetChainInferenceTest;
 #endif
 };

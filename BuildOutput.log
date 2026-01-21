@@ -16,7 +16,7 @@ Warning: Plugin 'VrmToolchain' does not list plugin 'IKRig' as a dependency, but
 UHT compiled-in object format Default
 Parsing headers for UnrealEditor
   Running Internal UnrealHeaderTool C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\HostProject.uproject C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Intermediate\Build\Win64\UnrealEditor\Development\UnrealEditor.uhtmanifest -WarningsAsErrors -installed
-UHT processed UnrealEditor in 2.0758683 seconds (12 files written)
+UHT processed UnrealEditor in 2.0598886 seconds (12 files written)
 Writing manifest to C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Saved\Manifest-UnrealEditor-Win64-Development.xml
 Building UnrealEditor...
 Using Visual Studio 2022 14.44.35222 toolchain (C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207) and Windows 10.0.22621.0 SDK (C:\Program Files (x86)\Windows Kits\10).
@@ -60,10 +60,10 @@ Using Visual Studio 2022 14.44.35222 toolchain (C:\Program Files\Microsoft Visua
 [Adaptive Build] Excluded from CaptureProtocolStack unity file: CaptureProtocolStack.cpp, ControlMessenger.cpp, ControlCommunication.cpp, ControlPacket.cpp, Constants.cpp, ControlJsonUtilities.cpp, ControlMessage.cpp, ControlRequest.cpp, ControlResponse.cpp, ControlUpdate.cpp, DiscoveryMessenger.cpp, DiscoveryCommunication.cpp, DiscoveryPacket.cpp, DiscoveryNotify.cpp, DiscoveryRequest.cpp, DiscoveryResponse.cpp, ExportClient.cpp, ExportWorker.cpp, ExportCommunication.cpp, ExportHeader.cpp, ExportRequest.cpp, ExportResponse.cpp, TestControlJsonUtilities.cpp, TestControlMessage.cpp, TestControlPacket.cpp, TestControlRequest.cpp, TestControlResponse.cpp, TestControlUpdate.cpp, TestDiscoveryNotify.cpp, TestDiscoveryPacket.cpp, TestDiscoveryRequest.cpp, TestDiscoveryResponse.cpp, TestExportHeader.cpp, TestExportRequest.cpp, TestExportResponse.cpp
 Determining max actions to execute in parallel (20 physical cores, 28 logical cores)
   Executing up to 20 processes, one per physical core
-  Requested 1.5 GB memory per action, 8.26 GB available: limiting max parallel actions to 5
+  Requested 1.5 GB memory per action, 8.58 GB available: limiting max parallel actions to 5
 Using Unreal Build Accelerator local executor to run 27 action(s)
   Storage capacity 40Gb
----- Starting trace: 260121_183136 ----
+---- Starting trace: 260121_183246 ----
 UbaServer - Listening on 0.0.0.0:1345
 [1/27] Resource Default.rc2
 [2/27] Resource Default.rc2
@@ -298,8 +298,7 @@ C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostPro
     TestEqual(TEXT("Title should be updated in-place"), FinalMetadata->Metadata.Title, UpdatedData.Title);
     ^
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(55,5): note: bei Anpassung der Argumentliste "(const wchar_t [33], const FString)"
-[13/27] Compile [x64] VrmNormalizationSettings.cpp
-[14/27] Compile [x64] VrmImportHooks.cpp
+[13/27] Compile [x64] VrmImportHooks.cpp
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(21,61): error C2061: Syntaxfehler: Bezeichner "FVrmMetadata"
     static bool ExtractVrmMetadata(const FString& FilePath, FVrmMetadata& OutMetadata)
                                                             ^
@@ -322,6 +321,7 @@ C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostPro
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(124,87): error C2065: "Metadata": nichtdeklarierter Bezeichner
     UVrmMetadataAsset* MetadataAsset = FVrmSdkFacade::UpsertVrmMetadata(SkeletalMesh, Metadata)
                                                                                       ^
+[14/27] Compile [x64] VrmNormalizationSettings.cpp
 [15/27] Compile [x64] VrmImportHooksTest.cpp
 [16/27] Compile [x64] VrmRetargetScaffoldGenerator.cpp
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmRetargetScaffoldGenerator.cpp(7,1): fatal error C1083: Datei (Include) kann nicht geöffnet werden: "IKRigDefinition.h": No such file or directory
@@ -465,13 +465,13 @@ C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\Engine\Classes\EditorFr
 class UAssetImportData : public UObject
       ^
 [22/27] Compile [x64] VrmRetargetActions.cpp
-Trace written to file C:/Users/Aliso/AppData/Roaming/Unreal Engine/AutomationTool/Logs/C+Program+Files+Epic+Games+UE_5.7/UBA-UnrealEditor-Win64-Development.uba with size 51.4kb
-Total time in Unreal Build Accelerator local executor: 28.96 seconds
+Trace written to file C:/Users/Aliso/AppData/Roaming/Unreal Engine/AutomationTool/Logs/C+Program+Files+Epic+Games+UE_5.7/UBA-UnrealEditor-Win64-Development.uba with size 51.3kb
+Total time in Unreal Build Accelerator local executor: 28.64 seconds
 
 Result: Failed (OtherCompilationError)
-Total execution time: 39.89 seconds
-Took 40.17s to run dotnet.exe, ExitCode=6
+Total execution time: 38.65 seconds
+Took 38.93s to run dotnet.exe, ExitCode=6
 UnrealBuildTool failed. See log for more details. (C:\Users\Aliso\AppData\Roaming\Unreal Engine\AutomationTool\Logs\C+Program+Files+Epic+Games+UE_5.7\UBA-UnrealEditor-Win64-Development.txt)
-AutomationTool executed for 0h 0m 40s
+AutomationTool executed for 0h 0m 39s
 AutomationTool exiting with ExitCode=6 (6)
 BUILD FAILED
