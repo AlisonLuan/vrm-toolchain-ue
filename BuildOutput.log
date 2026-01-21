@@ -3,7 +3,7 @@ Using bundled DotNet SDK version: 8.0.412 win-x64
 Starting AutomationTool...
 Parsing command line: BuildPlugin -Plugin=C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\Plugins\VrmToolchain\VrmToolchain.uplugin -Package=C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain -TargetPlatforms=Win64 -Rocket
 Initializing script modules...
-Total script module initialization time: 0.11 s.
+Total script module initialization time: 0.12 s.
 Using C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe
 Executing commands...
 Copying 132 file(s) using max 64 thread(s)
@@ -16,7 +16,7 @@ Warning: Plugin 'VrmToolchain' does not list plugin 'IKRig' as a dependency, but
 UHT compiled-in object format Default
 Parsing headers for UnrealEditor
   Running Internal UnrealHeaderTool C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\HostProject.uproject C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Intermediate\Build\Win64\UnrealEditor\Development\UnrealEditor.uhtmanifest -WarningsAsErrors -installed
-UHT processed UnrealEditor in 1.4295636 seconds (12 files written)
+UHT processed UnrealEditor in 2.1797105 seconds (12 files written)
 Writing manifest to C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Saved\Manifest-UnrealEditor-Win64-Development.xml
 Building UnrealEditor...
 Using Visual Studio 2022 14.44.35222 toolchain (C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207) and Windows 10.0.22621.0 SDK (C:\Program Files (x86)\Windows Kits\10).
@@ -60,248 +60,64 @@ Using Visual Studio 2022 14.44.35222 toolchain (C:\Program Files\Microsoft Visua
 [Adaptive Build] Excluded from CaptureProtocolStack unity file: CaptureProtocolStack.cpp, ControlMessenger.cpp, ControlCommunication.cpp, ControlPacket.cpp, Constants.cpp, ControlJsonUtilities.cpp, ControlMessage.cpp, ControlRequest.cpp, ControlResponse.cpp, ControlUpdate.cpp, DiscoveryMessenger.cpp, DiscoveryCommunication.cpp, DiscoveryPacket.cpp, DiscoveryNotify.cpp, DiscoveryRequest.cpp, DiscoveryResponse.cpp, ExportClient.cpp, ExportWorker.cpp, ExportCommunication.cpp, ExportHeader.cpp, ExportRequest.cpp, ExportResponse.cpp, TestControlJsonUtilities.cpp, TestControlMessage.cpp, TestControlPacket.cpp, TestControlRequest.cpp, TestControlResponse.cpp, TestControlUpdate.cpp, TestDiscoveryNotify.cpp, TestDiscoveryPacket.cpp, TestDiscoveryRequest.cpp, TestDiscoveryResponse.cpp, TestExportHeader.cpp, TestExportRequest.cpp, TestExportResponse.cpp
 Determining max actions to execute in parallel (20 physical cores, 28 logical cores)
   Executing up to 20 processes, one per physical core
-  Requested 1.5 GB memory per action, 11.12 GB available: limiting max parallel actions to 7
+  Requested 1.5 GB memory per action, 12.71 GB available: limiting max parallel actions to 8
 Using Unreal Build Accelerator local executor to run 27 action(s)
   Storage capacity 40Gb
----- Starting trace: 260121_184856 ----
+---- Starting trace: 260121_184956 ----
 UbaServer - Listening on 0.0.0.0:1345
 [1/27] Resource Default.rc2
 [2/27] Resource Default.rc2
 [3/27] Compile [x64] SharedPCH.UnrealEd.Cpp20.cpp
-[4/27] Compile [x64] Module.VrmToolchain.cpp
-[5/27] Compile [x64] Module.VrmToolchainEditor.cpp
-[6/27] Compile [x64] VRMMetadata.SkeletonInfo.Automation.cpp
-[7/27] Compile [x64] VrmToolchainBPLibrary.cpp
-[8/27] Compile [x64] VRMMetadata.Upsert.Automation.cpp
-[9/27] Compile [x64] VrmImportHooks.cpp
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(135,34): error C2440: "=": "EVrmVersion" kann nicht in "EVrmSpecVersion" konvertiert werden
-    MetadataAsset->SpecVersion = VrmVersion
-                                 ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(135,34): note: Die Konvertierung in einen Enumerationstypen erfordert explizite Umwandlung (static_cast-Umwandlung, C-Stil-Umwandlung oder eine in Klammern gesetzte Umwandlung im Funktionsstil)
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,43): error C2676: Binärer Operator "==": "EVrmVersion" definiert diesen Operator oder eine Konvertierung in einen für den vordefinierten Operator geeigneten Typ nicht
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                                          ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\CoreUObject\Public\UObject\WeakFieldPtr.h(386,26): note: kann "bool operator ==(TYPE_OF_NULLPTR,const TWeakFieldPtr<T> &)" sein
-UE_FORCEINLINE_HINT bool operator==(TYPE_OF_NULLPTR, const TWeakFieldPtr<RhsType>& Rhs)
-                         ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "bool operator ==(TYPE_OF_NULLPTR,const TWeakFieldPtr<T> &)": Das Vorlage-Argument für "const TWeakFieldPtr<T> &" konnte nicht von "EVrmSpecVersion" abgeleitet werden.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\CoreUObject\Public\UObject\WeakFieldPtr.h(376,26): note: oder "bool operator ==(const TWeakFieldPtr<T> &,TYPE_OF_NULLPTR)"
-UE_FORCEINLINE_HINT bool operator==(const TWeakFieldPtr<LhsType>& Lhs, TYPE_OF_NULLPTR)
-                         ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "bool operator ==(const TWeakFieldPtr<T> &,TYPE_OF_NULLPTR)": Das Vorlage-Argument für "const TWeakFieldPtr<T> &" konnte nicht von "EVrmVersion" abgeleitet werden.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\CoreUObject\Public\UObject\WeakFieldPtr.h(38,6): note: oder "bool operator ==(const LhsType *,const TWeakFieldPtr<RhsType> &)"
-bool operator==(const LhsType* Lhs, const TWeakFieldPtr<RhsType>& Rhs);
-     ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "bool operator ==(const LhsType *,const TWeakFieldPtr<RhsType> &)": Das Vorlage-Argument für "const LhsType *" konnte nicht von "EVrmVersion" abgeleitet werden.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\CoreUObject\Public\UObject\WeakFieldPtr.h(31,6): note: oder "bool operator ==(const TWeakFieldPtr<T> &,const RhsType *)"
-bool operator==(const TWeakFieldPtr<LhsType>& Lhs, const RhsType* Rhs);
-     ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "bool operator ==(const TWeakFieldPtr<T> &,const RhsType *)": Das Vorlage-Argument für "const TWeakFieldPtr<T> &" konnte nicht von "EVrmVersion" abgeleitet werden.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\CoreUObject\Public\UObject\WeakFieldPtr.h(24,6): note: oder "bool operator ==(const TWeakFieldPtr<T> &,const TWeakFieldPtr<RhsType> &)"
-bool operator==(const TWeakFieldPtr<LhsType>& Lhs, const TWeakFieldPtr<RhsType>& Rhs);
-     ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "bool operator ==(const TWeakFieldPtr<T> &,const TWeakFieldPtr<RhsType> &)": Das Vorlage-Argument für "const TWeakFieldPtr<T> &" konnte nicht von "EVrmVersion" abgeleitet werden.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\CoreUObject\Public\UObject\LazyObjectPtr.h(441,26): note: oder "bool operator ==(TYPE_OF_NULLPTR,const TLazyObjectPtr<T> &)"
-UE_FORCEINLINE_HINT bool operator==(TYPE_OF_NULLPTR, const TLazyObjectPtr<T>& Rhs)
-                         ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "bool operator ==(TYPE_OF_NULLPTR,const TLazyObjectPtr<T> &)": Das Vorlage-Argument für "const TLazyObjectPtr<T> &" konnte nicht von "EVrmSpecVersion" abgeleitet werden.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\CoreUObject\Public\UObject\LazyObjectPtr.h(434,26): note: oder "bool operator ==(const U *,const TLazyObjectPtr<T> &)"
-UE_FORCEINLINE_HINT bool operator==(const U* Lhs, const TLazyObjectPtr<T>& Rhs)
-                         ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "bool operator ==(const U *,const TLazyObjectPtr<T> &)": Das Vorlage-Argument für "const U *" konnte nicht von "EVrmVersion" abgeleitet werden.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\CoreUObject\Public\UObject\FieldPath.h(485,26): note: oder "bool operator ==(TYPE_OF_NULLPTR,TFieldPath<PropertyType> &)"
-UE_FORCEINLINE_HINT bool operator==(TYPE_OF_NULLPTR, TFieldPath<RhsType>& Rhs)
-                         ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "bool operator ==(TYPE_OF_NULLPTR,TFieldPath<PropertyType> &)": Das Vorlage-Argument für "TFieldPath<PropertyType> &" konnte nicht von "EVrmSpecVersion" abgeleitet werden.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\CoreUObject\Public\UObject\FieldPath.h(475,26): note: oder "bool operator ==(TFieldPath<PropertyType> &,TYPE_OF_NULLPTR)"
-UE_FORCEINLINE_HINT bool operator==(TFieldPath<LhsType>& Lhs, TYPE_OF_NULLPTR)
-                         ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "bool operator ==(TFieldPath<PropertyType> &,TYPE_OF_NULLPTR)": Das Vorlage-Argument für "TFieldPath<PropertyType> &" konnte nicht von "EVrmVersion" abgeleitet werden.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\CoreUObject\Public\UObject\FieldPath.h(464,26): note: oder "unknown-type operator ==(const LhsType *,const TFieldPath<RhsType> &)"
-UE_FORCEINLINE_HINT auto operator==(const LhsType* Lhs, const TFieldPath<RhsType>& Rhs)
-                         ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "unknown-type operator ==(const LhsType *,const TFieldPath<RhsType> &)": Das Vorlage-Argument für "const LhsType *" konnte nicht von "EVrmVersion" abgeleitet werden.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\CoreUObject\Public\UObject\FieldPath.h(452,26): note: oder "unknown-type operator ==(const TFieldPath<PropertyType> &,const RhsType *)"
-UE_FORCEINLINE_HINT auto operator==(const TFieldPath<LhsType>& Lhs, const RhsType* Rhs)
-                         ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "unknown-type operator ==(const TFieldPath<PropertyType> &,const RhsType *)": Das Vorlage-Argument für "const TFieldPath<PropertyType> &" konnte nicht von "EVrmVersion" abgeleitet werden.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\CoreUObject\Public\UObject\FieldPath.h(440,26): note: oder "unknown-type operator ==(const TFieldPath<PropertyType> &,const TFieldPath<PropertyType> &)"
-UE_FORCEINLINE_HINT auto operator==(const TFieldPath<LhsType>& Lhs, const TFieldPath<LhsType>& Rhs)
-                         ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "unknown-type operator ==(const TFieldPath<PropertyType> &,const TFieldPath<PropertyType> &)": Das Vorlage-Argument für "const TFieldPath<PropertyType> &" konnte nicht von "EVrmVersion" abgeleitet werden.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\Core\Public\Misc\UEOps.h(69,41): note: oder "bool operator ==(const LhsType &,int UE::Core::Private::FIncomplete::* )"
-[[nodiscard]] UE_REWRITE constexpr bool operator==(const LhsType& Lhs, int UE::Core::Private::FIncomplete::* Rhs)
-                                        ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,63): note: "Initialisierung": "EVrmSpecVersion" kann nicht in "int UE::Core::Private::FIncomplete::* " konvertiert werden
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                                                              ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,63): note: Es gibt keinen Kontext, in dem diese Konvertierung möglich ist
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\Core\Public\Misc\UEOps.h(54,41): note: oder "bool operator ==(const LhsType &,const RhsType &)"
-[[nodiscard]] UE_REWRITE constexpr bool operator==(const LhsType& Lhs, const RhsType& Rhs)
-                                        ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: Die zugeordneten Einschränkungen werden nicht erfüllt.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\Core\Public\Misc\UEOps.h(53,11): note: Das Konzept "UE::Core::Private::CWithUEOpEquals<EVrmVersion,EVrmSpecVersion>" wurde als FALSCH ausgewertet
-	requires UE::Core::Private::CWithUEOpEquals<LhsType, RhsType> || UE::Core::Private::CWithUEOpEquals<RhsType, LhsType>
-	         ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\Core\Public\Misc\UEOps.h(18,9): note: Links von ".UEOpEquals" müssen sich in einer Klasse/Struktur/Union befinden
-		{ Lhs.UEOpEquals(Rhs) } -> UE::CSameAs<bool>;
-		      ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\Core\Public\Misc\UEOps.h(18,9): note: Typ ist "const EVrmVersion"
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\Core\Public\Misc\UEOps.h(53,67): note: Das Konzept "UE::Core::Private::CWithUEOpEquals<EVrmSpecVersion,EVrmVersion>" wurde als FALSCH ausgewertet
-	requires UE::Core::Private::CWithUEOpEquals<LhsType, RhsType> || UE::Core::Private::CWithUEOpEquals<RhsType, LhsType>
-	                                                                 ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\Core\Public\Misc\UEOps.h(18,9): note: Links von ".UEOpEquals" müssen sich in einer Klasse/Struktur/Union befinden
-		{ Lhs.UEOpEquals(Rhs) } -> UE::CSameAs<bool>;
-		      ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\Core\Public\Misc\UEOps.h(18,9): note: Typ ist "const EVrmSpecVersion"
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\Core\Public\Misc\UEOps.h(54,41): note: oder "bool operator ==(const LhsType &,const RhsType &)" [synthetisierter Ausdruck 'y==x']
-[[nodiscard]] UE_REWRITE constexpr bool operator==(const LhsType& Lhs, const RhsType& Rhs)
-                                        ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: Die zugeordneten Einschränkungen werden nicht erfüllt.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\Core\Public\Misc\UEOps.h(53,11): note: Das Konzept "UE::Core::Private::CWithUEOpEquals<EVrmSpecVersion,EVrmVersion>" wurde als FALSCH ausgewertet
-	requires UE::Core::Private::CWithUEOpEquals<LhsType, RhsType> || UE::Core::Private::CWithUEOpEquals<RhsType, LhsType>
-	         ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\Core\Public\Misc\UEOps.h(18,9): note: Links von ".UEOpEquals" müssen sich in einer Klasse/Struktur/Union befinden
-		{ Lhs.UEOpEquals(Rhs) } -> UE::CSameAs<bool>;
-		      ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\Core\Public\Misc\UEOps.h(18,9): note: Typ ist "const EVrmSpecVersion"
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\Core\Public\Misc\UEOps.h(53,67): note: Das Konzept "UE::Core::Private::CWithUEOpEquals<EVrmVersion,EVrmSpecVersion>" wurde als FALSCH ausgewertet
-	requires UE::Core::Private::CWithUEOpEquals<LhsType, RhsType> || UE::Core::Private::CWithUEOpEquals<RhsType, LhsType>
-	                                                                 ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\Core\Public\Misc\UEOps.h(18,9): note: Links von ".UEOpEquals" müssen sich in einer Klasse/Struktur/Union befinden
-		{ Lhs.UEOpEquals(Rhs) } -> UE::CSameAs<bool>;
-		      ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\Core\Public\Misc\UEOps.h(18,9): note: Typ ist "const EVrmVersion"
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\Core\Public\Misc\UEOps.h(69,41): note: oder "bool operator ==(const LhsType &,int UE::Core::Private::FIncomplete::* )" [synthetisierter Ausdruck 'y==x']
-[[nodiscard]] UE_REWRITE constexpr bool operator==(const LhsType& Lhs, int UE::Core::Private::FIncomplete::* Rhs)
-                                        ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "Initialisierung": "EVrmVersion" kann nicht in "int UE::Core::Private::FIncomplete::* " konvertiert werden
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: Es gibt keinen Kontext, in dem diese Konvertierung möglich ist
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\CoreUObject\Public\UObject\FieldPath.h(440,26): note: oder "unknown-type operator ==(const TFieldPath<PropertyType> &,const TFieldPath<PropertyType> &)" [synthetisierter Ausdruck 'y==x']
-UE_FORCEINLINE_HINT auto operator==(const TFieldPath<LhsType>& Lhs, const TFieldPath<LhsType>& Rhs)
-                         ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "unknown-type operator ==(const TFieldPath<PropertyType> &,const TFieldPath<PropertyType> &)": Das Vorlage-Argument für "const TFieldPath<PropertyType> &" konnte nicht von "EVrmSpecVersion" abgeleitet werden.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\CoreUObject\Public\UObject\FieldPath.h(452,26): note: oder "unknown-type operator ==(const TFieldPath<PropertyType> &,const RhsType *)" [synthetisierter Ausdruck 'y==x']
-UE_FORCEINLINE_HINT auto operator==(const TFieldPath<LhsType>& Lhs, const RhsType* Rhs)
-                         ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "unknown-type operator ==(const TFieldPath<PropertyType> &,const RhsType *)": Das Vorlage-Argument für "const TFieldPath<PropertyType> &" konnte nicht von "EVrmSpecVersion" abgeleitet werden.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\CoreUObject\Public\UObject\FieldPath.h(464,26): note: oder "unknown-type operator ==(const LhsType *,const TFieldPath<RhsType> &)" [synthetisierter Ausdruck 'y==x']
-UE_FORCEINLINE_HINT auto operator==(const LhsType* Lhs, const TFieldPath<RhsType>& Rhs)
-                         ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "unknown-type operator ==(const LhsType *,const TFieldPath<RhsType> &)": Das Vorlage-Argument für "const LhsType *" konnte nicht von "EVrmSpecVersion" abgeleitet werden.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\CoreUObject\Public\UObject\FieldPath.h(475,26): note: oder "bool operator ==(TFieldPath<PropertyType> &,TYPE_OF_NULLPTR)" [synthetisierter Ausdruck 'y==x']
-UE_FORCEINLINE_HINT bool operator==(TFieldPath<LhsType>& Lhs, TYPE_OF_NULLPTR)
-                         ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "bool operator ==(TFieldPath<PropertyType> &,TYPE_OF_NULLPTR)": Das Vorlage-Argument für "TFieldPath<PropertyType> &" konnte nicht von "EVrmSpecVersion" abgeleitet werden.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\CoreUObject\Public\UObject\FieldPath.h(485,26): note: oder "bool operator ==(TYPE_OF_NULLPTR,TFieldPath<PropertyType> &)" [synthetisierter Ausdruck 'y==x']
-UE_FORCEINLINE_HINT bool operator==(TYPE_OF_NULLPTR, TFieldPath<RhsType>& Rhs)
-                         ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "bool operator ==(TYPE_OF_NULLPTR,TFieldPath<PropertyType> &)": Das Vorlage-Argument für "TFieldPath<PropertyType> &" konnte nicht von "EVrmVersion" abgeleitet werden.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\CoreUObject\Public\UObject\LazyObjectPtr.h(434,26): note: oder "bool operator ==(const U *,const TLazyObjectPtr<T> &)" [synthetisierter Ausdruck 'y==x']
-UE_FORCEINLINE_HINT bool operator==(const U* Lhs, const TLazyObjectPtr<T>& Rhs)
-                         ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "bool operator ==(const U *,const TLazyObjectPtr<T> &)": Das Vorlage-Argument für "const U *" konnte nicht von "EVrmSpecVersion" abgeleitet werden.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\CoreUObject\Public\UObject\LazyObjectPtr.h(441,26): note: oder "bool operator ==(TYPE_OF_NULLPTR,const TLazyObjectPtr<T> &)" [synthetisierter Ausdruck 'y==x']
-UE_FORCEINLINE_HINT bool operator==(TYPE_OF_NULLPTR, const TLazyObjectPtr<T>& Rhs)
-                         ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "bool operator ==(TYPE_OF_NULLPTR,const TLazyObjectPtr<T> &)": Das Vorlage-Argument für "const TLazyObjectPtr<T> &" konnte nicht von "EVrmVersion" abgeleitet werden.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\CoreUObject\Public\UObject\WeakFieldPtr.h(24,6): note: oder "bool operator ==(const TWeakFieldPtr<T> &,const TWeakFieldPtr<RhsType> &)" [synthetisierter Ausdruck 'y==x']
-bool operator==(const TWeakFieldPtr<LhsType>& Lhs, const TWeakFieldPtr<RhsType>& Rhs);
-     ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "bool operator ==(const TWeakFieldPtr<T> &,const TWeakFieldPtr<RhsType> &)": Das Vorlage-Argument für "const TWeakFieldPtr<T> &" konnte nicht von "EVrmSpecVersion" abgeleitet werden.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\CoreUObject\Public\UObject\WeakFieldPtr.h(31,6): note: oder "bool operator ==(const TWeakFieldPtr<T> &,const RhsType *)" [synthetisierter Ausdruck 'y==x']
-bool operator==(const TWeakFieldPtr<LhsType>& Lhs, const RhsType* Rhs);
-     ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "bool operator ==(const TWeakFieldPtr<T> &,const RhsType *)": Das Vorlage-Argument für "const TWeakFieldPtr<T> &" konnte nicht von "EVrmSpecVersion" abgeleitet werden.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\CoreUObject\Public\UObject\WeakFieldPtr.h(38,6): note: oder "bool operator ==(const LhsType *,const TWeakFieldPtr<RhsType> &)" [synthetisierter Ausdruck 'y==x']
-bool operator==(const LhsType* Lhs, const TWeakFieldPtr<RhsType>& Rhs);
-     ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "bool operator ==(const LhsType *,const TWeakFieldPtr<RhsType> &)": Das Vorlage-Argument für "const LhsType *" konnte nicht von "EVrmSpecVersion" abgeleitet werden.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\CoreUObject\Public\UObject\WeakFieldPtr.h(376,26): note: oder "bool operator ==(const TWeakFieldPtr<T> &,TYPE_OF_NULLPTR)" [synthetisierter Ausdruck 'y==x']
-UE_FORCEINLINE_HINT bool operator==(const TWeakFieldPtr<LhsType>& Lhs, TYPE_OF_NULLPTR)
-                         ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "bool operator ==(const TWeakFieldPtr<T> &,TYPE_OF_NULLPTR)": Das Vorlage-Argument für "const TWeakFieldPtr<T> &" konnte nicht von "EVrmSpecVersion" abgeleitet werden.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
-C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\CoreUObject\Public\UObject\WeakFieldPtr.h(386,26): note: oder "bool operator ==(TYPE_OF_NULLPTR,const TWeakFieldPtr<T> &)" [synthetisierter Ausdruck 'y==x']
-UE_FORCEINLINE_HINT bool operator==(TYPE_OF_NULLPTR, const TWeakFieldPtr<RhsType>& Rhs)
-                         ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(145,32): note: "bool operator ==(TYPE_OF_NULLPTR,const TWeakFieldPtr<T> &)": Das Vorlage-Argument für "const TWeakFieldPtr<T> &" konnte nicht von "EVrmVersion" abgeleitet werden.
-    const TCHAR* VersionStr = (VrmVersion == EVrmSpecVersion::VRM0) ? TEXT("VRM0") : TEXT("VRM1")
-                               ^
+[4/27] Compile [x64] Module.VrmToolchainEditor.cpp
+[5/27] Compile [x64] VRMMetadata.Upsert.Automation.cpp
+[6/27] Compile [x64] Module.VrmToolchain.cpp
+[7/27] Compile [x64] VRMMetadata.SkeletonInfo.Automation.cpp
+[8/27] Compile [x64] VrmToolchainBPLibrary.cpp
+[9/27] Compile [x64] VrmImportHooksTest.cpp
 [10/27] Compile [x64] VrmToolchain.cpp
 [11/27] Compile [x64] VrmMetadataTests.cpp
 [12/27] Compile [x64] VrmMetadata.cpp
 [13/27] Compile [x64] VrmNormalizationSettings.cpp
 [14/27] Link [x64] UnrealEditor-VrmToolchain.lib
    Bibliothek "C:/Users/Aliso/Documents/GIT/vrm-toolchain-ue/build/Package/VrmToolchain/HostProject/Plugins/VrmToolchain/Intermediate/Build/Win64/x64/UnrealEditor/Development/VrmToolchain/UnrealEditor-VrmToolchain.lib" und Objekt "C:/Users/Aliso/Documents/GIT/vrm-toolchain-ue/build/Package/VrmToolchain/HostProject/Plugins/VrmToolchain/Intermediate/Build/Win64/x64/UnrealEditor/Development/VrmToolchain/UnrealEditor-VrmToolchain.exp" werden erstellt.
-[15/27] Compile [x64] VrmImportHooksTest.cpp
+[15/27] Compile [x64] VrmImportHooks.cpp
 [16/27] Compile [x64] VrmNormalizationTests.cpp
-[17/27] Compile [x64] VrmRetargetScaffoldGeneratorTest.cpp
-[18/27] Compile [x64] VrmSdkFacadeEditor.cpp
-[19/27] Compile [x64] VrmNormalizationService.cpp
+[17/27] Compile [x64] VrmNormalizationService.cpp
+[18/27] Compile [x64] VrmRetargetScaffoldGeneratorTest.cpp
+[19/27] Compile [x64] VrmSdkFacadeEditor.cpp
 [20/27] Compile [x64] VrmToolchainEditor.cpp
 [21/27] Link [x64] UnrealEditor-VrmToolchain.dll
 [22/27] Compile [x64] VrmRetargetActions.cpp
 [23/27] Compile [x64] VrmContentBrowserActions.cpp
 [24/27] Compile [x64] VrmRetargetScaffoldGenerator.cpp
-Trace written to file C:/Users/Aliso/AppData/Roaming/Unreal Engine/AutomationTool/Logs/C+Program+Files+Epic+Games+UE_5.7/UBA-UnrealEditor-Win64-Development.uba with size 22.9kb
-Total time in Unreal Build Accelerator local executor: 29.08 seconds
+[25/27] Link [x64] UnrealEditor-VrmToolchainEditor.lib
+   Bibliothek "C:/Users/Aliso/Documents/GIT/vrm-toolchain-ue/build/Package/VrmToolchain/HostProject/Plugins/VrmToolchain/Intermediate/Build/Win64/x64/UnrealEditor/Development/VrmToolchainEditor/UnrealEditor-VrmToolchainEditor.lib" und Objekt "C:/Users/Aliso/Documents/GIT/vrm-toolchain-ue/build/Package/VrmToolchain/HostProject/Plugins/VrmToolchain/Intermediate/Build/Win64/x64/UnrealEditor/Development/VrmToolchainEditor/UnrealEditor-VrmToolchainEditor.exp" werden erstellt.
+[26/27] Link [x64] UnrealEditor-VrmToolchainEditor.dll
+Module.VrmToolchainEditor.cpp.obj : error LNK2019: Verweis auf nicht aufgelöstes externes Symbol ""__declspec(dllimport) class UClass * __cdecl Z_Construct_UClass_UDeveloperSettings_NoRegister(void)" (__imp_?Z_Construct_UClass_UDeveloperSettings_NoRegister@@YAPEAVUClass@@XZ)" in Funktion ""public: static class UClass * __cdecl UDeveloperSettings::StaticClass(void)" (?StaticClass@UDeveloperSettings@@SAPEAVUClass@@XZ)".
+Module.VrmToolchainEditor.cpp.obj : error LNK2019: Verweis auf nicht aufgelöstes externes Symbol ""__declspec(dllimport) public: __cdecl UDeveloperSettings::UDeveloperSettings(class FVTableHelper &)" (__imp_??0UDeveloperSettings@@QEAA@AEAVFVTableHelper@@@Z)" in Funktion ""public: __cdecl UVrmNormalizationSettings::UVrmNormalizationSettings(class FVTableHelper &)" (??0UVrmNormalizationSettings@@QEAA@AEAVFVTableHelper@@@Z)".
+Module.VrmToolchainEditor.cpp.obj : error LNK2019: Verweis auf nicht aufgelöstes externes Symbol ""__declspec(dllimport) public: virtual __cdecl UDeveloperSettings::~UDeveloperSettings(void)" (__imp_??1UDeveloperSettings@@UEAA@XZ)" in Funktion ""public: virtual __cdecl UVrmNormalizationSettings::~UVrmNormalizationSettings(void)" (??1UVrmNormalizationSettings@@UEAA@XZ)".
+VrmNormalizationSettings.cpp.obj : error LNK2001: Nicht aufgelöstes externes Symbol ""__declspec(dllimport) public: virtual __cdecl UDeveloperSettings::~UDeveloperSettings(void)" (__imp_??1UDeveloperSettings@@UEAA@XZ)".
+Module.VrmToolchainEditor.cpp.obj : error LNK2019: Verweis auf nicht aufgelöstes externes Symbol ""__declspec(dllimport) class UClass * __cdecl Z_Construct_UClass_UDeveloperSettings(void)" (__imp_?Z_Construct_UClass_UDeveloperSettings@@YAPEAVUClass@@XZ)" in Funktion ""void __cdecl `dynamic initializer for 'public: static class UObject * (__cdecl*const * const Z_Construct_UClass_UVrmNormalizationSettings_Statics::DependentSingletons)(void)''(void)" (??__E?DependentSingletons@Z_Construct_UClass_UVrmNormalizationSettings_Statics@@2QBQ6APEAVUObject@@XZB@@YAXXZ)".
+Module.VrmToolchainEditor.cpp.obj : error LNK2001: Nicht aufgelöstes externes Symbol ""public: virtual class TSharedPtr<class SWidget,1> __cdecl UDeveloperSettings::GetCustomSettingsWidget(void)const " (?GetCustomSettingsWidget@UDeveloperSettings@@UEBA?AV?$TSharedPtr@VSWidget@@$00@@XZ)".
+VrmNormalizationSettings.cpp.obj : error LNK2001: Nicht aufgelöstes externes Symbol ""public: virtual class TSharedPtr<class SWidget,1> __cdecl UDeveloperSettings::GetCustomSettingsWidget(void)const " (?GetCustomSettingsWidget@UDeveloperSettings@@UEBA?AV?$TSharedPtr@VSWidget@@$00@@XZ)".
+Module.VrmToolchainEditor.cpp.obj : error LNK2001: Nicht aufgelöstes externes Symbol ""public: virtual class FText __cdecl UDeveloperSettings::GetSectionDescription(void)const " (?GetSectionDescription@UDeveloperSettings@@UEBA?AVFText@@XZ)".
+VrmNormalizationSettings.cpp.obj : error LNK2001: Nicht aufgelöstes externes Symbol ""public: virtual class FText __cdecl UDeveloperSettings::GetSectionDescription(void)const " (?GetSectionDescription@UDeveloperSettings@@UEBA?AVFText@@XZ)".
+Module.VrmToolchainEditor.cpp.obj : error LNK2001: Nicht aufgelöstes externes Symbol ""public: virtual class FName __cdecl UDeveloperSettings::GetSectionName(void)const " (?GetSectionName@UDeveloperSettings@@UEBA?AVFName@@XZ)".
+VrmNormalizationSettings.cpp.obj : error LNK2001: Nicht aufgelöstes externes Symbol ""public: virtual class FName __cdecl UDeveloperSettings::GetSectionName(void)const " (?GetSectionName@UDeveloperSettings@@UEBA?AVFName@@XZ)".
+Module.VrmToolchainEditor.cpp.obj : error LNK2001: Nicht aufgelöstes externes Symbol ""public: virtual class FName __cdecl UDeveloperSettings::GetContainerName(void)const " (?GetContainerName@UDeveloperSettings@@UEBA?AVFName@@XZ)".
+VrmNormalizationSettings.cpp.obj : error LNK2001: Nicht aufgelöstes externes Symbol ""public: virtual class FName __cdecl UDeveloperSettings::GetContainerName(void)const " (?GetContainerName@UDeveloperSettings@@UEBA?AVFName@@XZ)".
+Module.VrmToolchainEditor.cpp.obj : error LNK2001: Nicht aufgelöstes externes Symbol ""public: virtual void __cdecl UDeveloperSettings::PostEditChangeProperty(struct FPropertyChangedEvent &)" (?PostEditChangeProperty@UDeveloperSettings@@UEAAXAEAUFPropertyChangedEvent@@@Z)".
+VrmNormalizationSettings.cpp.obj : error LNK2001: Nicht aufgelöstes externes Symbol ""public: virtual void __cdecl UDeveloperSettings::PostEditChangeProperty(struct FPropertyChangedEvent &)" (?PostEditChangeProperty@UDeveloperSettings@@UEAAXAEAUFPropertyChangedEvent@@@Z)".
+VrmNormalizationSettings.cpp.obj : error LNK2019: Verweis auf nicht aufgelöstes externes Symbol ""__declspec(dllimport) public: __cdecl UDeveloperSettings::UDeveloperSettings(class FObjectInitializer const &)" (__imp_??0UDeveloperSettings@@QEAA@AEBVFObjectInitializer@@@Z)" in Funktion ""public: __cdecl UVrmNormalizationSettings::UVrmNormalizationSettings(void)" (??0UVrmNormalizationSettings@@QEAA@XZ)".
+VrmNormalizationSettings.cpp.obj : error LNK2001: Nicht aufgelöstes externes Symbol ""public: virtual __cdecl UDeveloperSettings::~UDeveloperSettings(void)" (??1UDeveloperSettings@@UEAA@XZ)".
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Binaries\Win64\UnrealEditor-VrmToolchainEditor.dll : fatal error LNK1120: 11 nicht aufgelöste Externe
+Trace written to file C:/Users/Aliso/AppData/Roaming/Unreal Engine/AutomationTool/Logs/C+Program+Files+Epic+Games+UE_5.7/UBA-UnrealEditor-Win64-Development.uba with size 15.7kb
+Total time in Unreal Build Accelerator local executor: 28.86 seconds
 
 Result: Failed (OtherCompilationError)
-Total execution time: 38.95 seconds
-Took 39.26s to run dotnet.exe, ExitCode=6
+Total execution time: 39.47 seconds
+Took 39.76s to run dotnet.exe, ExitCode=6
 UnrealBuildTool failed. See log for more details. (C:\Users\Aliso\AppData\Roaming\Unreal Engine\AutomationTool\Logs\C+Program+Files+Epic+Games+UE_5.7\UBA-UnrealEditor-Win64-Development.txt)
-AutomationTool executed for 0h 0m 39s
+AutomationTool executed for 0h 0m 40s
 AutomationTool exiting with ExitCode=6 (6)
 BUILD FAILED

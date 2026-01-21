@@ -39,7 +39,8 @@ public class VrmToolchainEditor : ModuleRules
             "IKRig",
             "IKRigEditor",
             "Json",
-            "JsonUtilities"
+            "JsonUtilities",
+            "DeveloperSettings"
         });
     }
 }
