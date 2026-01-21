@@ -19,7 +19,7 @@ enum class EVrmSpecVersion : uint8
  * Struct holding VRM metadata extracted from the imported VRM file.
  */
 USTRUCT(BlueprintType)
-struct FVrmMetadata
+struct VRMTOOLCHAIN_API FVrmMetadataRecord
 {
 	GENERATED_BODY()
 
@@ -92,7 +92,7 @@ public:
 	EVrmSpecVersion SpecVersion = EVrmSpecVersion::Unknown;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VRM")
-	FVrmMetadata Metadata;
+	FVrmMetadataRecord Metadata;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VRM")
 	FVrmSkeletonCoverage SkeletonCoverage;
