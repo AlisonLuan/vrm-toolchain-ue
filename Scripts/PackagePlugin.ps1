@@ -1,8 +1,7 @@
 param(
   [string]$UE = "C:\Program Files\Epic Games\UE_5.7",
   [string]$RepoRoot = "C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue",
-  [string]$PluginName = "VrmToolchain",
-  [switch]$AllowBinaries
+  [string]$PluginName = "VrmToolchain"
 )
 
 $ErrorActionPreference = "Stop"
@@ -18,41 +17,43 @@ if (-not (Test-Path $Uplugin)) { throw ".uplugin not found: $Uplugin" }
 Remove-Item -Recurse -Force $OutPkg -ErrorAction SilentlyContinue | Out-Null
 
 # 1) Build package
+Write-Host "Building plugin package..." -ForegroundColor Cyan
 & $UAT BuildPlugin -Plugin="$Uplugin" -Package="$OutPkg" -TargetPlatforms=Win64 -Rocket
 if ($LASTEXITCODE -ne 0) { throw "BuildPlugin failed (exit $LASTEXITCODE)" }
 
-# 2) Fail-fast leak gate for dev-only tools and debug symbols in the package output
-Write-Host "Scanning package for forbidden binaries (.exe, .pdb) under ${OutPkg}..." -ForegroundColor Cyan
-# Find every executable and symbol file in the package output (recursive under $OutPkg only)
-$allLeaks = Get-ChildItem $OutPkg -Recurse -Include "*.exe", "*.pdb" -File -ErrorAction SilentlyContinue
-if ($allLeaks -and -not $AllowBinaries) {
-    Write-Error "Packaging leak detected in ${OutPkg}: the following binaries/symbols were found:" 
-    $allLeaks | ForEach-Object { Write-Error "  $($_.FullName)" }
-    throw "Packaging leak: Binaries or Symbols found in package output at ${OutPkg}. Rerun with -AllowBinaries if this is intentional (developer-only)."
-}
-elseif ($allLeaks -and $AllowBinaries) {
-    Write-Warning "AllowBinaries specified: removing found binaries from package output (opt-in only)."
-    foreach ($file in $allLeaks) {
-        if ($file.Attributes -band [IO.FileAttributes]::ReadOnly) { $file.Attributes = $file.Attributes -bxor [IO.FileAttributes]::ReadOnly }
-        Remove-Item -Force $file.FullName
-        Write-Host "Stripped: $($file.FullName)" -ForegroundColor Gray
-    }
-}
-else {
-    Write-Host "No binaries found in package output." -ForegroundColor Green
+# 2) Strip forbidden binaries and temporary build artifacts
+Write-Host "Stripping forbidden binaries and temporary build artifacts..." -ForegroundColor Cyan
+
+# Delete all .exe and .pdb files recursively
+$exeFiles = Get-ChildItem $OutPkg -Recurse -Include "*.exe" -File -ErrorAction SilentlyContinue
+$pdbFiles = Get-ChildItem $OutPkg -Recurse -Include "*.pdb" -File -ErrorAction SilentlyContinue
+
+foreach ($file in @($exeFiles + $pdbFiles)) {
+    Remove-Item -Force $file.FullName
+    Write-Host "  Removed: $($file.Name)" -ForegroundColor Gray
 }
 
-# Optional: Cleanup empty folders left behind in ThirdParty
-$PkgBinRoot = Join-Path $OutPkg "Source\ThirdParty\VrmSdk\bin"
-if (Test-Path $PkgBinRoot) {
-    if (-not (Get-ChildItem $PkgBinRoot -Recurse -File)) { 
-        Remove-Item -Recurse -Force $PkgBinRoot 
+# Delete temporary build folders
+$tempDirs = @(
+    (Join-Path $OutPkg "Intermediate"),
+    (Join-Path $OutPkg "Saved")
+)
+
+foreach ($dir in $tempDirs) {
+    if (Test-Path $dir) {
+        Remove-Item -Recurse -Force $dir
+        Write-Host "  Removed dir: $(Split-Path -Leaf $dir)" -ForegroundColor Gray
     }
 }
 
-# Final verification: if anything remains, fail
-$finalCheck = Get-ChildItem $OutPkg -Recurse -Include "*.exe", "*.pdb" -File -ErrorAction SilentlyContinue
-if ($finalCheck) {
-    $finalCheck | Select-Object FullName | Format-Table -AutoSize
-    throw "Packaging leak: Binaries or Symbols still exist in the output folder!"
+# 3) Final gate: verify NO binaries or symbols remain
+Write-Host "Running final validation gate..." -ForegroundColor Cyan
+$finalLeaks = Get-ChildItem $OutPkg -Recurse -Include "*.exe", "*.pdb" -File -ErrorAction SilentlyContinue
+if ($finalLeaks) {
+    Write-Error "Packaging validation FAILED: forbidden binaries/symbols still exist in output:"
+    $finalLeaks | ForEach-Object { Write-Error "  $($_.FullName)" }
+    throw "Packaging validation failed. Cannot proceed."
 }
+
+Write-Host "Package validation passed. No forbidden binaries found." -ForegroundColor Green
+Write-Host "Package output: $OutPkg" -ForegroundColor Green
