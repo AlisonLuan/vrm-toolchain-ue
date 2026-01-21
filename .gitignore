@@ -122,3 +122,4 @@ build/
 build_log.txt
 _codeql_detected_source_root
 
+BuildOutput*.log
