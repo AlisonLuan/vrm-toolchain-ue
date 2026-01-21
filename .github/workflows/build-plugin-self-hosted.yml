@@ -123,3 +123,37 @@ jobs:
         with:
           name: VrmToolchain-Package
           path: VrmToolchain-Package.zip
+
+      - name: Run Automation Tests (headless, targeted)
+        shell: pwsh
+        env:
+          UE_ENGINE_PATH: ${{ secrets.UE_ENGINE_PATH }}
+        run: |
+          if (-not $env:UE_ENGINE_PATH) { throw "UE_ENGINE_PATH secret is not set." }
+          $editor = Join-Path $env:UE_ENGINE_PATH 'Engine\Binaries\Win64\UnrealEditor.exe'
+          $project = Join-Path $PWD 'build\Package\VrmToolchain\HostProject\HostProject.uproject'
+          # Target tests under the VrmToolchain namespace to keep CI fast
+          $testFilter = "VrmToolchain"
+          $reports = Join-Path $PWD 'build\AutomationReports'
+          $logs = Join-Path $PWD 'build\AutomationLogs'
+          .\Scripts\RunAutomationTests.ps1 -EditorPath $editor -ProjectPath $project -TestFilter $testFilter -ReportOutputPath $reports -LogDir $logs -TimeoutSeconds 600
+
+      - name: Upload automation logs, reports & deterministic results
+        uses: actions/upload-artifact@v4
+        with:
+          name: Automation-Logs
+          path: |
+            build/AutomationLogs/**
+            build/AutomationReports/**
+            build/TestResults/**
+          retention-days: 7
+
+      - name: Post automation results to PR (if applicable)
+        if: github.event_name == 'pull_request'
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $results = Join-Path $PWD 'build\TestResults\VrmToolchain_Results.json'
+          if (Test-Path $results) { .\Scripts\PostAutomationResultsToPR.ps1 -ResultsFile $results } else { Write-Host "No deterministic results file found: $results" }
+

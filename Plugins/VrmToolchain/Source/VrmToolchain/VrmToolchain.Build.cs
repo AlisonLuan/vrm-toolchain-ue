@@ -40,20 +40,24 @@ string sdkRoot = LocateVrmSdkRoot();
         }
         PublicSystemIncludePaths.Add(includePath);
 
-        // 2. Updated Library Path (Removed "Win64" and handled the flat structure)
+        // 1. Define configuration string (Debug vs Release)
+        string configurationDir = (Target.Configuration == UnrealTargetConfiguration.Debug ||
+                                  Target.Configuration == UnrealTargetConfiguration.DebugGame)
+            ? "Debug"
+            : "Release";
+
+        // 2. Point to the base lib folder
         string libsRoot = Path.Combine(sdkRoot, "lib");
 
-        // Determine if we use the root lib folder (for Release) or the Debug subfolder
-        string configurationLibPath;
-        if (Target.Configuration == UnrealTargetConfiguration.Debug || 
-            Target.Configuration == UnrealTargetConfiguration.DebugGame)
+        // 3. Match folder layout: Debug libs in \lib\Debug, Release libs directly in \lib\
+        string configurationLibPath = (configurationDir == "Debug")
+            ? Path.Combine(libsRoot, "Debug")
+            : libsRoot;
+
+        // Fallback to Debug if the chosen path doesn't exist
+        if (!Directory.Exists(configurationLibPath))
         {
             configurationLibPath = Path.Combine(libsRoot, "Debug");
-        }
-        else
-        {
-            // Your 'dir' showed release libs are directly in \lib\
-            configurationLibPath = libsRoot; 
         }
 
         if (!Directory.Exists(configurationLibPath))
@@ -70,7 +74,7 @@ string sdkRoot = LocateVrmSdkRoot();
             var libPath = Path.Combine(configurationLibPath, lib);
             if (!File.Exists(libPath))
             {
-                missing.Add(libPath); // Changed to show the full path if missing
+                missing.Add(libPath);
             }
             else
             {
@@ -80,7 +84,6 @@ string sdkRoot = LocateVrmSdkRoot();
 
         if (missing.Count > 0)
         {
-            // Changed "configurationDir" to "configurationLibPath" to fix the CS0103 error
             throw new BuildException($"Missing required libraries in VRM SDK folder '{configurationLibPath}': {string.Join(", ", missing)}");
         }
     }
