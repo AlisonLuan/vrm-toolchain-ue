@@ -3,7 +3,7 @@
 #include "Misc/AutomationTest.h"
 #include "Engine/SkeletalMesh.h"
 #include "VrmSdkFacadeEditor.h"
-#include "VrmMetadataAsset.h"
+#include "VrmToolchain/Public/VrmMetadataAsset.h"
 #include "VrmToolchain/Public/VrmMetadata.h"
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmSkeletonInfoTest, "VrmToolchain.Metadata.SkeletonInfo", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)

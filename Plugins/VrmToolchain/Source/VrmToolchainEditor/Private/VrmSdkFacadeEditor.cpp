@@ -1,5 +1,5 @@
 #include "VrmSdkFacadeEditor.h"
-#include "VrmMetadataAsset.h"
+#include "VrmToolchain/Public/VrmMetadataAsset.h"
 #include "VrmToolchain/Public/VrmMetadata.h"
 #include "Engine/AssetUserData.h"
 #include "Engine/SkeletalMesh.h"
