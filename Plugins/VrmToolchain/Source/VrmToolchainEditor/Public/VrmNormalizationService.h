@@ -41,7 +41,6 @@ struct FVrmNormalizationOptions
 	 */
 	bool bAllowOverwrite = false;
 };
-};
 
 /**
  * Service class for normalizing VRM files
