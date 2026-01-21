@@ -16,7 +16,7 @@ Warning: Plugin 'VrmToolchain' does not list plugin 'IKRig' as a dependency, but
 UHT compiled-in object format Default
 Parsing headers for UnrealEditor
   Running Internal UnrealHeaderTool C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\HostProject.uproject C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Intermediate\Build\Win64\UnrealEditor\Development\UnrealEditor.uhtmanifest -WarningsAsErrors -installed
-UHT processed UnrealEditor in 2.1585791 seconds (12 files written)
+UHT processed UnrealEditor in 1.588561 seconds (12 files written)
 Writing manifest to C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Saved\Manifest-UnrealEditor-Win64-Development.xml
 Building UnrealEditor...
 Using Visual Studio 2022 14.44.35222 toolchain (C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207) and Windows 10.0.22621.0 SDK (C:\Program Files (x86)\Windows Kits\10).
@@ -60,10 +60,10 @@ Using Visual Studio 2022 14.44.35222 toolchain (C:\Program Files\Microsoft Visua
 [Adaptive Build] Excluded from CaptureProtocolStack unity file: CaptureProtocolStack.cpp, ControlMessenger.cpp, ControlCommunication.cpp, ControlPacket.cpp, Constants.cpp, ControlJsonUtilities.cpp, ControlMessage.cpp, ControlRequest.cpp, ControlResponse.cpp, ControlUpdate.cpp, DiscoveryMessenger.cpp, DiscoveryCommunication.cpp, DiscoveryPacket.cpp, DiscoveryNotify.cpp, DiscoveryRequest.cpp, DiscoveryResponse.cpp, ExportClient.cpp, ExportWorker.cpp, ExportCommunication.cpp, ExportHeader.cpp, ExportRequest.cpp, ExportResponse.cpp, TestControlJsonUtilities.cpp, TestControlMessage.cpp, TestControlPacket.cpp, TestControlRequest.cpp, TestControlResponse.cpp, TestControlUpdate.cpp, TestDiscoveryNotify.cpp, TestDiscoveryPacket.cpp, TestDiscoveryRequest.cpp, TestDiscoveryResponse.cpp, TestExportHeader.cpp, TestExportRequest.cpp, TestExportResponse.cpp
 Determining max actions to execute in parallel (20 physical cores, 28 logical cores)
   Executing up to 20 processes, one per physical core
-  Requested 1.5 GB memory per action, 8.58 GB available: limiting max parallel actions to 5
+  Requested 1.5 GB memory per action, 8.26 GB available: limiting max parallel actions to 5
 Using Unreal Build Accelerator local executor to run 27 action(s)
   Storage capacity 40Gb
----- Starting trace: 260121_183345 ----
+---- Starting trace: 260121_183459 ----
 UbaServer - Listening on 0.0.0.0:1345
 [1/27] Resource Default.rc2
 [2/27] Resource Default.rc2
@@ -176,7 +176,8 @@ C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostPro
     UVrmMetadataAsset* Asset2 = FVrmSdkFacade::UpsertVrmMetadata(TestMesh, Updated);
                                                                            ^
 [10/27] Compile [x64] VrmMetadataTests.cpp
-[11/27] Compile [x64] VRMMetadata.Upsert.Automation.cpp
+[11/27] Compile [x64] VrmMetadata.cpp
+[12/27] Compile [x64] VRMMetadata.Upsert.Automation.cpp
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(21,61): error C2061: Syntaxfehler: Bezeichner "FVrmMetadata"
     static bool ExtractVrmMetadata(const FString& FilePath, FVrmMetadata& OutMetadata)
                                                             ^
@@ -297,7 +298,6 @@ C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostPro
     TestEqual(TEXT("Title should be updated in-place"), FinalMetadata->Metadata.Title, UpdatedData.Title);
     ^
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(55,5): note: bei Anpassung der Argumentliste "(const wchar_t [33], const FString)"
-[12/27] Compile [x64] VrmMetadata.cpp
 [13/27] Compile [x64] VrmNormalizationSettings.cpp
 [14/27] Compile [x64] VrmImportHooks.cpp
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(21,61): error C2061: Syntaxfehler: Bezeichner "FVrmMetadata"
@@ -329,51 +329,6 @@ C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostPro
 ^
 [17/27] Compile [x64] VrmNormalizationTests.cpp
 [18/27] Compile [x64] VrmRetargetScaffoldGeneratorTest.cpp
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmRetargetScaffoldGeneratorTest.cpp(134,38): error C2248: "FVrmRetargetScaffoldGenerator::FindSpineChain": Kein Zugriff auf private Member, dessen Deklaration in der FVrmRetargetScaffoldGenerator-Klasse erfolgte.
-		if (FVrmRetargetScaffoldGenerator::FindSpineChain(TestBones, Start, End))
-		                                   ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmRetargetScaffoldGenerator.h(84,14): note: Siehe Deklaration von "FVrmRetargetScaffoldGenerator::FindSpineChain"
-	static bool FindSpineChain(const TArray<FName>& BoneNames, FName& OutStart, FName& OutEnd);
-	            ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmRetargetScaffoldGenerator.h(17,30): note: Siehe Deklaration von "FVrmRetargetScaffoldGenerator"
-class VRMTOOLCHAINEDITOR_API FVrmRetargetScaffoldGenerator
-                             ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmRetargetScaffoldGeneratorTest.cpp(141,38): error C2248: "FVrmRetargetScaffoldGenerator::FindArmChain": Kein Zugriff auf private Member, dessen Deklaration in der FVrmRetargetScaffoldGenerator-Klasse erfolgte.
-		if (FVrmRetargetScaffoldGenerator::FindArmChain(TestBones, true, Start, End))
-		                                   ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmRetargetScaffoldGenerator.h(89,14): note: Siehe Deklaration von "FVrmRetargetScaffoldGenerator::FindArmChain"
-	static bool FindArmChain(const TArray<FName>& BoneNames, bool bLeftSide, FName& OutStart, FName& OutEnd);
-	            ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmRetargetScaffoldGenerator.h(17,30): note: Siehe Deklaration von "FVrmRetargetScaffoldGenerator"
-class VRMTOOLCHAINEDITOR_API FVrmRetargetScaffoldGenerator
-                             ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmRetargetScaffoldGeneratorTest.cpp(148,38): error C2248: "FVrmRetargetScaffoldGenerator::FindArmChain": Kein Zugriff auf private Member, dessen Deklaration in der FVrmRetargetScaffoldGenerator-Klasse erfolgte.
-		if (FVrmRetargetScaffoldGenerator::FindArmChain(TestBones, false, Start, End))
-		                                   ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmRetargetScaffoldGenerator.h(89,14): note: Siehe Deklaration von "FVrmRetargetScaffoldGenerator::FindArmChain"
-	static bool FindArmChain(const TArray<FName>& BoneNames, bool bLeftSide, FName& OutStart, FName& OutEnd);
-	            ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmRetargetScaffoldGenerator.h(17,30): note: Siehe Deklaration von "FVrmRetargetScaffoldGenerator"
-class VRMTOOLCHAINEDITOR_API FVrmRetargetScaffoldGenerator
-                             ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmRetargetScaffoldGeneratorTest.cpp(155,38): error C2248: "FVrmRetargetScaffoldGenerator::FindLegChain": Kein Zugriff auf private Member, dessen Deklaration in der FVrmRetargetScaffoldGenerator-Klasse erfolgte.
-		if (FVrmRetargetScaffoldGenerator::FindLegChain(TestBones, true, Start, End))
-		                                   ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmRetargetScaffoldGenerator.h(94,14): note: Siehe Deklaration von "FVrmRetargetScaffoldGenerator::FindLegChain"
-	static bool FindLegChain(const TArray<FName>& BoneNames, bool bLeftSide, FName& OutStart, FName& OutEnd);
-	            ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmRetargetScaffoldGenerator.h(17,30): note: Siehe Deklaration von "FVrmRetargetScaffoldGenerator"
-class VRMTOOLCHAINEDITOR_API FVrmRetargetScaffoldGenerator
-                             ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmRetargetScaffoldGeneratorTest.cpp(162,38): error C2248: "FVrmRetargetScaffoldGenerator::FindLegChain": Kein Zugriff auf private Member, dessen Deklaration in der FVrmRetargetScaffoldGenerator-Klasse erfolgte.
-		if (FVrmRetargetScaffoldGenerator::FindLegChain(TestBones, false, Start, End))
-		                                   ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmRetargetScaffoldGenerator.h(94,14): note: Siehe Deklaration von "FVrmRetargetScaffoldGenerator::FindLegChain"
-	static bool FindLegChain(const TArray<FName>& BoneNames, bool bLeftSide, FName& OutStart, FName& OutEnd);
-	            ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmRetargetScaffoldGenerator.h(17,30): note: Siehe Deklaration von "FVrmRetargetScaffoldGenerator"
-class VRMTOOLCHAINEDITOR_API FVrmRetargetScaffoldGenerator
-                             ^
 [19/27] Compile [x64] VrmNormalizationService.cpp
 [20/27] Compile [x64] VrmToolchainEditor.cpp
 [21/27] Compile [x64] VrmContentBrowserActions.cpp
@@ -384,12 +339,12 @@ C:\Program Files\Epic Games\UE_5.7\Engine\Source\Runtime\Engine\Classes\EditorFr
 class UAssetImportData : public UObject
       ^
 [22/27] Compile [x64] VrmRetargetActions.cpp
-Trace written to file C:/Users/Aliso/AppData/Roaming/Unreal Engine/AutomationTool/Logs/C+Program+Files+Epic+Games+UE_5.7/UBA-UnrealEditor-Win64-Development.uba with size 44.0kb
-Total time in Unreal Build Accelerator local executor: 28.87 seconds
+Trace written to file C:/Users/Aliso/AppData/Roaming/Unreal Engine/AutomationTool/Logs/C+Program+Files+Epic+Games+UE_5.7/UBA-UnrealEditor-Win64-Development.uba with size 38.2kb
+Total time in Unreal Build Accelerator local executor: 28.88 seconds
 
 Result: Failed (OtherCompilationError)
-Total execution time: 39.13 seconds
-Took 39.40s to run dotnet.exe, ExitCode=6
+Total execution time: 38.69 seconds
+Took 39.00s to run dotnet.exe, ExitCode=6
 UnrealBuildTool failed. See log for more details. (C:\Users\Aliso\AppData\Roaming\Unreal Engine\AutomationTool\Logs\C+Program+Files+Epic+Games+UE_5.7\UBA-UnrealEditor-Win64-Development.txt)
 AutomationTool executed for 0h 0m 39s
 AutomationTool exiting with ExitCode=6 (6)

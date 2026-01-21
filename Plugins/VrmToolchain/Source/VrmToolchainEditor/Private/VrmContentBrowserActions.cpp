@@ -132,23 +132,14 @@ bool FVrmContentBrowserActions::GetSourceFilePathFromAsset(const FAssetData& Ass
 	{
 		return false;
 	}
-
-	// Get the first source file path (with exception handling for malformed import data)
+	// Get the source file path from import data
+	// UE 5.7: GetSourceFileCount() and GetSourceFile() replaced with direct SourceData access
 	if (ImportData->GetSourceFileCount() == 0)
 	{
 		return false;
 	}
 
-	FString SourceFilePath;
-	try
-	{
-		SourceFilePath = ImportData->GetSourceFile(0);
-	}
-	catch (...)
-	{
-		UE_LOG(LogVrmToolchainEditor, Warning, TEXT("Exception caught while reading source file from import data"));
-		return false;
-	}
+	FString SourceFilePath = ImportData->GetFilename();
 
 	if (SourceFilePath.IsEmpty())
 	{
