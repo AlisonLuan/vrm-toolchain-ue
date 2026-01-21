@@ -84,8 +84,8 @@ bool FVrmRetargetScaffoldGenerator::FindArmChain(const TArray<FName>& BoneNames,
 		Prefix + TEXT("clavicle"),
 		PrefixAlt + TEXT("shoulder"),
 		PrefixAlt + TEXT("clavicle"),
-		TEXT("shoulder") + TEXT(".") + PrefixShort,
-		TEXT("clavicle") + TEXT(".") + PrefixShort
+		FString(TEXT("shoulder.")) + PrefixShort,
+		FString(TEXT("clavicle.")) + PrefixShort
 	};
 	
 	OutStart = FindBoneByName(BoneNames, StartNames);
@@ -111,7 +111,7 @@ bool FVrmRetargetScaffoldGenerator::FindArmChain(const TArray<FName>& BoneNames,
 	TArray<FString> EndNames = {
 		Prefix + TEXT("hand"),
 		PrefixAlt + TEXT("hand"),
-		TEXT("hand") + TEXT(".") + PrefixShort
+		FString(TEXT("hand.")) + PrefixShort
 	};
 	OutEnd = FindBoneByName(BoneNames, EndNames);
 
@@ -131,7 +131,7 @@ bool FVrmRetargetScaffoldGenerator::FindLegChain(const TArray<FName>& BoneNames,
 		Prefix + TEXT("upperleg"),
 		PrefixAlt + TEXT("thigh"),
 		PrefixAlt + TEXT("upleg"),
-		TEXT("thigh") + TEXT(".") + PrefixShort
+		FString(TEXT("thigh.")) + PrefixShort
 	};
 	OutStart = FindBoneByName(BoneNames, StartNames);
 
@@ -144,7 +144,7 @@ bool FVrmRetargetScaffoldGenerator::FindLegChain(const TArray<FName>& BoneNames,
 	TArray<FString> EndNames = {
 		Prefix + TEXT("foot"),
 		PrefixAlt + TEXT("foot"),
-		TEXT("foot") + TEXT(".") + PrefixShort
+		FString(TEXT("foot.")) + PrefixShort
 	};
 	OutEnd = FindBoneByName(BoneNames, EndNames);
 

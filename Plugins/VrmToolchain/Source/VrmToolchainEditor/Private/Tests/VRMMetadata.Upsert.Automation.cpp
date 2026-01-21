@@ -53,7 +53,7 @@ bool FVrmMetadataUpsertTest::RunTest(const FString& Parameters)
     const UVrmMetadataAsset* FinalMetadata = TestMesh->GetAssetUserData<UVrmMetadataAsset>();
     TestNotNull(TEXT("Final metadata should be present"), FinalMetadata);
     TestEqual(TEXT("Data should be updated in-place (Author)"), FinalMetadata->Metadata.Author, UpdatedData.Authors.Num() > 0 ? UpdatedData.Authors[0] : FString());
-    TestEqual(TEXT("Title should be updated in-place"), FinalMetadata->Metadata.Title, UpdatedData.Title);
+    TestEqual(TEXT("Title should be updated in-place"), FinalMetadata->Metadata.Title, UpdatedData.Name);
 
     return true;
 }
