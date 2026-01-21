@@ -44,7 +44,11 @@ public class VrmToolchainEditor : ModuleRules
             "AssetRegistry",
             "EditorSubsystem",
             "IKRig",
-            "IKRigEditor"
+            "IKRigEditor",
+            "Json",
+            "JsonUtilities"
+        });
+>>>>>>> origin/copilot/add-normalize-vrm-action
         });
     }
 }

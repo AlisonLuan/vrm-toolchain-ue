@@ -69,3 +69,48 @@ The editor module registers a menu entry called "VRM Toolchain" under `LevelEdit
    `RunUAT.bat BuildPlugin -Plugin="Plugins/VrmToolchain/VrmToolchain.uplugin" -Package="Build/VrmToolchain" -TargetPlatforms=Win64 -CreateSubFolder`.
 
 The host project ensures the plugin is built with VS2022/Win64 settings and can be opened directly in Unreal Editor to test the menu stub or runtime wrapper behavior.
+
+## VRM Normalization Feature (Issue #4)
+
+The plugin provides an editor-only action to normalize/repair source VRM files. This is an **optional**, **opt-in** feature that developers can use to produce cleaned copies of VRM assets.
+
+### Features
+- **Content Browser Action**: Right-click on an imported `USkeletalMesh` (that originated from a `.vrm` or `.glb` file) and select **VrmToolchain → Normalize Source VRM**.
+- **Configurable Output**: Settings control where normalized files are written:
+  - **Next to Source** (default): Writes `<SourceDir>/<Name>.normalized.vrm`
+  - **Saved Directory**: Writes to `Saved/VrmToolchain/Normalized/<Name>.normalized.vrm`
+- **Report Generation**: Creates a JSON report (`.report.json`) describing changes made during normalization.
+- **Non-Fatal Failures**: If normalization fails, it logs an error without breaking the project or asset state.
+- **No External Dependencies**: Uses in-process library code (vrm_normalizers.lib); does not require `vrm_validate.exe`.
+
+### Configuration
+Open **Editor Preferences → Plugins → VRM Normalization** to configure:
+- **Output Location**: Choose between "Next to Source" or "Saved Directory"
+- **Overwrite Without Prompt**: Allow overwriting existing normalized files
+- **Normalized Suffix**: Customize the suffix appended to normalized filenames (default: `.normalized`)
+
+### Implementation
+- All normalization code is in the `VrmToolchainEditor` module (editor-only).
+- The runtime module (`VrmToolchain`) is not modified.
+- Uses `UAssetImportData` to resolve source file paths from imported skeletal meshes.
+- Validates that source files have `.vrm` or `.glb` extensions.
+- Generates deterministic output paths based on configurable settings.
+
+### Testing
+Deterministic unit tests verify:
+- Output path generation is deterministic for the same inputs
+- Custom suffixes and different output strategies work correctly
+- Validation logic correctly accepts/rejects file extensions
+
+### Usage Example
+1. Import a VRM file using VRM4U (creates a `USkeletalMesh` asset)
+2. Right-click the skeletal mesh in Content Browser
+3. Select **VrmToolchain → Normalize Source VRM**
+4. The normalized file and report are written to the configured location
+5. A notification shows the output paths or any errors
+
+### Implementation Notes
+- Currently implements a stub that validates and copies the file (actual normalization via vrm_normalizers.lib will be integrated when SDK headers are fully available).
+- The action is only visible for skeletal meshes with valid VRM/GLB source import data.
+- All operations are non-blocking and log results to the Output Log.
+
