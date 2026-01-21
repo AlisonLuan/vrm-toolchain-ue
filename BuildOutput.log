@@ -3,7 +3,7 @@ Using bundled DotNet SDK version: 8.0.412 win-x64
 Starting AutomationTool...
 Parsing command line: BuildPlugin -Plugin=C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\Plugins\VrmToolchain\VrmToolchain.uplugin -Package=C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain -TargetPlatforms=Win64 -Rocket
 Initializing script modules...
-Total script module initialization time: 0.12 s.
+Total script module initialization time: 0.11 s.
 Using C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe
 Executing commands...
 Copying 132 file(s) using max 64 thread(s)
@@ -16,7 +16,7 @@ Warning: Plugin 'VrmToolchain' does not list plugin 'IKRig' as a dependency, but
 UHT compiled-in object format Default
 Parsing headers for UnrealEditor
   Running Internal UnrealHeaderTool C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\HostProject.uproject C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Intermediate\Build\Win64\UnrealEditor\Development\UnrealEditor.uhtmanifest -WarningsAsErrors -installed
-UHT processed UnrealEditor in 2.1797105 seconds (12 files written)
+UHT processed UnrealEditor in 2.2213062 seconds (12 files written)
 Writing manifest to C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Saved\Manifest-UnrealEditor-Win64-Development.xml
 Building UnrealEditor...
 Using Visual Studio 2022 14.44.35222 toolchain (C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207) and Windows 10.0.22621.0 SDK (C:\Program Files (x86)\Windows Kits\10).
@@ -60,64 +60,108 @@ Using Visual Studio 2022 14.44.35222 toolchain (C:\Program Files\Microsoft Visua
 [Adaptive Build] Excluded from CaptureProtocolStack unity file: CaptureProtocolStack.cpp, ControlMessenger.cpp, ControlCommunication.cpp, ControlPacket.cpp, Constants.cpp, ControlJsonUtilities.cpp, ControlMessage.cpp, ControlRequest.cpp, ControlResponse.cpp, ControlUpdate.cpp, DiscoveryMessenger.cpp, DiscoveryCommunication.cpp, DiscoveryPacket.cpp, DiscoveryNotify.cpp, DiscoveryRequest.cpp, DiscoveryResponse.cpp, ExportClient.cpp, ExportWorker.cpp, ExportCommunication.cpp, ExportHeader.cpp, ExportRequest.cpp, ExportResponse.cpp, TestControlJsonUtilities.cpp, TestControlMessage.cpp, TestControlPacket.cpp, TestControlRequest.cpp, TestControlResponse.cpp, TestControlUpdate.cpp, TestDiscoveryNotify.cpp, TestDiscoveryPacket.cpp, TestDiscoveryRequest.cpp, TestDiscoveryResponse.cpp, TestExportHeader.cpp, TestExportRequest.cpp, TestExportResponse.cpp
 Determining max actions to execute in parallel (20 physical cores, 28 logical cores)
   Executing up to 20 processes, one per physical core
-  Requested 1.5 GB memory per action, 12.71 GB available: limiting max parallel actions to 8
+  Requested 1.5 GB memory per action, 13.66 GB available: limiting max parallel actions to 9
 Using Unreal Build Accelerator local executor to run 27 action(s)
   Storage capacity 40Gb
----- Starting trace: 260121_184956 ----
+---- Starting trace: 260121_185226 ----
 UbaServer - Listening on 0.0.0.0:1345
 [1/27] Resource Default.rc2
 [2/27] Resource Default.rc2
 [3/27] Compile [x64] SharedPCH.UnrealEd.Cpp20.cpp
-[4/27] Compile [x64] Module.VrmToolchainEditor.cpp
+[4/27] Compile [x64] Module.VrmToolchain.cpp
 [5/27] Compile [x64] VRMMetadata.Upsert.Automation.cpp
-[6/27] Compile [x64] Module.VrmToolchain.cpp
-[7/27] Compile [x64] VRMMetadata.SkeletonInfo.Automation.cpp
-[8/27] Compile [x64] VrmToolchainBPLibrary.cpp
-[9/27] Compile [x64] VrmImportHooksTest.cpp
-[10/27] Compile [x64] VrmToolchain.cpp
-[11/27] Compile [x64] VrmMetadataTests.cpp
-[12/27] Compile [x64] VrmMetadata.cpp
-[13/27] Compile [x64] VrmNormalizationSettings.cpp
-[14/27] Link [x64] UnrealEditor-VrmToolchain.lib
-   Bibliothek "C:/Users/Aliso/Documents/GIT/vrm-toolchain-ue/build/Package/VrmToolchain/HostProject/Plugins/VrmToolchain/Intermediate/Build/Win64/x64/UnrealEditor/Development/VrmToolchain/UnrealEditor-VrmToolchain.lib" und Objekt "C:/Users/Aliso/Documents/GIT/vrm-toolchain-ue/build/Package/VrmToolchain/HostProject/Plugins/VrmToolchain/Intermediate/Build/Win64/x64/UnrealEditor/Development/VrmToolchain/UnrealEditor-VrmToolchain.exp" werden erstellt.
+[6/27] Compile [x64] VRMMetadata.SkeletonInfo.Automation.cpp
+[7/27] Compile [x64] Module.VrmToolchainEditor.cpp
+[8/27] Compile [x64] VrmNormalizationSettings.cpp
+[9/27] Compile [x64] VrmToolchainBPLibrary.cpp
+[10/27] Compile [x64] VrmImportHooksTest.cpp
+[11/27] Compile [x64] VrmToolchain.cpp
+[12/27] Compile [x64] VrmMetadataTests.cpp
+[13/27] Compile [x64] VrmMetadata.cpp
+[14/27] Compile [x64] VrmNormalizationTests.cpp
 [15/27] Compile [x64] VrmImportHooks.cpp
-[16/27] Compile [x64] VrmNormalizationTests.cpp
-[17/27] Compile [x64] VrmNormalizationService.cpp
-[18/27] Compile [x64] VrmRetargetScaffoldGeneratorTest.cpp
+[16/27] Link [x64] UnrealEditor-VrmToolchain.lib
+   Bibliothek "C:/Users/Aliso/Documents/GIT/vrm-toolchain-ue/build/Package/VrmToolchain/HostProject/Plugins/VrmToolchain/Intermediate/Build/Win64/x64/UnrealEditor/Development/VrmToolchain/UnrealEditor-VrmToolchain.lib" und Objekt "C:/Users/Aliso/Documents/GIT/vrm-toolchain-ue/build/Package/VrmToolchain/HostProject/Plugins/VrmToolchain/Intermediate/Build/Win64/x64/UnrealEditor/Development/VrmToolchain/UnrealEditor-VrmToolchain.exp" werden erstellt.
+[17/27] Compile [x64] VrmRetargetScaffoldGeneratorTest.cpp
+[18/27] Compile [x64] VrmNormalizationService.cpp
 [19/27] Compile [x64] VrmSdkFacadeEditor.cpp
 [20/27] Compile [x64] VrmToolchainEditor.cpp
 [21/27] Link [x64] UnrealEditor-VrmToolchain.dll
-[22/27] Compile [x64] VrmRetargetActions.cpp
-[23/27] Compile [x64] VrmContentBrowserActions.cpp
+[22/27] Compile [x64] VrmContentBrowserActions.cpp
+[23/27] Compile [x64] VrmRetargetActions.cpp
 [24/27] Compile [x64] VrmRetargetScaffoldGenerator.cpp
 [25/27] Link [x64] UnrealEditor-VrmToolchainEditor.lib
    Bibliothek "C:/Users/Aliso/Documents/GIT/vrm-toolchain-ue/build/Package/VrmToolchain/HostProject/Plugins/VrmToolchain/Intermediate/Build/Win64/x64/UnrealEditor/Development/VrmToolchainEditor/UnrealEditor-VrmToolchainEditor.lib" und Objekt "C:/Users/Aliso/Documents/GIT/vrm-toolchain-ue/build/Package/VrmToolchain/HostProject/Plugins/VrmToolchain/Intermediate/Build/Win64/x64/UnrealEditor/Development/VrmToolchainEditor/UnrealEditor-VrmToolchainEditor.exp" werden erstellt.
 [26/27] Link [x64] UnrealEditor-VrmToolchainEditor.dll
-Module.VrmToolchainEditor.cpp.obj : error LNK2019: Verweis auf nicht aufgelöstes externes Symbol ""__declspec(dllimport) class UClass * __cdecl Z_Construct_UClass_UDeveloperSettings_NoRegister(void)" (__imp_?Z_Construct_UClass_UDeveloperSettings_NoRegister@@YAPEAVUClass@@XZ)" in Funktion ""public: static class UClass * __cdecl UDeveloperSettings::StaticClass(void)" (?StaticClass@UDeveloperSettings@@SAPEAVUClass@@XZ)".
-Module.VrmToolchainEditor.cpp.obj : error LNK2019: Verweis auf nicht aufgelöstes externes Symbol ""__declspec(dllimport) public: __cdecl UDeveloperSettings::UDeveloperSettings(class FVTableHelper &)" (__imp_??0UDeveloperSettings@@QEAA@AEAVFVTableHelper@@@Z)" in Funktion ""public: __cdecl UVrmNormalizationSettings::UVrmNormalizationSettings(class FVTableHelper &)" (??0UVrmNormalizationSettings@@QEAA@AEAVFVTableHelper@@@Z)".
-Module.VrmToolchainEditor.cpp.obj : error LNK2019: Verweis auf nicht aufgelöstes externes Symbol ""__declspec(dllimport) public: virtual __cdecl UDeveloperSettings::~UDeveloperSettings(void)" (__imp_??1UDeveloperSettings@@UEAA@XZ)" in Funktion ""public: virtual __cdecl UVrmNormalizationSettings::~UVrmNormalizationSettings(void)" (??1UVrmNormalizationSettings@@UEAA@XZ)".
-VrmNormalizationSettings.cpp.obj : error LNK2001: Nicht aufgelöstes externes Symbol ""__declspec(dllimport) public: virtual __cdecl UDeveloperSettings::~UDeveloperSettings(void)" (__imp_??1UDeveloperSettings@@UEAA@XZ)".
-Module.VrmToolchainEditor.cpp.obj : error LNK2019: Verweis auf nicht aufgelöstes externes Symbol ""__declspec(dllimport) class UClass * __cdecl Z_Construct_UClass_UDeveloperSettings(void)" (__imp_?Z_Construct_UClass_UDeveloperSettings@@YAPEAVUClass@@XZ)" in Funktion ""void __cdecl `dynamic initializer for 'public: static class UObject * (__cdecl*const * const Z_Construct_UClass_UVrmNormalizationSettings_Statics::DependentSingletons)(void)''(void)" (??__E?DependentSingletons@Z_Construct_UClass_UVrmNormalizationSettings_Statics@@2QBQ6APEAVUObject@@XZB@@YAXXZ)".
-Module.VrmToolchainEditor.cpp.obj : error LNK2001: Nicht aufgelöstes externes Symbol ""public: virtual class TSharedPtr<class SWidget,1> __cdecl UDeveloperSettings::GetCustomSettingsWidget(void)const " (?GetCustomSettingsWidget@UDeveloperSettings@@UEBA?AV?$TSharedPtr@VSWidget@@$00@@XZ)".
-VrmNormalizationSettings.cpp.obj : error LNK2001: Nicht aufgelöstes externes Symbol ""public: virtual class TSharedPtr<class SWidget,1> __cdecl UDeveloperSettings::GetCustomSettingsWidget(void)const " (?GetCustomSettingsWidget@UDeveloperSettings@@UEBA?AV?$TSharedPtr@VSWidget@@$00@@XZ)".
-Module.VrmToolchainEditor.cpp.obj : error LNK2001: Nicht aufgelöstes externes Symbol ""public: virtual class FText __cdecl UDeveloperSettings::GetSectionDescription(void)const " (?GetSectionDescription@UDeveloperSettings@@UEBA?AVFText@@XZ)".
-VrmNormalizationSettings.cpp.obj : error LNK2001: Nicht aufgelöstes externes Symbol ""public: virtual class FText __cdecl UDeveloperSettings::GetSectionDescription(void)const " (?GetSectionDescription@UDeveloperSettings@@UEBA?AVFText@@XZ)".
-Module.VrmToolchainEditor.cpp.obj : error LNK2001: Nicht aufgelöstes externes Symbol ""public: virtual class FName __cdecl UDeveloperSettings::GetSectionName(void)const " (?GetSectionName@UDeveloperSettings@@UEBA?AVFName@@XZ)".
-VrmNormalizationSettings.cpp.obj : error LNK2001: Nicht aufgelöstes externes Symbol ""public: virtual class FName __cdecl UDeveloperSettings::GetSectionName(void)const " (?GetSectionName@UDeveloperSettings@@UEBA?AVFName@@XZ)".
-Module.VrmToolchainEditor.cpp.obj : error LNK2001: Nicht aufgelöstes externes Symbol ""public: virtual class FName __cdecl UDeveloperSettings::GetContainerName(void)const " (?GetContainerName@UDeveloperSettings@@UEBA?AVFName@@XZ)".
-VrmNormalizationSettings.cpp.obj : error LNK2001: Nicht aufgelöstes externes Symbol ""public: virtual class FName __cdecl UDeveloperSettings::GetContainerName(void)const " (?GetContainerName@UDeveloperSettings@@UEBA?AVFName@@XZ)".
-Module.VrmToolchainEditor.cpp.obj : error LNK2001: Nicht aufgelöstes externes Symbol ""public: virtual void __cdecl UDeveloperSettings::PostEditChangeProperty(struct FPropertyChangedEvent &)" (?PostEditChangeProperty@UDeveloperSettings@@UEAAXAEAUFPropertyChangedEvent@@@Z)".
-VrmNormalizationSettings.cpp.obj : error LNK2001: Nicht aufgelöstes externes Symbol ""public: virtual void __cdecl UDeveloperSettings::PostEditChangeProperty(struct FPropertyChangedEvent &)" (?PostEditChangeProperty@UDeveloperSettings@@UEAAXAEAUFPropertyChangedEvent@@@Z)".
-VrmNormalizationSettings.cpp.obj : error LNK2019: Verweis auf nicht aufgelöstes externes Symbol ""__declspec(dllimport) public: __cdecl UDeveloperSettings::UDeveloperSettings(class FObjectInitializer const &)" (__imp_??0UDeveloperSettings@@QEAA@AEBVFObjectInitializer@@@Z)" in Funktion ""public: __cdecl UVrmNormalizationSettings::UVrmNormalizationSettings(void)" (??0UVrmNormalizationSettings@@QEAA@XZ)".
-VrmNormalizationSettings.cpp.obj : error LNK2001: Nicht aufgelöstes externes Symbol ""public: virtual __cdecl UDeveloperSettings::~UDeveloperSettings(void)" (??1UDeveloperSettings@@UEAA@XZ)".
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Binaries\Win64\UnrealEditor-VrmToolchainEditor.dll : fatal error LNK1120: 11 nicht aufgelöste Externe
-Trace written to file C:/Users/Aliso/AppData/Roaming/Unreal Engine/AutomationTool/Logs/C+Program+Files+Epic+Games+UE_5.7/UBA-UnrealEditor-Win64-Development.uba with size 15.7kb
-Total time in Unreal Build Accelerator local executor: 28.86 seconds
+[27/27] WriteMetadata UnrealEditor.target [NoUba]
 
-Result: Failed (OtherCompilationError)
-Total execution time: 39.47 seconds
-Took 39.76s to run dotnet.exe, ExitCode=6
-UnrealBuildTool failed. See log for more details. (C:\Users\Aliso\AppData\Roaming\Unreal Engine\AutomationTool\Logs\C+Program+Files+Epic+Games+UE_5.7\UBA-UnrealEditor-Win64-Development.txt)
-AutomationTool executed for 0h 0m 40s
-AutomationTool exiting with ExitCode=6 (6)
-BUILD FAILED
+Trace written to file C:/Users/Aliso/AppData/Roaming/Unreal Engine/AutomationTool/Logs/C+Program+Files+Epic+Games+UE_5.7/UBA-UnrealEditor-Win64-Development.uba with size 10.5kb
+Total time in Unreal Build Accelerator local executor: 30.02 seconds
+
+Result: Succeeded
+Total execution time: 41.66 seconds
+Took 41.96s to run dotnet.exe, ExitCode=0
+Building plugin for target platforms: Win64
+Running: C:\Program Files\Epic Games\UE_5.7\Engine\Binaries\ThirdParty\DotNet\8.0.412\win-x64\dotnet.exe "C:\Program Files\Epic Games\UE_5.7\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.dll" UnrealGame Win64 Development -Project="C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\HostProject.uproject" -plugin="C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\VrmToolchain.uplugin" -noubtmakefiles -manifest="C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Saved\Manifest-UnrealGame-Win64-Development.xml" -nohotreload -log="C:\Users\Aliso\AppData\Roaming\Unreal Engine\AutomationTool\Logs\C+Program+Files+Epic+Games+UE_5.7\UBA-UnrealGame-Win64-Development.txt"
+Log file: C:\Users\Aliso\AppData\Roaming\Unreal Engine\AutomationTool\Logs\C+Program+Files+Epic+Games+UE_5.7\UBA-UnrealGame-Win64-Development.txt
+UHT compiled-in object format Default
+Parsing headers for UnrealGame
+  Running Internal UnrealHeaderTool C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\HostProject.uproject C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Intermediate\Build\Win64\UnrealGame\Development\UnrealGame.uhtmanifest -WarningsAsErrors -installed
+UHT processed UnrealGame in 0.8098322 seconds (6 files written)
+Writing manifest to C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Saved\Manifest-UnrealGame-Win64-Development.xml
+Building UnrealGame...
+Using Visual Studio 2022 14.44.35222 toolchain (C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207) and Windows 10.0.22621.0 SDK (C:\Program Files (x86)\Windows Kits\10).
+[Adaptive Build] Excluded from VrmToolchain unity file: VrmMetadata.cpp, VrmMetadataTests.cpp, VrmToolchain.cpp, VrmToolchainBPLibrary.cpp
+Determining max actions to execute in parallel (20 physical cores, 28 logical cores)
+  Executing up to 20 processes, one per physical core
+  Requested 1.5 GB memory per action, 16.84 GB available: limiting max parallel actions to 11
+Using Unreal Build Accelerator local executor to run 5 action(s)
+  Storage capacity 40Gb
+---- Starting trace: 260121_185259 ----
+UbaSessionServer - Disable remote execution (remote sessions will finish current processes)
+[1/5] Compile [x64] VrmToolchainBPLibrary.cpp
+[2/5] Compile [x64] VrmToolchain.cpp
+[3/5] Compile [x64] Module.VrmToolchain.cpp
+[4/5] Compile [x64] VrmMetadata.cpp
+[5/5] Compile [x64] VrmMetadataTests.cpp
+
+Trace written to file C:/Users/Aliso/AppData/Roaming/Unreal Engine/AutomationTool/Logs/C+Program+Files+Epic+Games+UE_5.7/UBA-UnrealGame-Win64-Development.uba with size 3.6kb
+Total time in Unreal Build Accelerator local executor: 3.88 seconds
+
+Result: Succeeded
+Total execution time: 6.41 seconds
+Took 6.55s to run dotnet.exe, ExitCode=0
+Running: C:\Program Files\Epic Games\UE_5.7\Engine\Binaries\ThirdParty\DotNet\8.0.412\win-x64\dotnet.exe "C:\Program Files\Epic Games\UE_5.7\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.dll" UnrealGame Win64 Shipping -Project="C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\HostProject.uproject" -plugin="C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\VrmToolchain.uplugin" -noubtmakefiles -manifest="C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Saved\Manifest-UnrealGame-Win64-Shipping.xml" -nohotreload -log="C:\Users\Aliso\AppData\Roaming\Unreal Engine\AutomationTool\Logs\C+Program+Files+Epic+Games+UE_5.7\UBA-UnrealGame-Win64-Shipping.txt"
+Log file: C:\Users\Aliso\AppData\Roaming\Unreal Engine\AutomationTool\Logs\C+Program+Files+Epic+Games+UE_5.7\UBA-UnrealGame-Win64-Shipping.txt
+UHT compiled-in object format Default
+Parsing headers for UnrealGame
+  Running Internal UnrealHeaderTool C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\HostProject.uproject C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Intermediate\Build\Win64\UnrealGame\Shipping\UnrealGame.uhtmanifest -WarningsAsErrors -installed
+UHT processed UnrealGame in 0.7802063 seconds (0 files written)
+Writing manifest to C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Saved\Manifest-UnrealGame-Win64-Shipping.xml
+Building UnrealGame...
+Using Visual Studio 2022 14.44.35222 toolchain (C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207) and Windows 10.0.22621.0 SDK (C:\Program Files (x86)\Windows Kits\10).
+[Adaptive Build] Excluded from VrmToolchain unity file: VrmMetadata.cpp, VrmMetadataTests.cpp, VrmToolchain.cpp, VrmToolchainBPLibrary.cpp
+Determining max actions to execute in parallel (20 physical cores, 28 logical cores)
+  Executing up to 20 processes, one per physical core
+  Requested 1.5 GB memory per action, 16.52 GB available: limiting max parallel actions to 11
+Using Unreal Build Accelerator local executor to run 5 action(s)
+  Storage capacity 40Gb
+---- Starting trace: 260121_185306 ----
+UbaSessionServer - Disable remote execution (remote sessions will finish current processes)
+[1/5] Compile [x64] VrmToolchainBPLibrary.cpp
+[2/5] Compile [x64] VrmToolchain.cpp
+[3/5] Compile [x64] Module.VrmToolchain.cpp
+[4/5] Compile [x64] VrmMetadataTests.cpp
+[5/5] Compile [x64] VrmMetadata.cpp
+
+Trace written to file C:/Users/Aliso/AppData/Roaming/Unreal Engine/AutomationTool/Logs/C+Program+Files+Epic+Games+UE_5.7/UBA-UnrealGame-Win64-Shipping.uba with size 3.5kb
+Total time in Unreal Build Accelerator local executor: 3.02 seconds
+
+Result: Succeeded
+Total execution time: 5.31 seconds
+Took 5.46s to run dotnet.exe, ExitCode=0
+Reading filter rules from C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Config\FilterPlugin.ini
+Loading FilterPluginWin64.ini
+BUILD SUCCESSFUL
+AutomationTool executed for 0h 0m 55s
+AutomationTool exiting with ExitCode=0 (Success)
