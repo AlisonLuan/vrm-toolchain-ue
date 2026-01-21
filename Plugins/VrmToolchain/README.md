@@ -103,7 +103,7 @@ Deterministic unit tests verify:
 - Validation logic correctly accepts/rejects file extensions
 
 ### Usage Example
-1. Import a VRM file using VRM4U (creates a `USkeletalMesh` asset)
+1. Import a VRM file using a VRM importer (e.g., VRM4U) (creates a `USkeletalMesh` asset)
 2. Right-click the skeletal mesh in Content Browser
 3. Select **VrmToolchain → Normalize Source VRM**
 4. The normalized file and report are written to the configured location

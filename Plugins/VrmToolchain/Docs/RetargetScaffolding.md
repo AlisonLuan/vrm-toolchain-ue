@@ -17,7 +17,7 @@ The VRM Retarget Scaffolding Generator is an editor-only workflow helper that au
 
 ### Basic Workflow
 
-1. **Import a VRM asset** using VRM4U or similar importer
+1. **Import a VRM asset** using a VRM importer (e.g., VRM4U)
 2. **Navigate to the skeletal mesh** in the Content Browser
 3. **Right-click** on the skeletal mesh asset
 4. **Select "Create Retarget Scaffolding"** from the context menu

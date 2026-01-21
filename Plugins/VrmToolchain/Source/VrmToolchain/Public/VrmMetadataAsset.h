@@ -80,7 +80,7 @@ struct FVrmSkeletonCoverage
 
 /**
  * Asset user data that stores VRM metadata and skeleton coverage information.
- * Attached to SkeletalMesh assets imported via VRM4U.
+ * Attached to SkeletalMesh assets imported via a VRM importer (e.g., VRM4U).
  */
 UCLASS()
 class VRMTOOLCHAIN_API UVrmMetadataAsset : public UAssetUserData

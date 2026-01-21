@@ -78,6 +78,11 @@ jobs:
           if (-not (Test-Path $env:UE_ENGINE_PATH)) { throw "UE_ENGINE_PATH does not exist: $env:UE_ENGINE_PATH" }
           Write-Host "UE_ENGINE_PATH OK: $env:UE_ENGINE_PATH"
 
+      - name: Assert dev-tool staging disabled
+        shell: pwsh
+        run: |
+          if ($env:VRM_TOOLCHAIN_STAGE_DEV_TOOLS) { throw "VRM_TOOLCHAIN_STAGE_DEV_TOOLS must not be set in CI (policy: no dev binaries staged)." }
+
       - name: Package plugin (BuildPlugin + strip dev exe + leak gate)
         shell: pwsh
         env:

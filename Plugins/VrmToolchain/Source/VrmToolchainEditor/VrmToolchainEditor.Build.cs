@@ -18,9 +18,9 @@ public class VrmToolchainEditor : ModuleRules
             string exePath = Path.Combine(pluginDir, "Source", "ThirdParty", "VrmSdk", "bin", "Win64", "vrm_validate.exe");
 
             string stageFlag = Environment.GetEnvironmentVariable("VRM_TOOLCHAIN_STAGE_DEV_TOOLS");
-            if (File.Exists(exePath) && stageFlag == "1")
+            if (File.Exists(exePath) && stageFlag == "1" && Target.bBuildEditor)
             {
-                // Stage as NonUFS so it ships as a loose file (opt-in only)
+                // Stage as NonUFS so it ships as a loose file (opt-in only) and only for editor targets
                 RuntimeDependencies.Add(exePath, StagedFileType.NonUFS);
             }
         }
@@ -51,7 +51,7 @@ public class VrmToolchainEditor : ModuleRules
             "Json",
             "JsonUtilities"
         });
->>>>>>> origin/copilot/add-normalize-vrm-action
-        });
+    }
+} 
     }
 }
