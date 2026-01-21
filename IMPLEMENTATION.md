@@ -24,6 +24,11 @@ This repository now provides a minimal Unreal Engine 5 plugin skeleton plus a li
 - Run Unreal's `GenerateProjectFiles.bat` with `HostProject/HostProject.uproject`, then open the resulting solution in VS2022 and build the `HostProjectEditor` target.
 - The README files under `Plugins/VrmToolchain/` and `HostProject/` explain the local build steps and how to package the plugin via `RunUAT BuildPlugin`.
 
+## Packaging leak gate policy
+- `Scripts/PackagePlugin.ps1` is *fail-fast*: it scans only the package output directory (`$OutPkg`, typically `build\Package\<PluginName>`) for `*.exe` / `*.pdb` and fails the packaging step if any are found.
+- The script accepts an explicit opt-in (`-AllowBinaries`) for local debug only; **CI/workflows must never pass `-AllowBinaries`**. When `-AllowBinaries` is provided, the script will remove binaries from the package output but this is strictly for local developer diagnostics.
+- Developer tooling (for example `vrm_validate.exe`) is **never** staged by `*.Build.cs` rules. Editor code must locate developer tools at runtime via `VRM_SDK_ROOT`, PATH, or local developer-only locations — do not depend on build staging.
+
 ## Next Steps
 1. Replace the stubbed `FVrmSdkFacade` implementation with real VRM SDK calls once the SDK is available.
 2. Expand the editor menu stub into actual tooling (importers, validators) as requirements emerge.
