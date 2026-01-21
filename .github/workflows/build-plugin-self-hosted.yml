@@ -15,6 +15,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: "Lint workflows: forbid -AllowBinaries"
+        shell: pwsh
+        run: |
+          # Fail if any workflow calls PackagePlugin.ps1 with -AllowBinaries (forbidden by policy)
+          $hits = Select-String -Path ".github/workflows/*.yml" -Pattern "-AllowBinaries" -SimpleMatch -CaseSensitive:$false -ErrorAction SilentlyContinue |
+            Where-Object { $_.Line -notmatch '^\s*#' -and $_.Line -match 'PackagePlugin\.ps1' }
+          if ($hits) {
+            $hits | ForEach-Object { Write-Error $_.Line }
+            throw "CI must never call PackagePlugin.ps1 with -AllowBinaries (policy: no binaries in distributed plugin)."
+          }
+          Write-Host "OK: no -AllowBinaries usage in workflows."
+
       - name: Fetch VRM SDK
         shell: pwsh
         env:
@@ -78,6 +90,11 @@ jobs:
           if (-not (Test-Path $env:UE_ENGINE_PATH)) { throw "UE_ENGINE_PATH does not exist: $env:UE_ENGINE_PATH" }
           Write-Host "UE_ENGINE_PATH OK: $env:UE_ENGINE_PATH"
 
+      - name: Assert dev-tool staging disabled
+        shell: pwsh
+        run: |
+          if ($env:VRM_TOOLCHAIN_STAGE_DEV_TOOLS) { throw "VRM_TOOLCHAIN_STAGE_DEV_TOOLS must not be set in CI (policy: no dev binaries staged)." }
+
       - name: Package plugin (BuildPlugin + strip dev exe + leak gate)
         shell: pwsh
         env:
@@ -123,3 +140,37 @@ jobs:
         with:
           name: VrmToolchain-Package
           path: VrmToolchain-Package.zip
+
+      - name: Run Automation Tests (headless, targeted)
+        shell: pwsh
+        env:
+          UE_ENGINE_PATH: ${{ secrets.UE_ENGINE_PATH }}
+        run: |
+          if (-not $env:UE_ENGINE_PATH) { throw "UE_ENGINE_PATH secret is not set." }
+          $editor = Join-Path $env:UE_ENGINE_PATH 'Engine\Binaries\Win64\UnrealEditor.exe'
+          $project = Join-Path $PWD 'build\Package\VrmToolchain\HostProject\HostProject.uproject'
+          # Target tests under the VrmToolchain namespace to keep CI fast
+          $testFilter = "VrmToolchain"
+          $reports = Join-Path $PWD 'build\AutomationReports'
+          $logs = Join-Path $PWD 'build\AutomationLogs'
+          .\Scripts\RunAutomationTests.ps1 -EditorPath $editor -ProjectPath $project -TestFilter $testFilter -ReportOutputPath $reports -LogDir $logs -TimeoutSeconds 600
+
+      - name: Upload automation logs, reports & deterministic results
+        uses: actions/upload-artifact@v4
+        with:
+          name: Automation-Logs
+          path: |
+            build/AutomationLogs/**
+            build/AutomationReports/**
+            build/TestResults/**
+          retention-days: 7
+
+      - name: Post automation results to PR (if applicable)
+        if: github.event_name == 'pull_request'
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          $results = Join-Path $PWD 'build\TestResults\VrmToolchain_Results.json'
+          if (Test-Path $results) { .\Scripts\PostAutomationResultsToPR.ps1 -ResultsFile $results } else { Write-Host "No deterministic results file found: $results" }
+

@@ -119,3 +119,10 @@ build/
 /releases/
 *.zip
 
+build_log.txt
+_codeql_detected_source_root
+
+BuildOutput*.log
+# Local PR prep artifacts
+FINAL_READINESS_REPORT.md
+GITHUB_PR_BODY.txt

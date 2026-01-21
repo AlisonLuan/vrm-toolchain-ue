@@ -6,48 +6,95 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$UAT     = Join-Path $UE "Engine\Build\BatchFiles\RunUAT.bat"
-$Uplugin = Join-Path $RepoRoot "Plugins\$PluginName\$PluginName.uplugin"
-$OutPkg  = Join-Path $RepoRoot "build\Package\$PluginName"
+$UAT      = Join-Path $UE "Engine\Build\BatchFiles\RunUAT.bat"
+$Uplugin  = Join-Path $RepoRoot "Plugins\$PluginName\$PluginName.uplugin"
+$RawPkg   = Join-Path $RepoRoot "build\PackageRaw\$PluginName"
+$OutPkg   = Join-Path $RepoRoot "build\Package\$PluginName"
 
 if (-not (Test-Path $UAT))     { throw "RunUAT not found: $UAT" }
 if (-not (Test-Path $Uplugin)) { throw ".uplugin not found: $Uplugin" }
 
-# Clean package output
+# Clean raw and dist outputs
+Remove-Item -Recurse -Force $RawPkg -ErrorAction SilentlyContinue | Out-Null
 Remove-Item -Recurse -Force $OutPkg -ErrorAction SilentlyContinue | Out-Null
 
-# 1) Build package
-& $UAT BuildPlugin -Plugin="$Uplugin" -Package="$OutPkg" -TargetPlatforms=Win64 -Rocket
+# 1) Build plugin to raw staging directory
+Write-Host "Building plugin package to raw staging..." -ForegroundColor Cyan
+& $UAT BuildPlugin -Plugin="$Uplugin" -Package="$RawPkg" -TargetPlatforms=Win64 -Rocket
 if ($LASTEXITCODE -ne 0) { throw "BuildPlugin failed (exit $LASTEXITCODE)" }
 
-# 2) Strip ALL dev-only tools and debug symbols from the ENTIRE package
-Write-Host "Sanitizing package: Removing all .exe and .pdb files..." -ForegroundColor Cyan
+# 2) Copy allowed folders from raw → dist using robocopy
+Write-Host "Filtering plugin output to clean dist..." -ForegroundColor Cyan
+New-Item -ItemType Directory -Path $OutPkg -Force | Out-Null
 
-# Find every executable and symbol file in the output (recursive from root)
-$allLeaks = Get-ChildItem $OutPkg -Recurse -Include "*.exe", "*.pdb" -File
+# Allowed folders to copy (everything else in Intermediate, Saved, HostProject, etc. is trash)
+$allowedFolders = @("Binaries", "Resources", "Source")
 
-foreach ($file in $allLeaks) {
-    # Clear ReadOnly flag to prevent 'Access Denied' errors
-    if ($file.Attributes -band [IO.FileAttributes]::ReadOnly) {
-        $file.Attributes = $file.Attributes -bxor [IO.FileAttributes]::ReadOnly
-    }
-    Remove-Item -Force $file.FullName
-    Write-Host "Stripped: $($file.Name)" -ForegroundColor Gray
-}
-
-# Optional: Cleanup empty folders left behind in ThirdParty
-$PkgBinRoot = Join-Path $OutPkg "Source\ThirdParty\VrmSdk\bin"
-if (Test-Path $PkgBinRoot) {
-    if (-not (Get-ChildItem $PkgBinRoot -Recurse -File)) { 
-        Remove-Item -Recurse -Force $PkgBinRoot 
+foreach ($folder in $allowedFolders) {
+    $src = Join-Path $RawPkg $folder
+    $dst = Join-Path $OutPkg $folder
+    
+    if (Test-Path $src) {
+        Write-Host "  Copying $folder..." -ForegroundColor Gray
+        robocopy "$src" "$dst" /E /NP /NFL /NDL | Out-Null
+        if ($LASTEXITCODE -gt 7) {
+            throw "robocopy failed for $folder (exit $LASTEXITCODE)"
+        }
     }
 }
 
-# 3) Final Leak Gate Check (Global)
-$finalCheck = Get-ChildItem $OutPkg -Recurse -Include "*.exe", "*.pdb" -File
-if ($finalCheck) {
-    $finalCheck | Select-Object FullName | Format-Table -AutoSize
-    throw "Packaging leak: Binaries or Symbols still exist in the output folder!"
+# Copy uplugin manifest (required)
+$upluginFile = Join-Path $RawPkg "$PluginName.uplugin"
+if (Test-Path $upluginFile) {
+    Write-Host "  Copying $PluginName.uplugin..." -ForegroundColor Gray
+    Copy-Item $upluginFile -Destination (Join-Path $OutPkg "$PluginName.uplugin") -Force
 }
 
-Write-Host "OK: Package is fully sanitized (No .exe or .pdb found)." -ForegroundColor Green
+# Copy optional README if exists
+$readmeFile = Join-Path $RawPkg "README.md"
+if (Test-Path $readmeFile) {
+    Write-Host "  Copying README.md..." -ForegroundColor Gray
+    Copy-Item $readmeFile -Destination (Join-Path $OutPkg "README.md") -Force
+}
+
+# 3) Strip forbidden binaries from dist folder
+Write-Host "Stripping forbidden binaries from dist folder..." -ForegroundColor Cyan
+
+# Scan and report forbidden files
+$exeFiles = Get-ChildItem $OutPkg -Recurse -Include "*.exe" -File -ErrorAction SilentlyContinue
+$pdbFiles = Get-ChildItem $OutPkg -Recurse -Include "*.pdb" -File -ErrorAction SilentlyContinue
+
+if ($exeFiles -or $pdbFiles) {
+    Write-Host "Found forbidden files (will be removed):" -ForegroundColor Yellow
+    foreach ($file in @($exeFiles + $pdbFiles)) {
+        Write-Host "  - $($file.Name)" -ForegroundColor Yellow
+    }
+}
+
+# Remove the files
+foreach ($file in @($exeFiles + $pdbFiles)) {
+    Remove-Item -Force $file.FullName -ErrorAction Continue
+}
+
+if ($exeFiles -or $pdbFiles) {
+    $exeCount = if ($exeFiles.Count) { $exeFiles.Count } else { 0 }
+    $pdbCount = if ($pdbFiles.Count) { $pdbFiles.Count } else { 0 }
+    $totalRemoved = $exeCount + $pdbCount
+    Write-Host "  Removed: $totalRemoved file(s)" -ForegroundColor Green
+}
+
+# 4) Cleanup raw staging (optional, can keep for inspection)
+Write-Host "Cleaning up raw staging folder..." -ForegroundColor Cyan
+Remove-Item -Recurse -Force $RawPkg -ErrorAction SilentlyContinue | Out-Null
+Write-Host "✓ Raw staging cleaned" -ForegroundColor Green
+
+# 5) Validate final dist folder using the contract validation script
+Write-Host "Running package contract validation..." -ForegroundColor Cyan
+$ValidateScript = Join-Path (Split-Path $PSScriptRoot) "Scripts\ValidatePackage.ps1"
+& $ValidateScript -PackagePath $OutPkg
+
+if ($LASTEXITCODE -ne 0) {
+    throw "Package contract validation failed (exit code: $LASTEXITCODE)"
+}
+
+Write-Host "`n✓ Package output: $OutPkg" -ForegroundColor Green

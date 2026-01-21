@@ -11,15 +11,8 @@ public class VrmToolchainEditor : ModuleRules
         {
             PrivateDefinitions.Add("VRM_TOOLCHAIN_WIN64=1");
             
-            // Stage vrm_validate.exe runtime dependency for Win64
-            string pluginDir = Path.GetFullPath(Path.Combine(ModuleDirectory, "..", ".."));
-            string exePath = Path.Combine(pluginDir, "Source", "ThirdParty", "VrmSdk", "bin", "Win64", "vrm_validate.exe");
-            
-            if (File.Exists(exePath))
-            {
-                // Stage as NonUFS so it ships as a loose file
-                RuntimeDependencies.Add(exePath, StagedFileType.NonUFS);
-            }
+            // Developer tool staging removed: do NOT ship developer-only executables like vrm_validate.exe via build rules.
+            // Editor code should locate optional developer tooling at runtime via VRM_SDK_ROOT, PATH, or local dev-only locations.
         }
 
         PublicDependencyModuleNames.AddRange(new string[]
@@ -38,7 +31,16 @@ public class VrmToolchainEditor : ModuleRules
         PrivateDependencyModuleNames.AddRange(new string[]
         {
             "LevelEditor",
-            "ToolMenus"
+            "ToolMenus",
+            "ContentBrowser",
+            "AssetTools",
+            "AssetRegistry",
+            "EditorSubsystem",
+            "IKRig",
+            "IKRigEditor",
+            "Json",
+            "JsonUtilities",
+            "DeveloperSettings"
         });
     }
 }
