@@ -3,10 +3,10 @@ Using bundled DotNet SDK version: 8.0.412 win-x64
 Starting AutomationTool...
 Parsing command line: BuildPlugin -Plugin=C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\Plugins\VrmToolchain\VrmToolchain.uplugin -Package=C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain -TargetPlatforms=Win64 -Rocket
 Initializing script modules...
-Total script module initialization time: 0.11 s.
+Total script module initialization time: 0.10 s.
 Using C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin\MSBuild.exe
 Executing commands...
-Copying 131 file(s) using max 64 thread(s)
+Copying 132 file(s) using max 64 thread(s)
 Reading plugin from C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\VrmToolchain.uplugin...
 Building plugin for host platforms: Win64
 Running: C:\Program Files\Epic Games\UE_5.7\Engine\Binaries\ThirdParty\DotNet\8.0.412\win-x64\dotnet.exe "C:\Program Files\Epic Games\UE_5.7\Engine\Binaries\DotNET\UnrealBuildTool\UnrealBuildTool.dll" UnrealEditor Win64 Development -Project="C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\HostProject.uproject" -plugin="C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\VrmToolchain.uplugin" -noubtmakefiles -manifest="C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Saved\Manifest-UnrealEditor-Win64-Development.xml" -nohotreload -log="C:\Users\Aliso\AppData\Roaming\Unreal Engine\AutomationTool\Logs\C+Program+Files+Epic+Games+UE_5.7\UBA-UnrealEditor-Win64-Development.txt"
@@ -16,12 +16,12 @@ Warning: Plugin 'VrmToolchain' does not list plugin 'IKRig' as a dependency, but
 UHT compiled-in object format Default
 Parsing headers for UnrealEditor
   Running Internal UnrealHeaderTool C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\HostProject.uproject C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Intermediate\Build\Win64\UnrealEditor\Development\UnrealEditor.uhtmanifest -WarningsAsErrors -installed
-UHT processed UnrealEditor in 3.0136001 seconds (12 files written)
+UHT processed UnrealEditor in 1.1990395 seconds (12 files written)
 Writing manifest to C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Saved\Manifest-UnrealEditor-Win64-Development.xml
 Building UnrealEditor...
 Using Visual Studio 2022 14.44.35222 toolchain (C:\Program Files\Microsoft Visual Studio\2022\Community\VC\Tools\MSVC\14.44.35207) and Windows 10.0.22621.0 SDK (C:\Program Files (x86)\Windows Kits\10).
-[Adaptive Build] Excluded from VrmToolchain unity file: VrmMetadata.cpp, VrmMetadataTests.cpp, VrmSdkFacadeHelpers.cpp, VrmToolchain.cpp, VrmToolchainBPLibrary.cpp
-[Adaptive Build] Excluded from VrmToolchainEditor unity file: VrmContentBrowserActions.cpp, VrmImportHooks.cpp, VrmImportHooksTest.cpp, VrmNormalizationService.cpp, VrmNormalizationSettings.cpp, VrmNormalizationTests.cpp, VrmRetargetActions.cpp, VrmRetargetScaffoldGenerator.cpp, VrmRetargetScaffoldGeneratorTest.cpp, VrmToolchainEditor.cpp, VRMMetadata.SkeletonInfo.Automation.cpp, VRMMetadata.Upsert.Automation.cpp
+[Adaptive Build] Excluded from VrmToolchain unity file: VrmMetadata.cpp, VrmMetadataTests.cpp, VrmToolchain.cpp, VrmToolchainBPLibrary.cpp
+[Adaptive Build] Excluded from VrmToolchainEditor unity file: VrmContentBrowserActions.cpp, VrmImportHooks.cpp, VrmImportHooksTest.cpp, VrmNormalizationService.cpp, VrmNormalizationSettings.cpp, VrmNormalizationTests.cpp, VrmRetargetActions.cpp, VrmRetargetScaffoldGenerator.cpp, VrmRetargetScaffoldGeneratorTest.cpp, VrmSdkFacadeEditor.cpp, VrmToolchainEditor.cpp, VRMMetadata.SkeletonInfo.Automation.cpp, VRMMetadata.Upsert.Automation.cpp
 [Adaptive Build] Excluded from MetaHumanCalibrationDiagnostics unity file: MetaHumanCalibrationDiagnosticsModule.cpp, UMetaHumanRobustFeatureMatcher.cpp, MetaHumanCalibrationErrorCalculator.cpp, SCalibrationDiagnosticsImageViewer.cpp, SCalibrationDiagnosticsWindow.cpp
 [Adaptive Build] Excluded from CaptureDataUtils unity file: CaptureDataUtilsModule.cpp, ImageSequenceTimecodeUtils.cpp, ParseTakeUtils.cpp, SoundWaveTimecodeUtils.cpp
 [Adaptive Build] Excluded from MetaHumanCalibrationCore unity file: MetaHumanAreaOfInterest.cpp, MetaHumanCalibrationCoreModule.cpp, MetaHumanCalibrationStyle.cpp, TestMetaHumanCalibrationFrameResolver.cpp, MetaHumanCalibrationAreaSelection.cpp, MetaHumanCalibrationFrameResolver.cpp, MetaHumanCalibrationNotificationManager.cpp, MetaHumanCalibrationUtils.cpp, MetaHumanChessboardPointCounter.cpp, SMetaHumanImageViewerScrubber.cpp, SMetaHumanSingleImageViewer.cpp
@@ -60,47 +60,25 @@ Using Visual Studio 2022 14.44.35222 toolchain (C:\Program Files\Microsoft Visua
 [Adaptive Build] Excluded from CaptureProtocolStack unity file: CaptureProtocolStack.cpp, ControlMessenger.cpp, ControlCommunication.cpp, ControlPacket.cpp, Constants.cpp, ControlJsonUtilities.cpp, ControlMessage.cpp, ControlRequest.cpp, ControlResponse.cpp, ControlUpdate.cpp, DiscoveryMessenger.cpp, DiscoveryCommunication.cpp, DiscoveryPacket.cpp, DiscoveryNotify.cpp, DiscoveryRequest.cpp, DiscoveryResponse.cpp, ExportClient.cpp, ExportWorker.cpp, ExportCommunication.cpp, ExportHeader.cpp, ExportRequest.cpp, ExportResponse.cpp, TestControlJsonUtilities.cpp, TestControlMessage.cpp, TestControlPacket.cpp, TestControlRequest.cpp, TestControlResponse.cpp, TestControlUpdate.cpp, TestDiscoveryNotify.cpp, TestDiscoveryPacket.cpp, TestDiscoveryRequest.cpp, TestDiscoveryResponse.cpp, TestExportHeader.cpp, TestExportRequest.cpp, TestExportResponse.cpp
 Determining max actions to execute in parallel (20 physical cores, 28 logical cores)
   Executing up to 20 processes, one per physical core
-  Requested 1.5 GB memory per action, 9.21 GB available: limiting max parallel actions to 6
+  Requested 1.5 GB memory per action, 9.53 GB available: limiting max parallel actions to 6
 Using Unreal Build Accelerator local executor to run 27 action(s)
   Storage capacity 40Gb
----- Starting trace: 260121_184052 ----
+---- Starting trace: 260121_184304 ----
 UbaServer - Listening on 0.0.0.0:1345
 [1/27] Resource Default.rc2
 [2/27] Resource Default.rc2
 [3/27] Compile [x64] SharedPCH.UnrealEd.Cpp20.cpp
-[4/27] Compile [x64] VrmSdkFacadeHelpers.cpp
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(20,28): error C3646: "DetectVrmVersion": Unbekannter Überschreibungsspezifizierer
+[4/27] Compile [x64] Module.VrmToolchain.cpp
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(18,28): error C3646: "DetectVrmVersion": Unbekannter Überschreibungsspezifizierer
     static EVrmSpecVersion DetectVrmVersion(const FString& FilePath);
                            ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(20,45): error C2059: Syntaxfehler: "const"
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(18,45): error C2059: Syntaxfehler: "const"
     static EVrmSpecVersion DetectVrmVersion(const FString& FilePath);
                                             ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(20,69): error C2238: Unerwartete(s) Token vor ";"
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(18,69): error C2238: Unerwartete(s) Token vor ";"
     static EVrmSpecVersion DetectVrmVersion(const FString& FilePath);
                                                                     ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(23,61): error C2061: Syntaxfehler: Bezeichner "FVrmMetadata"
-    static bool ExtractVrmMetadata(const FString& FilePath, FVrmMetadata& OutMetadata);
-                                                            ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(26,72): error C4430: Fehlender Typspezifizierer - int wird angenommen. Hinweis: "default-int" wird von C++ nicht unterstützt.
-    static class UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata);
-                                                                       ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(26,90): error C2143: Syntaxfehler: Es fehlt "," vor "&"
-    static class UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata);
-                                                                                         ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Private\VrmSdkFacadeHelpers.cpp(3,1): fatal error C1083: Datei (Include) kann nicht geöffnet werden: "VrmMetadataAsset.h": No such file or directory
-#include "VrmMetadataAsset.h"
-^
-[5/27] Compile [x64] Module.VrmToolchain.cpp
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(20,28): error C3646: "DetectVrmVersion": Unbekannter Überschreibungsspezifizierer
-    static EVrmSpecVersion DetectVrmVersion(const FString& FilePath);
-                           ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(20,45): error C2059: Syntaxfehler: "const"
-    static EVrmSpecVersion DetectVrmVersion(const FString& FilePath);
-                                            ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(20,69): error C2238: Unerwartete(s) Token vor ";"
-    static EVrmSpecVersion DetectVrmVersion(const FString& FilePath);
-                                                                    ^
-[6/27] Compile [x64] Module.VrmToolchainEditor.cpp
+[5/27] Compile [x64] Module.VrmToolchainEditor.cpp
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Intermediate\Build\Win64\UnrealEditor\Inc\VrmToolchainEditor\UHT\VrmMetadataAsset.gen.cpp(136,42): error C4273: "FVrmMetadataRecord::StaticStruct": Inkonsistente DLL-Bindung.
 class UScriptStruct* FVrmMetadataRecord::StaticStruct()
                                          ^
@@ -137,111 +115,65 @@ UVrmMetadataAsset::~UVrmMetadataAsset() {}
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmMetadataAsset.h(88,2): note: siehe vorherige Definition von "UVrmMetadataAsset::~UVrmMetadataAsset"
 	GENERATED_BODY()
 	^
-[7/27] Compile [x64] VRMMetadata.SkeletonInfo.Automation.cpp
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(20,28): error C3646: "DetectVrmVersion": Unbekannter Überschreibungsspezifizierer
-    static EVrmSpecVersion DetectVrmVersion(const FString& FilePath);
-                           ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(20,45): error C2059: Syntaxfehler: "const"
-    static EVrmSpecVersion DetectVrmVersion(const FString& FilePath);
-                                            ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(20,69): error C2238: Unerwartete(s) Token vor ";"
-    static EVrmSpecVersion DetectVrmVersion(const FString& FilePath);
-                                                                    ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(23,61): error C2061: Syntaxfehler: Bezeichner "FVrmMetadata"
-    static bool ExtractVrmMetadata(const FString& FilePath, FVrmMetadata& OutMetadata);
-                                                            ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(26,72): error C4430: Fehlender Typspezifizierer - int wird angenommen. Hinweis: "default-int" wird von C++ nicht unterstützt.
-    static class UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata);
-                                                                       ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(26,90): error C2143: Syntaxfehler: Es fehlt "," vor "&"
-    static class UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata);
-                                                                                         ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.SkeletonInfo.Automation.cpp(37,5): error C2065: "FVrmMetadata": nichtdeklarierter Bezeichner
-    FVrmMetadata InitialMetadata;
-    ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.SkeletonInfo.Automation.cpp(37,18): error C2146: Syntaxfehler: Fehlendes ";" vor Bezeichner "InitialMetadata"
+[6/27] Compile [x64] VRMMetadata.SkeletonInfo.Automation.cpp
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.SkeletonInfo.Automation.cpp(37,18): error C2079: "InitialMetadata" verwendet undefiniertes struct "FVrmMetadata"
     FVrmMetadata InitialMetadata;
                  ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.SkeletonInfo.Automation.cpp(37,18): error C2065: "InitialMetadata": nichtdeklarierter Bezeichner
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.SkeletonInfo.Automation.cpp(38,5): error C2065: "InitialMetadata": nichtdeklarierter Bezeichner
-    InitialMetadata.Title = TEXT("SkeletonTest");
-    ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.SkeletonInfo.Automation.cpp(40,76): error C2065: "InitialMetadata": nichtdeklarierter Bezeichner
-    UVrmMetadataAsset* Asset1 = FVrmSdkFacade::UpsertVrmMetadata(TestMesh, InitialMetadata);
-                                                                           ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.SkeletonInfo.Automation.cpp(47,5): error C2065: "FVrmMetadata": nichtdeklarierter Bezeichner
-    FVrmMetadata Updated;
-    ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.SkeletonInfo.Automation.cpp(47,18): error C2146: Syntaxfehler: Fehlendes ";" vor Bezeichner "Updated"
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.SkeletonInfo.Automation.cpp(40,54): error C2664: "UVrmMetadataAsset *FVrmSdkFacadeEditor::UpsertVrmMetadata(UObject *,const FVrmMetadata &)" : Konvertierung von Argument 2 von "<error type>" in "const FVrmMetadata &" nicht möglich
+    UVrmMetadataAsset* Asset1 = FVrmSdkFacadeEditor::UpsertVrmMetadata(TestMesh, InitialMetadata);
+                                                     ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.SkeletonInfo.Automation.cpp(40,82): note: Ursache: Konvertierung von "<error type>" in "const FVrmMetadata" nicht möglich
+    UVrmMetadataAsset* Asset1 = FVrmSdkFacadeEditor::UpsertVrmMetadata(TestMesh, InitialMetadata);
+                                                                                 ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.SkeletonInfo.Automation.cpp(40,82): note: Der nicht definierte Typ "FVrmMetadata" wird verwendet.
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmSdkFacadeEditor.h(6,8): note: Siehe Deklaration von "FVrmMetadata"
+struct FVrmMetadata;
+       ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmSdkFacadeEditor.h(17,31): note: Siehe Deklaration von "FVrmSdkFacadeEditor::UpsertVrmMetadata"
+    static UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata);
+                              ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.SkeletonInfo.Automation.cpp(40,54): note: bei Anpassung der Argumentliste "(USkeletalMesh *, <error type>)"
+    UVrmMetadataAsset* Asset1 = FVrmSdkFacadeEditor::UpsertVrmMetadata(TestMesh, InitialMetadata);
+                                                     ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.SkeletonInfo.Automation.cpp(47,18): error C2079: "Updated" verwendet undefiniertes struct "FVrmMetadata"
     FVrmMetadata Updated;
                  ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.SkeletonInfo.Automation.cpp(47,18): error C2065: "Updated": nichtdeklarierter Bezeichner
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.SkeletonInfo.Automation.cpp(48,5): error C2065: "Updated": nichtdeklarierter Bezeichner
-    Updated.Title = TEXT("SkeletonTestUpdated");
-    ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.SkeletonInfo.Automation.cpp(49,76): error C2065: "Updated": nichtdeklarierter Bezeichner
-    UVrmMetadataAsset* Asset2 = FVrmSdkFacade::UpsertVrmMetadata(TestMesh, Updated);
-                                                                           ^
-[8/27] Compile [x64] VrmToolchainBPLibrary.cpp
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(20,28): error C3646: "DetectVrmVersion": Unbekannter Überschreibungsspezifizierer
-    static EVrmSpecVersion DetectVrmVersion(const FString& FilePath);
-                           ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(20,45): error C2059: Syntaxfehler: "const"
-    static EVrmSpecVersion DetectVrmVersion(const FString& FilePath);
-                                            ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(20,69): error C2238: Unerwartete(s) Token vor ";"
-    static EVrmSpecVersion DetectVrmVersion(const FString& FilePath);
-                                                                    ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(23,61): error C2061: Syntaxfehler: Bezeichner "FVrmMetadata"
-    static bool ExtractVrmMetadata(const FString& FilePath, FVrmMetadata& OutMetadata);
-                                                            ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(26,72): error C4430: Fehlender Typspezifizierer - int wird angenommen. Hinweis: "default-int" wird von C++ nicht unterstützt.
-    static class UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata);
-                                                                       ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(26,90): error C2143: Syntaxfehler: Es fehlt "," vor "&"
-    static class UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata);
-                                                                                         ^
-[9/27] Compile [x64] VRMMetadata.Upsert.Automation.cpp
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(20,28): error C3646: "DetectVrmVersion": Unbekannter Überschreibungsspezifizierer
-    static EVrmSpecVersion DetectVrmVersion(const FString& FilePath);
-                           ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(20,45): error C2059: Syntaxfehler: "const"
-    static EVrmSpecVersion DetectVrmVersion(const FString& FilePath);
-                                            ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(20,69): error C2238: Unerwartete(s) Token vor ";"
-    static EVrmSpecVersion DetectVrmVersion(const FString& FilePath);
-                                                                    ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(23,61): error C2061: Syntaxfehler: Bezeichner "FVrmMetadata"
-    static bool ExtractVrmMetadata(const FString& FilePath, FVrmMetadata& OutMetadata);
-                                                            ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(26,72): error C4430: Fehlender Typspezifizierer - int wird angenommen. Hinweis: "default-int" wird von C++ nicht unterstützt.
-    static class UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata);
-                                                                       ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(26,90): error C2143: Syntaxfehler: Es fehlt "," vor "&"
-    static class UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata);
-                                                                                         ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(17,5): error C2065: "FVrmMetadata": nichtdeklarierter Bezeichner
-    FVrmMetadata InitialData;
-    ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(17,18): error C2146: Syntaxfehler: Fehlendes ";" vor Bezeichner "InitialData"
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.SkeletonInfo.Automation.cpp(49,54): error C2664: "UVrmMetadataAsset *FVrmSdkFacadeEditor::UpsertVrmMetadata(UObject *,const FVrmMetadata &)" : Konvertierung von Argument 2 von "<error type>" in "const FVrmMetadata &" nicht möglich
+    UVrmMetadataAsset* Asset2 = FVrmSdkFacadeEditor::UpsertVrmMetadata(TestMesh, Updated);
+                                                     ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.SkeletonInfo.Automation.cpp(49,82): note: Ursache: Konvertierung von "<error type>" in "const FVrmMetadata" nicht möglich
+    UVrmMetadataAsset* Asset2 = FVrmSdkFacadeEditor::UpsertVrmMetadata(TestMesh, Updated);
+                                                                                 ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.SkeletonInfo.Automation.cpp(49,82): note: Der nicht definierte Typ "FVrmMetadata" wird verwendet.
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmSdkFacadeEditor.h(6,8): note: Siehe Deklaration von "FVrmMetadata"
+struct FVrmMetadata;
+       ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmSdkFacadeEditor.h(17,31): note: Siehe Deklaration von "FVrmSdkFacadeEditor::UpsertVrmMetadata"
+    static UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata);
+                              ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.SkeletonInfo.Automation.cpp(49,54): note: bei Anpassung der Argumentliste "(USkeletalMesh *, <error type>)"
+    UVrmMetadataAsset* Asset2 = FVrmSdkFacadeEditor::UpsertVrmMetadata(TestMesh, Updated);
+                                                     ^
+[7/27] Compile [x64] VRMMetadata.Upsert.Automation.cpp
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(17,18): error C2079: "InitialData" verwendet undefiniertes struct "FVrmMetadata"
     FVrmMetadata InitialData;
                  ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(17,18): error C2065: "InitialData": nichtdeklarierter Bezeichner
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(18,5): error C2065: "InitialData": nichtdeklarierter Bezeichner
-    InitialData.Title = TEXT("Test Model");
-    ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(19,5): error C2065: "InitialData": nichtdeklarierter Bezeichner
-    InitialData.Author = TEXT("Author A");
-    ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(20,5): error C2065: "InitialData": nichtdeklarierter Bezeichner
-    InitialData.Version = TEXT("1.0");
-    ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(22,83): error C2065: "InitialData": nichtdeklarierter Bezeichner
-    UVrmMetadataAsset* MetadataAsset = FVrmSdkFacade::UpsertVrmMetadata(TestMesh, InitialData);
-                                                                                  ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(27,88): error C2065: "InitialData": nichtdeklarierter Bezeichner
-    TestEqual(TEXT("Title should match after first upsert"), ReadBack->Metadata.Title, InitialData.Title);
-                                                                                       ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(22,61): error C2664: "UVrmMetadataAsset *FVrmSdkFacadeEditor::UpsertVrmMetadata(UObject *,const FVrmMetadata &)" : Konvertierung von Argument 2 von "<error type>" in "const FVrmMetadata &" nicht möglich
+    UVrmMetadataAsset* MetadataAsset = FVrmSdkFacadeEditor::UpsertVrmMetadata(TestMesh, InitialData);
+                                                            ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(22,89): note: Ursache: Konvertierung von "<error type>" in "const FVrmMetadata" nicht möglich
+    UVrmMetadataAsset* MetadataAsset = FVrmSdkFacadeEditor::UpsertVrmMetadata(TestMesh, InitialData);
+                                                                                        ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(22,89): note: Der nicht definierte Typ "FVrmMetadata" wird verwendet.
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmSdkFacadeEditor.h(6,8): note: Siehe Deklaration von "FVrmMetadata"
+struct FVrmMetadata;
+       ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmSdkFacadeEditor.h(17,31): note: Siehe Deklaration von "FVrmSdkFacadeEditor::UpsertVrmMetadata"
+    static UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata);
+                              ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(22,61): note: bei Anpassung der Argumentliste "(USkeletalMesh *, <error type>)"
+    UVrmMetadataAsset* MetadataAsset = FVrmSdkFacadeEditor::UpsertVrmMetadata(TestMesh, InitialData);
+                                                            ^
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(27,5): error C2661: "FAutomationTestBase::TestEqual": Keine überladene Funktion akzeptiert 2 Argumente
     TestEqual(TEXT("Title should match after first upsert"), ReadBack->Metadata.Title, InitialData.Title);
     ^
@@ -258,25 +190,25 @@ C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostPro
     TestEqual(TEXT("Title should match after first upsert"), ReadBack->Metadata.Title, InitialData.Title);
     ^
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(27,5): note: bei Anpassung der Argumentliste "(const wchar_t [38], const FString)"
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(30,5): error C2065: "FVrmMetadata": nichtdeklarierter Bezeichner
-    FVrmMetadata UpdatedData;
-    ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(30,18): error C2146: Syntaxfehler: Fehlendes ";" vor Bezeichner "UpdatedData"
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(30,18): error C2079: "UpdatedData" verwendet undefiniertes struct "FVrmMetadata"
     FVrmMetadata UpdatedData;
                  ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(30,18): error C2065: "UpdatedData": nichtdeklarierter Bezeichner
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(31,5): error C2065: "UpdatedData": nichtdeklarierter Bezeichner
-    UpdatedData.Title = TEXT("Test Model Updated");
-    ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(32,5): error C2065: "UpdatedData": nichtdeklarierter Bezeichner
-    UpdatedData.Author = TEXT("Author B");
-    ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(34,84): error C2065: "UpdatedData": nichtdeklarierter Bezeichner
-    UVrmMetadataAsset* MetadataAsset2 = FVrmSdkFacade::UpsertVrmMetadata(TestMesh, UpdatedData);
-                                                                                   ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(38,101): error C2065: "UpdatedData": nichtdeklarierter Bezeichner
-    TestEqual(TEXT("Returned object should contain updated Title"), MetadataAsset2->Metadata.Title, UpdatedData.Title);
-                                                                                                    ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(34,62): error C2664: "UVrmMetadataAsset *FVrmSdkFacadeEditor::UpsertVrmMetadata(UObject *,const FVrmMetadata &)" : Konvertierung von Argument 2 von "<error type>" in "const FVrmMetadata &" nicht möglich
+    UVrmMetadataAsset* MetadataAsset2 = FVrmSdkFacadeEditor::UpsertVrmMetadata(TestMesh, UpdatedData);
+                                                             ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(34,90): note: Ursache: Konvertierung von "<error type>" in "const FVrmMetadata" nicht möglich
+    UVrmMetadataAsset* MetadataAsset2 = FVrmSdkFacadeEditor::UpsertVrmMetadata(TestMesh, UpdatedData);
+                                                                                         ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(34,90): note: Der nicht definierte Typ "FVrmMetadata" wird verwendet.
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmSdkFacadeEditor.h(6,8): note: Siehe Deklaration von "FVrmMetadata"
+struct FVrmMetadata;
+       ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Public\VrmSdkFacadeEditor.h(17,31): note: Siehe Deklaration von "FVrmSdkFacadeEditor::UpsertVrmMetadata"
+    static UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata);
+                              ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(34,62): note: bei Anpassung der Argumentliste "(USkeletalMesh *, <error type>)"
+    UVrmMetadataAsset* MetadataAsset2 = FVrmSdkFacadeEditor::UpsertVrmMetadata(TestMesh, UpdatedData);
+                                                             ^
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(38,5): error C2661: "FAutomationTestBase::TestEqual": Keine überladene Funktion akzeptiert 2 Argumente
     TestEqual(TEXT("Returned object should contain updated Title"), MetadataAsset2->Metadata.Title, UpdatedData.Title);
     ^
@@ -293,9 +225,6 @@ C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostPro
     TestEqual(TEXT("Returned object should contain updated Title"), MetadataAsset2->Metadata.Title, UpdatedData.Title);
     ^
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(38,5): note: bei Anpassung der Argumentliste "(const wchar_t [45], FString)"
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(54,97): error C2065: "UpdatedData": nichtdeklarierter Bezeichner
-    TestEqual(TEXT("Data should be updated in-place (Author)"), FinalMetadata->Metadata.Author, UpdatedData.Author);
-                                                                                                ^
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(54,5): error C2661: "FAutomationTestBase::TestEqual": Keine überladene Funktion akzeptiert 2 Argumente
     TestEqual(TEXT("Data should be updated in-place (Author)"), FinalMetadata->Metadata.Author, UpdatedData.Author);
     ^
@@ -312,9 +241,6 @@ C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostPro
     TestEqual(TEXT("Data should be updated in-place (Author)"), FinalMetadata->Metadata.Author, UpdatedData.Author);
     ^
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(54,5): note: bei Anpassung der Argumentliste "(const wchar_t [41], const FString)"
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(55,88): error C2065: "UpdatedData": nichtdeklarierter Bezeichner
-    TestEqual(TEXT("Title should be updated in-place"), FinalMetadata->Metadata.Title, UpdatedData.Title);
-                                                                                       ^
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(55,5): error C2661: "FAutomationTestBase::TestEqual": Keine überladene Funktion akzeptiert 2 Argumente
     TestEqual(TEXT("Title should be updated in-place"), FinalMetadata->Metadata.Title, UpdatedData.Title);
     ^
@@ -331,84 +257,50 @@ C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostPro
     TestEqual(TEXT("Title should be updated in-place"), FinalMetadata->Metadata.Title, UpdatedData.Title);
     ^
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\Tests\VRMMetadata.Upsert.Automation.cpp(55,5): note: bei Anpassung der Argumentliste "(const wchar_t [33], const FString)"
-[10/27] Compile [x64] VrmToolchain.cpp
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(20,28): error C3646: "DetectVrmVersion": Unbekannter Überschreibungsspezifizierer
-    static EVrmSpecVersion DetectVrmVersion(const FString& FilePath);
+[8/27] Compile [x64] VrmToolchainBPLibrary.cpp
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(18,28): error C3646: "DetectVrmVersion": Unbekannter Überschreibungsspezifizierer
+    static EVrmSpecVersion DetectVrmVersion(const FString& FilePath)
                            ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(20,45): error C2059: Syntaxfehler: "const"
-    static EVrmSpecVersion DetectVrmVersion(const FString& FilePath);
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(18,45): error C2059: Syntaxfehler: "const"
+    static EVrmSpecVersion DetectVrmVersion(const FString& FilePath)
                                             ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(20,69): error C2238: Unerwartete(s) Token vor ";"
-    static EVrmSpecVersion DetectVrmVersion(const FString& FilePath);
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(18,69): error C2238: Unerwartete(s) Token vor ";"
+    static EVrmSpecVersion DetectVrmVersion(const FString& FilePath)
                                                                     ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(23,61): error C2061: Syntaxfehler: Bezeichner "FVrmMetadata"
-    static bool ExtractVrmMetadata(const FString& FilePath, FVrmMetadata& OutMetadata);
-                                                            ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(26,72): error C4430: Fehlender Typspezifizierer - int wird angenommen. Hinweis: "default-int" wird von C++ nicht unterstützt.
-    static class UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata);
-                                                                       ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(26,90): error C2143: Syntaxfehler: Es fehlt "," vor "&"
-    static class UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata);
-                                                                                         ^
+[9/27] Compile [x64] VrmToolchain.cpp
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(18,28): error C3646: "DetectVrmVersion": Unbekannter Überschreibungsspezifizierer
+    static EVrmSpecVersion DetectVrmVersion(const FString& FilePath)
+                           ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(18,45): error C2059: Syntaxfehler: "const"
+    static EVrmSpecVersion DetectVrmVersion(const FString& FilePath)
+                                            ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(18,69): error C2238: Unerwartete(s) Token vor ";"
+    static EVrmSpecVersion DetectVrmVersion(const FString& FilePath)
+                                                                    ^
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Private\VrmToolchain.cpp(6,1): fatal error C1083: Datei (Include) kann nicht geöffnet werden: "VrmMetadataAsset.h": No such file or directory
 #include "VrmMetadataAsset.h
 ^
-[11/27] Compile [x64] VrmImportHooks.cpp
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(20,28): error C3646: "DetectVrmVersion": Unbekannter Überschreibungsspezifizierer
-    static EVrmSpecVersion DetectVrmVersion(const FString& FilePath);
-                           ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(20,45): error C2059: Syntaxfehler: "const"
-    static EVrmSpecVersion DetectVrmVersion(const FString& FilePath);
-                                            ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(20,69): error C2238: Unerwartete(s) Token vor ";"
-    static EVrmSpecVersion DetectVrmVersion(const FString& FilePath);
-                                                                    ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(23,61): error C2061: Syntaxfehler: Bezeichner "FVrmMetadata"
-    static bool ExtractVrmMetadata(const FString& FilePath, FVrmMetadata& OutMetadata);
-                                                            ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(26,72): error C4430: Fehlender Typspezifizierer - int wird angenommen. Hinweis: "default-int" wird von C++ nicht unterstützt.
-    static class UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata);
-                                                                       ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(26,90): error C2143: Syntaxfehler: Es fehlt "," vor "&"
-    static class UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata);
-                                                                                         ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(109,49): error C2039: "DetectVrmVersion" ist kein Member von "FVrmSdkFacade".
+[10/27] Compile [x64] VrmImportHooks.cpp
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(109,34): error C2653: "FVrmSdkFacade": Keine Klasse oder Namespace
     EVrmSpecVersion VrmVersion = FVrmSdkFacade::DetectVrmVersion(SourceFilePath)
-                                                ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(11,24): note: Siehe Deklaration von "FVrmSdkFacade"
-class VRMTOOLCHAIN_API FVrmSdkFacad
-                       ^
+                                 ^
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(109,49): error C3861: "DetectVrmVersion": Bezeichner wurde nicht gefunden.
     EVrmSpecVersion VrmVersion = FVrmSdkFacade::DetectVrmVersion(SourceFilePath)
                                                 ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(118,25): error C2660: "FVrmSdkFacade::ExtractVrmMetadata": Funktion akzeptiert keine 2 Argumente
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(118,10): error C2653: "FVrmSdkFacade": Keine Klasse oder Namespace
+    if (!FVrmSdkFacade::ExtractVrmMetadata(SourceFilePath, Metadata)
+         ^
+C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(118,25): error C3861: "ExtractVrmMetadata": Bezeichner wurde nicht gefunden.
     if (!FVrmSdkFacade::ExtractVrmMetadata(SourceFilePath, Metadata)
                         ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(23,17): note: Siehe Deklaration von "FVrmSdkFacade::ExtractVrmMetadata"
-    static bool ExtractVrmMetadata(const FString& FilePath, FVrmMetadata& OutMetadata)
-                ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(118,25): note: bei Anpassung der Argumentliste "(FString, FVrmMetadata)"
-    if (!FVrmSdkFacade::ExtractVrmMetadata(SourceFilePath, Metadata)
-                        ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(125,55): error C2664: "UVrmMetadataAsset *FVrmSdkFacade::UpsertVrmMetadata(UObject *,const int)" : Konvertierung von Argument 2 von "FVrmMetadata" in "const int" nicht möglich
-    UVrmMetadataAsset* MetadataAsset = FVrmSdkFacade::UpsertVrmMetadata(SkeletalMesh, Metadata)
-                                                      ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(125,87): note: Kein benutzerdefinierter Konvertierungsoperator verfügbar, der diese Konvertierung durchführen kann, oder der Operator kann nicht aufgerufen werden
-    UVrmMetadataAsset* MetadataAsset = FVrmSdkFacade::UpsertVrmMetadata(SkeletalMesh, Metadata)
-                                                                                      ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchain\Public\VrmToolchainWrapper.h(26,37): note: Siehe Deklaration von "FVrmSdkFacade::UpsertVrmMetadata"
-    static class UVrmMetadataAsset* UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata)
-                                    ^
-C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmImportHooks.cpp(125,55): note: bei Anpassung der Argumentliste "(USkeletalMesh *, FVrmMetadata)"
-    UVrmMetadataAsset* MetadataAsset = FVrmSdkFacade::UpsertVrmMetadata(SkeletalMesh, Metadata)
-                                                      ^
-[12/27] Compile [x64] VrmImportHooksTest.cpp
-[13/27] Compile [x64] VrmMetadataTests.cpp
-[14/27] Compile [x64] VrmMetadata.cpp
-[15/27] Compile [x64] VrmNormalizationSettings.cpp
-[16/27] Compile [x64] VrmNormalizationTests.cpp
-[17/27] Compile [x64] VrmRetargetScaffoldGeneratorTest.cpp
-[18/27] Compile [x64] VrmNormalizationService.cpp
+[11/27] Compile [x64] VrmImportHooksTest.cpp
+[12/27] Compile [x64] VrmMetadataTests.cpp
+[13/27] Compile [x64] VrmMetadata.cpp
+[14/27] Compile [x64] VrmNormalizationSettings.cpp
+[15/27] Compile [x64] VrmNormalizationTests.cpp
+[16/27] Compile [x64] VrmRetargetScaffoldGeneratorTest.cpp
+[17/27] Compile [x64] VrmNormalizationService.cpp
+[18/27] Compile [x64] VrmSdkFacadeEditor.cpp
 [19/27] Compile [x64] VrmToolchainEditor.cpp
 [20/27] Compile [x64] VrmContentBrowserActions.cpp
 C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostProject\Plugins\VrmToolchain\Source\VrmToolchainEditor\Private\VrmContentBrowserActions.cpp(142,39): error C2039: "GetFilename" ist kein Member von "UAssetImportData".
@@ -446,13 +338,13 @@ C:\Users\Aliso\Documents\GIT\vrm-toolchain-ue\build\Package\VrmToolchain\HostPro
 C:\Program Files\Epic Games\UE_5.7\Engine\Plugins\Animation\IKRig\Source\IKRig\Public\Retargeter\IKRetargeter.h(59,7): note: Siehe Deklaration von "UIKRetargeter"
 class UIKRetargeter : public UObject
       ^
-Trace written to file C:/Users/Aliso/AppData/Roaming/Unreal Engine/AutomationTool/Logs/C+Program+Files+Epic+Games+UE_5.7/UBA-UnrealEditor-Win64-Development.uba with size 49.2kb
-Total time in Unreal Build Accelerator local executor: 29.19 seconds
+Trace written to file C:/Users/Aliso/AppData/Roaming/Unreal Engine/AutomationTool/Logs/C+Program+Files+Epic+Games+UE_5.7/UBA-UnrealEditor-Win64-Development.uba with size 40.0kb
+Total time in Unreal Build Accelerator local executor: 27.88 seconds
 
 Result: Failed (OtherCompilationError)
-Total execution time: 73.84 seconds
-Took 74.17s to run dotnet.exe, ExitCode=6
+Total execution time: 34.82 seconds
+Took 35.11s to run dotnet.exe, ExitCode=6
 UnrealBuildTool failed. See log for more details. (C:\Users\Aliso\AppData\Roaming\Unreal Engine\AutomationTool\Logs\C+Program+Files+Epic+Games+UE_5.7\UBA-UnrealEditor-Win64-Development.txt)
-AutomationTool executed for 0h 1m 14s
+AutomationTool executed for 0h 0m 35s
 AutomationTool exiting with ExitCode=6 (6)
 BUILD FAILED

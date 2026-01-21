@@ -19,7 +19,7 @@ enum class EVrmSpecVersion : uint8
  * Struct holding VRM metadata extracted from the imported VRM file.
  */
 USTRUCT(BlueprintType)
-struct VRMTOOLCHAIN_API FVrmMetadataRecord
+struct VRMTOOLCHAINEDITOR_API FVrmMetadataRecord
 {
 	GENERATED_BODY()
 
@@ -83,7 +83,7 @@ struct FVrmSkeletonCoverage
  * Attached to SkeletalMesh assets imported via a VRM importer (e.g., VRM4U).
  */
 UCLASS()
-class VRMTOOLCHAIN_API UVrmMetadataAsset : public UAssetUserData
+class VRMTOOLCHAINEDITOR_API UVrmMetadataAsset : public UAssetUserData
 {
 	GENERATED_BODY()
 
