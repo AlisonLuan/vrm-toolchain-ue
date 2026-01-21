@@ -11,13 +11,16 @@ public class VrmToolchainEditor : ModuleRules
         {
             PrivateDefinitions.Add("VRM_TOOLCHAIN_WIN64=1");
             
-            // Stage vrm_validate.exe runtime dependency for Win64
+            // Stage vrm_validate.exe runtime dependency for Win64 (DEVELOPER-ONLY, opt-in)
+            // Guard staging behind an explicit environment variable to avoid accidental packaging.
+            // CI/workflows must NOT set VRM_TOOLCHAIN_STAGE_DEV_TOOLS (default OFF).
             string pluginDir = Path.GetFullPath(Path.Combine(ModuleDirectory, "..", ".."));
             string exePath = Path.Combine(pluginDir, "Source", "ThirdParty", "VrmSdk", "bin", "Win64", "vrm_validate.exe");
-            
-            if (File.Exists(exePath))
+
+            string stageFlag = Environment.GetEnvironmentVariable("VRM_TOOLCHAIN_STAGE_DEV_TOOLS");
+            if (File.Exists(exePath) && stageFlag == "1")
             {
-                // Stage as NonUFS so it ships as a loose file
+                // Stage as NonUFS so it ships as a loose file (opt-in only)
                 RuntimeDependencies.Add(exePath, StagedFileType.NonUFS);
             }
         }
