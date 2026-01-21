@@ -4,7 +4,7 @@
 #include "VrmToolchainEditor.h"
 #include "Engine/SkeletalMesh.h"
 #include "Animation/Skeleton.h"
-#include "IKRigDefinition.h"
+#include "Rig/IKRigDefinition.h"
 #include "Retargeter/IKRetargeter.h"
 #include "AssetRegistry/AssetRegistryModule.h"
 #include "AssetToolsModule.h"
