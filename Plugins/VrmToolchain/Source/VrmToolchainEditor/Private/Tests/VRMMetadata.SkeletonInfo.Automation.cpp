@@ -2,7 +2,7 @@
 
 #include "Misc/AutomationTest.h"
 #include "Engine/SkeletalMesh.h"
-#include "VrmToolchainWrapper.h"
+#include "VrmSdkFacadeEditor.h"
 #include "VrmMetadataAsset.h"
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmSkeletonInfoTest, "VrmToolchain.Metadata.SkeletonInfo", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
@@ -18,7 +18,7 @@ bool FVrmSkeletonInfoTest::RunTest(const FString& Parameters)
     Algo::Reverse(Bones);
 
     // Compute coverage using facade helper
-    FVrmSkeletonCoverage Coverage = FVrmSdkFacade::ComputeSkeletonCoverage(Bones);
+    FVrmSkeletonCoverage Coverage = FVrmSdkFacadeEditor::ComputeSkeletonCoverage(Bones);
 
     TestEqual(TEXT("Total bone count should match input"), Coverage.TotalBoneCount, Bones.Num());
 
@@ -37,7 +37,7 @@ bool FVrmSkeletonInfoTest::RunTest(const FString& Parameters)
     FVrmMetadata InitialMetadata;
     InitialMetadata.Title = TEXT("SkeletonTest");
 
-    UVrmMetadataAsset* Asset1 = FVrmSdkFacade::UpsertVrmMetadata(TestMesh, InitialMetadata);
+    UVrmMetadataAsset* Asset1 = FVrmSdkFacadeEditor::UpsertVrmMetadata(TestMesh, InitialMetadata);
     TestNotNull(TEXT("Metadata created on first upsert"), Asset1);
 
     // Assign coverage and mark package as dirty for editor-friendly behavior
@@ -46,7 +46,7 @@ bool FVrmSkeletonInfoTest::RunTest(const FString& Parameters)
     // Second upsert
     FVrmMetadata Updated;
     Updated.Title = TEXT("SkeletonTestUpdated");
-    UVrmMetadataAsset* Asset2 = FVrmSdkFacade::UpsertVrmMetadata(TestMesh, Updated);
+    UVrmMetadataAsset* Asset2 = FVrmSdkFacadeEditor::UpsertVrmMetadata(TestMesh, Updated);
     TestNotNull(TEXT("Metadata returned on second upsert"), Asset2);
 
     // Ensure same object pointer (in-place update)

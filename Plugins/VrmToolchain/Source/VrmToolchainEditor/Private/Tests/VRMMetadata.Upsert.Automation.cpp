@@ -2,7 +2,7 @@
 
 #include "Misc/AutomationTest.h"
 #include "Engine/SkeletalMesh.h"
-#include "VrmToolchainWrapper.h"
+#include "VrmSdkFacadeEditor.h"
 #include "VrmMetadataAsset.h"
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmMetadataUpsertTest, "VrmToolchain.Metadata.UpsertIdempotency", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
@@ -19,7 +19,7 @@ bool FVrmMetadataUpsertTest::RunTest(const FString& Parameters)
     InitialData.Author = TEXT("Author A");
     InitialData.Version = TEXT("1.0");
 
-    UVrmMetadataAsset* MetadataAsset = FVrmSdkFacade::UpsertVrmMetadata(TestMesh, InitialData);
+    UVrmMetadataAsset* MetadataAsset = FVrmSdkFacadeEditor::UpsertVrmMetadata(TestMesh, InitialData);
     TestNotNull(TEXT("Metadata should be created"), MetadataAsset);
 
     const UVrmMetadataAsset* ReadBack = TestMesh->GetAssetUserData<UVrmMetadataAsset>();
@@ -31,7 +31,7 @@ bool FVrmMetadataUpsertTest::RunTest(const FString& Parameters)
     UpdatedData.Title = TEXT("Test Model Updated");
     UpdatedData.Author = TEXT("Author B");
 
-    UVrmMetadataAsset* MetadataAsset2 = FVrmSdkFacade::UpsertVrmMetadata(TestMesh, UpdatedData);
+    UVrmMetadataAsset* MetadataAsset2 = FVrmSdkFacadeEditor::UpsertVrmMetadata(TestMesh, UpdatedData);
     TestNotNull(TEXT("Metadata still present on second upsert"), MetadataAsset2);
 
     // Upsert performed, check in-place update (the returned object is the same user data)

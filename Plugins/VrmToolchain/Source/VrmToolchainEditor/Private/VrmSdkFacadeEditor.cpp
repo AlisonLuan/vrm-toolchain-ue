@@ -1,15 +1,11 @@
-#include "CoreMinimal.h"
-#include "VrmToolchainWrapper.h"
+#include "VrmSdkFacadeEditor.h"
 #include "VrmMetadataAsset.h"
+#include "VrmToolchain/Public/VrmMetadata.h"
 #include "Engine/AssetUserData.h"
 #include "Engine/SkeletalMesh.h"
 #include "Engine/StaticMesh.h"
 
-#include "Containers/Array.h"
-#include "Misc/Char.h"
-
-
-UVrmMetadataAsset* FVrmSdkFacade::UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata)
+UVrmMetadataAsset* FVrmSdkFacadeEditor::UpsertVrmMetadata(UObject* Object, const FVrmMetadata& Metadata)
 {
     if (!Object)
     {
@@ -22,23 +18,27 @@ UVrmMetadataAsset* FVrmSdkFacade::UpsertVrmMetadata(UObject* Object, const FVrmM
         UVrmMetadataAsset* Existing = Mesh->GetAssetUserData<UVrmMetadataAsset>();
         if (Existing)
         {
-            Existing->Metadata = Metadata;
-#if WITH_EDITOR
+            // Convert FVrmMetadata to FVrmMetadataRecord
+            Existing->Metadata.Title = Metadata.Name;
+            Existing->Metadata.Version = Metadata.ModelVersion;
+            Existing->Metadata.Author = Metadata.Authors.Num() > 0 ? Metadata.Authors[0] : FString();
+            Existing->Metadata.LicenseName = Metadata.License;
             Existing->MarkPackageDirty();
             Mesh->MarkPackageDirty();
-#endif
             return Existing;
         }
 
         UVrmMetadataAsset* NewMetadata = NewObject<UVrmMetadataAsset>(Mesh, NAME_None, RF_Public | RF_Transactional);
         if (NewMetadata)
         {
-            NewMetadata->Metadata = Metadata;
+            // Convert FVrmMetadata to FVrmMetadataRecord
+            NewMetadata->Metadata.Title = Metadata.Name;
+            NewMetadata->Metadata.Version = Metadata.ModelVersion;
+            NewMetadata->Metadata.Author = Metadata.Authors.Num() > 0 ? Metadata.Authors[0] : FString();
+            NewMetadata->Metadata.LicenseName = Metadata.License;
             Mesh->AddAssetUserData(NewMetadata);
-#if WITH_EDITOR
             NewMetadata->MarkPackageDirty();
             Mesh->MarkPackageDirty();
-#endif
         }
         return NewMetadata;
     }
@@ -49,23 +49,27 @@ UVrmMetadataAsset* FVrmSdkFacade::UpsertVrmMetadata(UObject* Object, const FVrmM
         UVrmMetadataAsset* Existing = SM->GetAssetUserData<UVrmMetadataAsset>();
         if (Existing)
         {
-            Existing->Metadata = Metadata;
-#if WITH_EDITOR
+            // Convert FVrmMetadata to FVrmMetadataRecord
+            Existing->Metadata.Title = Metadata.Name;
+            Existing->Metadata.Version = Metadata.ModelVersion;
+            Existing->Metadata.Author = Metadata.Authors.Num() > 0 ? Metadata.Authors[0] : FString();
+            Existing->Metadata.LicenseName = Metadata.License;
             Existing->MarkPackageDirty();
             SM->MarkPackageDirty();
-#endif
             return Existing;
         }
 
         UVrmMetadataAsset* NewMetadata = NewObject<UVrmMetadataAsset>(SM, NAME_None, RF_Public | RF_Transactional);
         if (NewMetadata)
         {
-            NewMetadata->Metadata = Metadata;
+            // Convert FVrmMetadata to FVrmMetadataRecord
+            NewMetadata->Metadata.Title = Metadata.Name;
+            NewMetadata->Metadata.Version = Metadata.ModelVersion;
+            NewMetadata->Metadata.Author = Metadata.Authors.Num() > 0 ? Metadata.Authors[0] : FString();
+            NewMetadata->Metadata.LicenseName = Metadata.License;
             SM->AddAssetUserData(NewMetadata);
-#if WITH_EDITOR
             NewMetadata->MarkPackageDirty();
             SM->MarkPackageDirty();
-#endif
         }
         return NewMetadata;
     }
@@ -74,9 +78,7 @@ UVrmMetadataAsset* FVrmSdkFacade::UpsertVrmMetadata(UObject* Object, const FVrmM
     return nullptr;
 }
 
-
-// Deterministic skeleton coverage computation helper
-FVrmSkeletonCoverage FVrmSdkFacade::ComputeSkeletonCoverage(const TArray<FName>& BoneNames)
+FVrmSkeletonCoverage FVrmSdkFacadeEditor::ComputeSkeletonCoverage(const TArray<FName>& BoneNames)
 {
     FVrmSkeletonCoverage OutCoverage;
     OutCoverage.TotalBoneCount = BoneNames.Num();
