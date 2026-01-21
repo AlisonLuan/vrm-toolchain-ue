@@ -80,41 +80,18 @@ if ($exeFiles -or $pdbFiles) {
     Write-Host "  Removed: $(($exeFiles.Count ?? 0) + ($pdbFiles.Count ?? 0)) file(s)" -ForegroundColor Green
 }
 
-# 4) Validate dist folder structure
-Write-Host "Validating dist folder structure..." -ForegroundColor Cyan
-
-# Check for forbidden directories
-$forbiddenDirs = @("HostProject", "Intermediate", "Saved")
-$foundForbidden = $false
-
-foreach ($dirName in $forbiddenDirs) {
-    $forbiddenPath = Join-Path $OutPkg $dirName
-    if (Test-Path $forbiddenPath) {
-        Write-Error "Found forbidden directory in dist: $dirName"
-        $foundForbidden = $true
-    }
-}
-
-# 5) Final validation gate: no binaries and no trash dirs
-Write-Host "Running final validation gate..." -ForegroundColor Cyan
-$finalLeaks = Get-ChildItem $OutPkg -Recurse -Include "*.exe", "*.pdb" -File -ErrorAction SilentlyContinue
-
-if ($finalLeaks -or $foundForbidden) {
-    if ($finalLeaks) {
-        Write-Error "Packaging validation FAILED: forbidden binaries still exist in dist:"
-        $finalLeaks | ForEach-Object { Write-Error "  $($_.FullName)" }
-    }
-    if ($foundForbidden) {
-        Write-Error "Packaging validation FAILED: forbidden directories found in dist"
-    }
-    throw "Packaging validation failed. Cannot proceed."
-}
-
-Write-Host "✓ Package structure validated: allowed folders only (Binaries, Resources, Source)" -ForegroundColor Green
-Write-Host "✓ Binary validation passed: no forbidden binaries found" -ForegroundColor Green
-Write-Host "✓ Package output: $OutPkg" -ForegroundColor Green
-
-# Cleanup raw staging (optional, can keep for inspection)
+# 4) Cleanup raw staging (optional, can keep for inspection)
 Write-Host "Cleaning up raw staging folder..." -ForegroundColor Cyan
 Remove-Item -Recurse -Force $RawPkg -ErrorAction SilentlyContinue | Out-Null
 Write-Host "✓ Raw staging cleaned" -ForegroundColor Green
+
+# 5) Validate final dist folder using the contract validation script
+Write-Host "Running package contract validation..." -ForegroundColor Cyan
+$ValidateScript = Join-Path (Split-Path $PSScriptRoot) "Scripts\ValidatePackage.ps1"
+& $ValidateScript -PackagePath $OutPkg
+
+if ($LASTEXITCODE -ne 0) {
+    throw "Package contract validation failed (exit code: $LASTEXITCODE)"
+}
+
+Write-Host "`n✓ Package output: $OutPkg" -ForegroundColor Green
