@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Lint workflows: forbid -AllowBinaries
+      - name: "Lint workflows: forbid -AllowBinaries"
         shell: pwsh
         run: |
           # Fail if any workflow calls PackagePlugin.ps1 with -AllowBinaries (forbidden by policy)
