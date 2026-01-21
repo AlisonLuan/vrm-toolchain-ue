@@ -83,26 +83,32 @@ if ($ForbiddenFiles.Count -gt 0) { throw "Packaging failed: forbidden binaries f
 - ✅ CI workflows can use the script unmodified
 - ✅ No forbidden binaries in package output (verified: 0 .exe/.pdb files remain)
 
-## Phase 3: Module Boundary Cleanup (2 commits)
+## Phase 3: Module Boundary Cleanup (5 commits)
 
 ### Problem
 Over-scoped refactoring moved `UVrmMetadataAsset` to editor module, but the type is runtime-safe and should be accessible from both modules.
 
-### Solution: Restore Runtime Module Ownership
+### Solution: Restore Runtime Module Ownership with Proper Include Structure
 **Changes**:
-1. **New File**: [Plugins/VrmToolchain/Source/VrmToolchain/Public/VrmMetadataAsset.h](Plugins/VrmToolchain/Source/VrmToolchain/Public/VrmMetadataAsset.h)
-   - Contains full `UVrmMetadataAsset` class definition
-   - Includes `VrmMetadata.h` for `EVrmVersion` 
-   - Uses `VRMTOOLCHAIN_API` macro for export
+1. **Header Reorganization**: 
+   - Moved headers to proper namespace: `Source/VrmToolchain/Public/VrmToolchain/`
+   - New location: [Plugins/VrmToolchain/Source/VrmToolchain/Public/VrmToolchain/VrmMetadata.h](Plugins/VrmToolchain/Source/VrmToolchain/Public/VrmToolchain/VrmMetadata.h)
+   - New location: [Plugins/VrmToolchain/Source/VrmToolchain/Public/VrmToolchain/VrmMetadataAsset.h](Plugins/VrmToolchain/Source/VrmToolchain/Public/VrmToolchain/VrmMetadataAsset.h)
 
-2. **Deleted File**: `Plugins/VrmToolchain/Source/VrmToolchainEditor/Public/VrmMetadataAsset.h` (wrapper, no longer needed)
+2. **Standardized Include Paths**:
+   - **Runtime includes**: `#include "VrmToolchain/VrmMetadata.h"` and `#include "VrmToolchain/VrmMetadataAsset.h"`
+   - **Files updated** (6 total):
+     - [Plugins/VrmToolchain/Source/VrmToolchain/Private/VrmMetadata.cpp](Plugins/VrmToolchain/Source/VrmToolchain/Private/VrmMetadata.cpp#L1)
+     - [Plugins/VrmToolchain/Source/VrmToolchain/Private/VrmMetadataTests.cpp](Plugins/VrmToolchain/Source/VrmToolchain/Private/VrmMetadataTests.cpp#L1)
+     - [Plugins/VrmToolchain/Source/VrmToolchain/Public/VrmToolchain/VrmMetadataAsset.h](Plugins/VrmToolchain/Source/VrmToolchain/Public/VrmToolchain/VrmMetadataAsset.h#L5) (includes VrmMetadata)
+     - [Plugins/VrmToolchain/Source/VrmToolchain/Public/VrmToolchainWrapper.h](Plugins/VrmToolchain/Source/VrmToolchain/Public/VrmToolchainWrapper.h#L4)
+     - [Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/VrmImportHooks.cpp](Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/VrmImportHooks.cpp#L7)
+     - [Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/VrmImportHooksTest.cpp](Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/VrmImportHooksTest.cpp#L4)
+   - Editor automation tests also updated to use namespaced includes
+
+3. **Deleted File**: `Plugins/VrmToolchain/Source/VrmToolchainEditor/Public/VrmMetadataAsset.h` (wrapper, no longer needed)
    - Removed to eliminate confusion about canonical type location
-   - Editor code now uses runtime header directly
-
-3. **Updated Includes** (3 files):
-   - [Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/VrmSdkFacadeEditor.cpp](Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/VrmSdkFacadeEditor.cpp#L2) — Changed to `#include "VrmToolchain/Public/VrmMetadataAsset.h"`
-   - [Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/Tests/VRMMetadata.SkeletonInfo.Automation.cpp](Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/Tests/VRMMetadata.SkeletonInfo.Automation.cpp#L6) — Changed to runtime header
-   - [Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/Tests/VRMMetadata.Upsert.Automation.cpp](Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/Tests/VRMMetadata.Upsert.Automation.cpp#L6) — Changed to runtime header
+   - Editor code now uses runtime header directly via proper module dependencies
 
 4. **Enum Consolidation**:
    - [Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/VrmImportHooks.cpp](Plugins/VrmToolchain/Source/VrmToolchainEditor/Private/VrmImportHooks.cpp#L135) — Direct assignment `MetadataAsset->SpecVersion = VrmVersion;` (no cast needed)
@@ -110,8 +116,10 @@ Over-scoped refactoring moved `UVrmMetadataAsset` to editor module, but the type
 ### Design Rationale
 - **Runtime Asset Type**: `UAssetUserData` is not editor-only; metadata can be read at runtime
 - **Proper Layering**: Runtime module provides types; editor module provides mutation operations only
+- **Idiomatic Include Pattern**: Namespaced includes (`VrmToolchain/VrmMetadata.h`) follow UE module conventions
+- **Module Dependencies**: Editor module has runtime module in PublicDependencyModuleNames, enabling direct include access
 - **Reduced Complexity**: Single enum prevents type confusion and casting errors
-- **No Wrapper Pattern**: Editor code uses runtime header directly (avoids re-export anti-pattern)
+- **No Wrapper Pattern**: Direct includes eliminate re-export anti-pattern
 
 ## Dependency Verification
 
