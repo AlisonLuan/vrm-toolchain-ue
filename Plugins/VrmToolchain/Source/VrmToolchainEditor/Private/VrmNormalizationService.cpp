@@ -114,7 +114,9 @@ bool FVrmNormalizationService::PerformNormalization(const FString& InPath, const
 		return false;
 	}
 
-	// TODO(Issue #4): Integrate vrm_normalizers.lib to perform actual normalization.
+	// TODO: Integrate vrm_normalizers.lib to perform actual normalization.
+	// This is a placeholder stub demonstrating the end-to-end flow.
+	// See Plugins/VrmToolchain/README.md "VRM Normalization Feature" for details.
 	// Expected integration points:
 	// 1. Parse VRM/GLB using vrm_glb_parser API
 	// 2. Apply normalization rules via vrm_normalizers API

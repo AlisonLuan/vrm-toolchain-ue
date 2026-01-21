@@ -77,7 +77,10 @@ foreach ($file in @($exeFiles + $pdbFiles)) {
 }
 
 if ($exeFiles -or $pdbFiles) {
-    Write-Host "  Removed: $(($exeFiles.Count ?? 0) + ($pdbFiles.Count ?? 0)) file(s)" -ForegroundColor Green
+    $exeCount = if ($exeFiles.Count) { $exeFiles.Count } else { 0 }
+    $pdbCount = if ($pdbFiles.Count) { $pdbFiles.Count } else { 0 }
+    $totalRemoved = $exeCount + $pdbCount
+    Write-Host "  Removed: $totalRemoved file(s)" -ForegroundColor Green
 }
 
 # 4) Cleanup raw staging (optional, can keep for inspection)
