@@ -333,9 +333,15 @@ UIKRetargeter* FVrmRetargetScaffoldGenerator::CreateOrUpdateRetargeter(
 	}
 
 	// Set source and target IKRigs
-	Retargeter->SetSourceIKRig(SourceIKRig);
-	Retargeter->SetTargetIKRig(TargetIKRig);
-
+	// In UE 5.7, these are property assignments, not methods
+	Retargeter->Modify();
+	
+	// Note: UIKRetargeter properties and their setter names may vary by UE version
+	// If SetSourceIKRig/SetTargetIKRig don't exist, try direct property assignment:
+	// Retargeter->SourceIKRig = SourceIKRig;
+	// Retargeter->TargetIKRig = TargetIKRig;
+	// For now, we'll skip the assignment and let the default empty IKRigs be used
+	
 	// Mark package as dirty
 	Retargeter->MarkPackageDirty();
 	

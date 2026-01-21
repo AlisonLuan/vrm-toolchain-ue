@@ -133,13 +133,13 @@ bool FVrmContentBrowserActions::GetSourceFilePathFromAsset(const FAssetData& Ass
 		return false;
 	}
 	// Get the source file path from import data
-	// UE 5.7: GetSourceFileCount() and GetSourceFile() replaced with direct SourceData access
-	if (ImportData->GetSourceFileCount() == 0)
+	// UE 5.7: Use GetFirstFilename() or ExtractFilenames() to get source path
+	if (!ImportData || ImportData->GetSourceFileCount() == 0)
 	{
 		return false;
 	}
 
-	FString SourceFilePath = ImportData->GetFilename();
+	FString SourceFilePath = ImportData->GetFirstFilename();
 
 	if (SourceFilePath.IsEmpty())
 	{
