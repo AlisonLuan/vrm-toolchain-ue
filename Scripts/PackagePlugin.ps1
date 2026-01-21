@@ -6,23 +6,59 @@ param(
 
 $ErrorActionPreference = "Stop"
 
-$UAT     = Join-Path $UE "Engine\Build\BatchFiles\RunUAT.bat"
-$Uplugin = Join-Path $RepoRoot "Plugins\$PluginName\$PluginName.uplugin"
-$OutPkg  = Join-Path $RepoRoot "build\Package\$PluginName"
+$UAT      = Join-Path $UE "Engine\Build\BatchFiles\RunUAT.bat"
+$Uplugin  = Join-Path $RepoRoot "Plugins\$PluginName\$PluginName.uplugin"
+$RawPkg   = Join-Path $RepoRoot "build\PackageRaw\$PluginName"
+$OutPkg   = Join-Path $RepoRoot "build\Package\$PluginName"
 
 if (-not (Test-Path $UAT))     { throw "RunUAT not found: $UAT" }
 if (-not (Test-Path $Uplugin)) { throw ".uplugin not found: $Uplugin" }
 
-# Clean package output
+# Clean raw and dist outputs
+Remove-Item -Recurse -Force $RawPkg -ErrorAction SilentlyContinue | Out-Null
 Remove-Item -Recurse -Force $OutPkg -ErrorAction SilentlyContinue | Out-Null
 
-# 1) Build package
-Write-Host "Building plugin package..." -ForegroundColor Cyan
-& $UAT BuildPlugin -Plugin="$Uplugin" -Package="$OutPkg" -TargetPlatforms=Win64 -Rocket
+# 1) Build plugin to raw staging directory
+Write-Host "Building plugin package to raw staging..." -ForegroundColor Cyan
+& $UAT BuildPlugin -Plugin="$Uplugin" -Package="$RawPkg" -TargetPlatforms=Win64 -Rocket
 if ($LASTEXITCODE -ne 0) { throw "BuildPlugin failed (exit $LASTEXITCODE)" }
 
-# 2) Strip forbidden binaries and temporary build artifacts
-Write-Host "Stripping forbidden binaries and temporary build artifacts..." -ForegroundColor Cyan
+# 2) Copy allowed folders from raw → dist using robocopy
+Write-Host "Filtering plugin output to clean dist..." -ForegroundColor Cyan
+New-Item -ItemType Directory -Path $OutPkg -Force | Out-Null
+
+# Allowed folders to copy (everything else in Intermediate, Saved, HostProject, etc. is trash)
+$allowedFolders = @("Binaries", "Resources", "Source")
+
+foreach ($folder in $allowedFolders) {
+    $src = Join-Path $RawPkg $folder
+    $dst = Join-Path $OutPkg $folder
+    
+    if (Test-Path $src) {
+        Write-Host "  Copying $folder..." -ForegroundColor Gray
+        robocopy "$src" "$dst" /E /NP /NFL /NDL | Out-Null
+        if ($LASTEXITCODE -gt 7) {
+            throw "robocopy failed for $folder (exit $LASTEXITCODE)"
+        }
+    }
+}
+
+# Copy uplugin manifest (required)
+$upluginFile = Join-Path $RawPkg "$PluginName.uplugin"
+if (Test-Path $upluginFile) {
+    Write-Host "  Copying $PluginName.uplugin..." -ForegroundColor Gray
+    Copy-Item $upluginFile -Destination (Join-Path $OutPkg "$PluginName.uplugin") -Force
+}
+
+# Copy optional README if exists
+$readmeFile = Join-Path $RawPkg "README.md"
+if (Test-Path $readmeFile) {
+    Write-Host "  Copying README.md..." -ForegroundColor Gray
+    Copy-Item $readmeFile -Destination (Join-Path $OutPkg "README.md") -Force
+}
+
+# 3) Strip forbidden binaries from dist folder
+Write-Host "Stripping forbidden binaries from dist folder..." -ForegroundColor Cyan
 
 # Scan and report forbidden files
 $exeFiles = Get-ChildItem $OutPkg -Recurse -Include "*.exe" -File -ErrorAction SilentlyContinue
@@ -44,31 +80,41 @@ if ($exeFiles -or $pdbFiles) {
     Write-Host "  Removed: $(($exeFiles.Count ?? 0) + ($pdbFiles.Count ?? 0)) file(s)" -ForegroundColor Green
 }
 
-# Delete temporary build folders (if they are not locked)
-$tempDirs = @(
-    (Join-Path $OutPkg "Intermediate"),
-    (Join-Path $OutPkg "Saved")
-)
+# 4) Validate dist folder structure
+Write-Host "Validating dist folder structure..." -ForegroundColor Cyan
 
-foreach ($dir in $tempDirs) {
-    if (Test-Path $dir) {
-        try {
-            Remove-Item -Recurse -Force $dir
-            Write-Host "  Removed dir: $(Split-Path -Leaf $dir)" -ForegroundColor Gray
-        } catch {
-            Write-Host "  Warning: Could not remove $dir (may be in use): $($_.Exception.Message)" -ForegroundColor Yellow
-        }
+# Check for forbidden directories
+$forbiddenDirs = @("HostProject", "Intermediate", "Saved")
+$foundForbidden = $false
+
+foreach ($dirName in $forbiddenDirs) {
+    $forbiddenPath = Join-Path $OutPkg $dirName
+    if (Test-Path $forbiddenPath) {
+        Write-Error "Found forbidden directory in dist: $dirName"
+        $foundForbidden = $true
     }
 }
 
-# 3) Final gate: verify NO binaries or symbols remain
+# 5) Final validation gate: no binaries and no trash dirs
 Write-Host "Running final validation gate..." -ForegroundColor Cyan
 $finalLeaks = Get-ChildItem $OutPkg -Recurse -Include "*.exe", "*.pdb" -File -ErrorAction SilentlyContinue
-if ($finalLeaks) {
-    Write-Error "Packaging validation FAILED: forbidden binaries/symbols still exist in output:"
-    $finalLeaks | ForEach-Object { Write-Error "  $($_.FullName)" }
+
+if ($finalLeaks -or $foundForbidden) {
+    if ($finalLeaks) {
+        Write-Error "Packaging validation FAILED: forbidden binaries still exist in dist:"
+        $finalLeaks | ForEach-Object { Write-Error "  $($_.FullName)" }
+    }
+    if ($foundForbidden) {
+        Write-Error "Packaging validation FAILED: forbidden directories found in dist"
+    }
     throw "Packaging validation failed. Cannot proceed."
 }
 
-Write-Host "Package validation passed. No forbidden binaries found." -ForegroundColor Green
-Write-Host "Package output: $OutPkg" -ForegroundColor Green
+Write-Host "✓ Package structure validated: allowed folders only (Binaries, Resources, Source)" -ForegroundColor Green
+Write-Host "✓ Binary validation passed: no forbidden binaries found" -ForegroundColor Green
+Write-Host "✓ Package output: $OutPkg" -ForegroundColor Green
+
+# Cleanup raw staging (optional, can keep for inspection)
+Write-Host "Cleaning up raw staging folder..." -ForegroundColor Cyan
+Remove-Item -Recurse -Force $RawPkg -ErrorAction SilentlyContinue | Out-Null
+Write-Host "✓ Raw staging cleaned" -ForegroundColor Green
