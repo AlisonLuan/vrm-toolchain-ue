@@ -59,14 +59,15 @@ TSharedRef<FExtender> FVrmContentBrowserActions::CreateAssetContextMenuExtender(
 				MenuBuilder.AddMenuSeparator();
 				MenuBuilder.BeginSection("VrmToolchain", NSLOCTEXT("VrmToolchain", "VrmToolchainSection", "VRM Toolchain"));
 				{
+					FUIAction UIAction(
+						FExecuteAction::CreateLambda([SelectedAssets]() { ExecuteNormalizeVrm(SelectedAssets); }),
+						FCanExecuteAction::CreateLambda([SelectedAssets]() { return CanNormalizeVrm(SelectedAssets); })
+					);
 					MenuBuilder.AddMenuEntry(
-						NSLOCTEXT("VrmToolchain", "NormalizeSourceVRM", "Normalize Source VRM"),
-						NSLOCTEXT("VrmToolchain", "NormalizeSourceVRMTooltip", "Normalize the source VRM/GLB file and write a cleaned copy"),
-						FSlateIcon(),
-						FUIAction(
-							FExecuteAction::CreateStatic(&FVrmContentBrowserActions::ExecuteNormalizeVrm, SelectedAssets),
-							FCanExecuteAction::CreateStatic(&FVrmContentBrowserActions::CanNormalizeVrm, SelectedAssets)
-						)
+						UIAction,
+						SNew(STextBlock)
+							.Text(NSLOCTEXT("VrmToolchain", "NormalizeSourceVRM", "Normalize Source VRM"))
+							.ToolTipText(NSLOCTEXT("VrmToolchain", "NormalizeSourceVRMTooltip", "Normalize the source VRM/GLB file and write a cleaned copy"))
 					);
 				}
 				MenuBuilder.EndSection();
