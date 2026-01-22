@@ -32,8 +32,17 @@ $logPath = Join-Path $LogDir "Automation_$timestamp.log"
 # Build ExecCmds: target specific tests and request JSON report output
 # Compose ExecCmds carefully to avoid nested quoting issues
 $execCmds = 'Automation RunTests'
-if ($UATTest -and $UATTest -ne '') { $execCmds += " $UATTest" }
-if ($UATExtraArgs -and $UATExtraArgs -ne '') { $execCmds += " $UATExtraArgs" } elseif ($TestFilter -and $TestFilter -ne 'All') { $execCmds += " $TestFilter" }
+# Only add UATTest node if running a specific test filter (not "All")
+if (($TestFilter -and $TestFilter -ne 'All') -and $UATTest -and $UATTest -ne '') { 
+    $execCmds += " $UATTest" 
+}
+if ($UATExtraArgs -and $UATExtraArgs -ne '') { 
+    $execCmds += " $UATExtraArgs" 
+} elseif ($TestFilter -and $TestFilter -ne 'All') { 
+    $execCmds += " $TestFilter" 
+} elseif ($TestFilter -eq 'All' -or -not $TestFilter) {
+    $execCmds += " All"
+}
 $execCmds += " -ReportOutputPath=$ReportOutputPath; Quit"
 $editorArgs = "`"$ProjectPath`" -unattended -nullrhi -ExecCmds=`"$execCmds`" -LOG=`"$logPath`""
 
