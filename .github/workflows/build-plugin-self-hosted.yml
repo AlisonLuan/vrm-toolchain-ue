@@ -153,6 +153,18 @@ jobs:
           name: VrmToolchain-Package
           path: VrmToolchain-Package.zip
 
+      - name: Stage VrmToolchain into HostProject Plugins
+        shell: pwsh
+        run: |
+          $src = Join-Path $PWD 'Plugins\VrmToolchain'
+          if (-not (Test-Path $src)) { throw "Plugin source not found: $src" }
+          $dstDir = Join-Path $PWD 'HostProject\Plugins'
+          $dst = Join-Path $dstDir 'VrmToolchain'
+          if (Test-Path $dst) { Remove-Item -Recurse -Force $dst }
+          New-Item -ItemType Directory -Path $dstDir -Force | Out-Null
+          Copy-Item -Path $src -Destination $dst -Recurse -Force
+          if (-not (Test-Path (Join-Path $dst 'VrmToolchain.uplugin'))) { throw "Plugin copy failed: $dst" }
+
       - name: Build HostProjectEditor (Win64, Development)
         shell: pwsh
         env:
