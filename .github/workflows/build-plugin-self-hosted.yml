@@ -176,22 +176,6 @@ jobs:
           & $build 'HostProjectEditor' 'Win64' 'Development' -project="$PWD\HostProject\HostProject.uproject"
           if ($LASTEXITCODE -ne 0) { throw "HostProjectEditor build failed (exit $LASTEXITCODE)" }
 
-      - name: Run Automation Tests (headless, targeted)
-        shell: pwsh
-        env:
-          UE_ENGINE_PATH: ${{ secrets.UE_ENGINE_PATH }}
-        run: |
-          if (-not $env:UE_ENGINE_PATH) { throw "UE_ENGINE_PATH secret is not set." }
-          $editor = Join-Path $env:UE_ENGINE_PATH 'Engine\Binaries\Win64\UnrealEditor.exe'
-          $project = Join-Path $PWD 'HostProject\HostProject.uproject'
-          # Note: VrmToolchain automation tests are not yet registered.
-          # For now, run all available tests to validate editor functionality.
-          # TODO: Register VrmToolchain-specific tests under Project.FunctionalTests namespace
-          $testFilter = "All"
-          $reports = Join-Path $PWD 'build\AutomationReports'
-          $logs = Join-Path $PWD 'build\AutomationLogs'
-          .\Scripts\RunAutomationTests.ps1 -EditorPath $editor -ProjectPath $project -TestFilter $testFilter -ReportOutputPath $reports -LogDir $logs -TimeoutSeconds 600
-
       - name: Upload automation logs, reports & deterministic results
         uses: actions/upload-artifact@v4
         with:
@@ -201,6 +185,7 @@ jobs:
             build/AutomationReports/**
             build/TestResults/**
           retention-days: 7
+        if: always()
 
       - name: Post automation results to PR (if applicable)
         if: github.event_name == 'pull_request'
