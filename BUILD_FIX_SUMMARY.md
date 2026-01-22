@@ -225,8 +225,12 @@ These are not direct VRM logs but reference the VrmToolchain in the test query, 
 
 #### Summary Analysis (VRM-Specific)
 - **Successes**: Plugin loads without errors; SDK and editor actions integrate fine.
-- **Issues**: No direct VRM errors, but the test failure suggests configuration problems (e.g., tests not in "Project.Functional Tests.VrmToolchain" namespace). Verify test blueprints/scripts in the plugin/project.
-- **Recommendations**: If debugging VRM, focus on these logs for init sequence. For test issues, inspect automation test registration in the VrmToolchain plugin code. No warnings/errors directly in VRM logs, so broader engine setup (e.g., paths in runner) might be the culprit.
+- **Test Discovery**: Engine found 4869 available tests, but **none matched** 'Project.Functional Tests.VrmToolchain'. This indicates VrmToolchain automation/functional tests have not yet been registered/created in the plugin or host project.
+- **Workflow Adjustment**: Automation tests step now runs `All` tests (editor smoke tests) instead of filtering for nonexistent VrmToolchain tests, ensuring CI validates editor functionality without failing on missing test namespaces.
+- **Recommendations**: 
+  1. If debugging VRM, focus on plugin load logs for init sequence (all successful).
+  2. To enable VRM-specific testing, register automation tests in the plugin under `Project.FunctionalTests.VrmToolchain` namespace.
+  3. Once tests are registered, update the workflow `-TestFilter` parameter to target them.
 
 #### Test invocation guidance (Gauntlet/RunUAT) 🔧
 - Distinction: *Automation tests* (unit/in-editor automation) vs *Functional tests* (integration/gauntlet-style). If your VrmToolchain tests are *functional*, use an editor-context functional invocation rather than the default `Automation RunTests` node used in the failing run.
