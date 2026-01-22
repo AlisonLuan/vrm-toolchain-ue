@@ -188,7 +188,7 @@ jobs:
           $testFilter = "VrmToolchain"
           $reports = Join-Path $PWD 'build\AutomationReports'
           $logs = Join-Path $PWD 'build\AutomationLogs'
-          .\Scripts\RunAutomationTests.ps1 -EditorPath $editor -ProjectPath $project -TestFilter $testFilter -ReportOutputPath $reports -LogDir $logs -TimeoutSeconds 600
+          .\Scripts\RunAutomationTests.ps1 -EditorPath $editor -ProjectPath $project -TestFilter $testFilter -UATTest 'UE.EditorAutomation' -UATExtraArgs "-runtest=`"$testFilter`"" -ReportOutputPath $reports -LogDir $logs -TimeoutSeconds 600
 
       - name: Upload automation logs, reports & deterministic results
         uses: actions/upload-artifact@v4

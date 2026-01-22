@@ -183,6 +183,62 @@ Over-scoped refactoring moved `UVrmMetadataAsset` to editor module, but the type
 - All modules compile cleanly
 - All tests compile successfully
 
+### VRM Plugin-Related Logs
+
+Based on the provided Unreal Engine log, I've filtered and summarized the entries specifically related to the VRM (VrmToolchain) plugin. These include initialization, startup, and any associated events or errors. The plugin appears to load successfully, but the automation test fails due to no matching tests found for "Project.Functional Tests.VrmToolchain". No direct errors in VRM initialization, but the test command is tied to it.
+
+#### Key VRM Logs
+- **[2026.01.22-19.28.39:315][ 0] LogVrmToolchain: VrmToolchain runtime module startup**  
+  - Context: Runtime module for VrmToolchain starts loading.  
+  - Diagnostic value: Indicates successful startup of the core runtime component.
+
+- **[2026.01.22-19.28.39:354][ 0] LogVrmToolchainEditor: VrmToolchainEditor startup**  
+  - Context: Editor-specific module for VrmToolchain begins initialization.  
+  - Diagnostic value: Editor integration starting.
+
+- **[2026.01.22-19.28:39:354][ 0] LogVrmToolchainEditor: Display: VrmToolchain plugin resolved: BaseDir='../../../../../../actions-runner/_work/vrm-toolchain-ue/vrm-toolchain-ue/HostProject/Plugins/VrmToolchain' Descriptor='../../../../../../actions-runner/_work/vrm-toolchain-ue/vrm-toolchain-ue/HostProject/Plugins/VrmToolchain/VrmToolchain.uplugin'**  
+  - Context: Plugin path and descriptor resolved.  
+  - Diagnostic value: Confirms plugin location and loading from the project directory (likely a GitHub Actions runner environment).
+
+- **[2026.01.22-19.28:39:355][ 0] LogVrmToolchainEditor: Display: Validation CLI found via SDK at 'C:/VRM_SDK/bin/vrm_validate.exe'**  
+  - Context: External VRM validation tool detected.  
+  - Diagnostic value: SDK integration successful; useful for VRM file validation features.
+
+- **[2026.01.22-19.28:39:355][ 0] LogVrmToolchainEditor: VRM Content Browser actions registered**  
+  - Context: Custom actions added to the Content Browser for VRM handling.  
+  - Diagnostic value: UI/editor extensions for VRM assets are set up.
+
+#### Related Test Execution Logs (Tied to VRM)
+These are not direct VRM logs but reference the VrmToolchain in the test query, which is the focus of the run.
+- **[2026.01.22-19.28:22:052][ 0] LogInit: Command Line: -gauntlet ... -ExecCmds="Automation RunTests Project.Functional Tests.VrmToolchain" ...**  
+  - Context: Engine launched with Gauntlet automation for VrmToolchain tests.
+
+- **[2026.01.22-19.28:44:627][ 0] Cmd: Automation RunTests Project.Functional Tests.VrmToolchain**  
+  - Context: Test command executed.
+
+- **[2026.01.22-19.29.03:247][191] LogAutomationCommandLine: Error: No automation tests matched 'Project.Functional Tests.VrmToolchain'**  
+  - Context: Test search fails.  
+  - Diagnostic value: Likely issue – tests not registered or misspelled path. Check project automation setup for VrmToolchain tests.
+
+- **[2026.01.22-19.29.03:248][191] LogAutomationCommandLine: Display: ...Automation Test Queue Empty 0 tests performed.**  
+  - Context: No tests run.
+
+#### Summary Analysis (VRM-Specific)
+- **Successes**: Plugin loads without errors; SDK and editor actions integrate fine.
+- **Issues**: No direct VRM errors, but the test failure suggests configuration problems (e.g., tests not in "Project.Functional Tests.VrmToolchain" namespace). Verify test blueprints/scripts in the plugin/project.
+- **Recommendations**: If debugging VRM, focus on these logs for init sequence. For test issues, inspect automation test registration in the VrmToolchain plugin code. No warnings/errors directly in VRM logs, so broader engine setup (e.g., paths in runner) might be the culprit.
+
+#### Test invocation guidance (Gauntlet/RunUAT) 🔧
+- Distinction: *Automation tests* (unit/in-editor automation) vs *Functional tests* (integration/gauntlet-style). If your VrmToolchain tests are *functional*, use an editor-context functional invocation rather than the default `Automation RunTests` node used in the failing run.
+- Suggested RunUAT/AutomationTool flags for editor-context functional tests: `-Test=UE.EditorAutomation -runtest="VrmToolchain"` (or equivalently ensure the ExecCmd uses `Automation RunTests UE.EditorAutomation -runtest="VrmToolchain"`).
+- Namespace/format: prefer `Project.FunctionalTests.VrmToolchain` (no extra spaces) when addressing functional tests; mismatch or spacing errors cause "No automation tests matched" issues.
+- Pipeline note: Gauntlet often uses `EditorTest.EditorTestNode`, which may not include functional tests by default. If functional tests are required, switch the test node or testflags accordingly, or add a workflow toggle to select the appropriate RunUAT `-Test` value.
+
+**Actionable next steps**:
+1. Verify test registration in the plugin (are tests registered under `Project.FunctionalTests.VrmToolchain`?).
+2. Try invoking RunUAT locally with `-Test=UE.EditorAutomation -runtest="VrmToolchain"` to validate discovery.
+3. Consider adding a parameter to `Scripts/RunAutomationTests.ps1` to allow overriding the RunUAT `-Test` value (default: `EditorTest.EditorTestNode`) so CI can toggle between automation/unit vs functional/editor contexts.
+
 ## Commit Timeline
 
 ```

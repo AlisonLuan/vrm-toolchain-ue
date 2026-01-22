@@ -7,6 +7,12 @@ param(
 
     [string]$TestFilter = "All",
 
+    # UAT/AutomationTool test selector (default preserves historical behavior)
+    [string]$UATTest = "EditorTest.EditorTestNode",
+
+    # Additional args passed through to RunUAT/AutomationTool (e.g. -runtest="VrmToolchain")
+    [string]$UATExtraArgs = "",
+
     [string]$LogDir = "$PSScriptRoot\AutomationLogs",
 
     [string]$ReportOutputPath = "$PSScriptRoot\AutomationReports",
@@ -25,7 +31,10 @@ $logPath = Join-Path $LogDir "Automation_$timestamp.log"
 
 # Build ExecCmds: target specific tests and request JSON report output
 # Compose ExecCmds carefully to avoid nested quoting issues
-$execCmds = "Automation RunTests $TestFilter -ReportOutputPath=$ReportOutputPath; Quit"
+$execCmds = 'Automation RunTests'
+if ($UATTest -and $UATTest -ne '') { $execCmds += " $UATTest" }
+if ($UATExtraArgs -and $UATExtraArgs -ne '') { $execCmds += " $UATExtraArgs" } elseif ($TestFilter -and $TestFilter -ne 'All') { $execCmds += " $TestFilter" }
+$execCmds += " -ReportOutputPath=$ReportOutputPath; Quit"
 $editorArgs = "`"$ProjectPath`" -unattended -nullrhi -ExecCmds=`"$execCmds`" -LOG=`"$logPath`""
 
 # Prefer RunUAT / AutomationTool for headless, CI-friendly automation runs
@@ -47,7 +56,8 @@ if (Test-Path $uat) {
     # Prefer Gauntlet's RunEditorTests to run in-editor Automation tests via the EditorTest node
     $runArgs = @()
     $runArgs += 'RunEditorTests'
-    $runArgs += '-Test="EditorTest.EditorTestNode"'
+    $runArgs += "-Test=`"$UATTest`""
+    if ($UATExtraArgs) { $runArgs += $UATExtraArgs }
     if ($TestFilter -and $TestFilter -ne 'All') { $runArgs += "-testname=`"$TestFilter`"" }
     $runArgs += "-project=`"$ProjectPath`""
     $runArgs += "-reportoutputpath=`"$ReportOutputPath`""
@@ -60,7 +70,8 @@ if (Test-Path $uat) {
     # If RunUAT.bat isn't available, invoke AutomationTool.dll directly via dotnet with RunEditorTests
     $dotnet = (Get-Command dotnet -ErrorAction SilentlyContinue).Path
     if (-not $dotnet) { throw "dotnet not found to run AutomationTool.dll" }
-    $dtArgs = @('RunEditorTests', '-Test="EditorTest.EditorTestNode"')
+    $dtArgs = @('RunEditorTests', "-Test=`"$UATTest`"")
+    if ($UATExtraArgs) { $dtArgs += $UATExtraArgs }
     if ($TestFilter -and $TestFilter -ne 'All') { $dtArgs += "-testname=`"$TestFilter`"" }
     $dtArgs += "-project=`"$ProjectPath`""
     $dtArgs += "-reportoutputpath=`"$ReportOutputPath`""
