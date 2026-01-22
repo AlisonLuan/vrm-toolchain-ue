@@ -53,33 +53,47 @@ $uat = if ($ueRoot) { Join-Path $ueRoot "Engine\Build\BatchFiles\RunUAT.bat" } e
 $automationDll = if ($ueRoot) { Join-Path $ueRoot "Engine\Binaries\DotNET\AutomationTool\AutomationTool.dll" } else { $null }
 
 if (Test-Path $uat) {
-    # Prefer Gauntlet's RunEditorTests to run in-editor Automation tests via the EditorTest node
-    $runArgs = @()
-    $runArgs += 'RunEditorTests'
-    $runArgs += "-Test=`"$UATTest`""
-    if ($UATExtraArgs) { $runArgs += $UATExtraArgs }
-    if ($TestFilter -and $TestFilter -ne 'All') { $runArgs += "-testname=`"$TestFilter`"" }
-    $runArgs += "-project=`"$ProjectPath`""
-    $runArgs += "-reportoutputpath=`"$ReportOutputPath`""
-    $runArgs += "-log=`"$logPath`""
+    # Only use RunUAT/Gauntlet if we have a specific test filter.
+    # EditorTest.EditorTestNode requires -testname, so skip RunUAT for "All" tests.
+    if ($TestFilter -and $TestFilter -ne 'All') {
+        # Prefer Gauntlet's RunEditorTests to run targeted tests via the EditorTest node
+        $runArgs = @()
+        $runArgs += 'RunEditorTests'
+        $runArgs += "-Test=`"$UATTest`""
+        if ($UATExtraArgs) { $runArgs += $UATExtraArgs }
+        $runArgs += "-testname=`"$TestFilter`""
+        $runArgs += "-project=`"$ProjectPath`""
+        $runArgs += "-reportoutputpath=`"$ReportOutputPath`""
+        $runArgs += "-log=`"$logPath`""
 
-    Write-Host "Using RunUAT: $uat $($runArgs -join ' ')"
-    & $uat @runArgs
-    $exitCode = $LASTEXITCODE
+        Write-Host "Using RunUAT: $uat $($runArgs -join ' ')"
+        & $uat @runArgs
+        $exitCode = $LASTEXITCODE
+    } else {
+        # For "All" tests, skip RunUAT and go straight to fallback editor launch
+        Write-Host "Running all tests; skipping RunUAT (Gauntlet requires -testname). Using fallback editor launch."
+        $exitCode = -1  # Force fallback
+    }
 } elseif (Test-Path $automationDll) {
-    # If RunUAT.bat isn't available, invoke AutomationTool.dll directly via dotnet with RunEditorTests
-    $dotnet = (Get-Command dotnet -ErrorAction SilentlyContinue).Path
-    if (-not $dotnet) { throw "dotnet not found to run AutomationTool.dll" }
-    $dtArgs = @('RunEditorTests', "-Test=`"$UATTest`"")
-    if ($UATExtraArgs) { $dtArgs += $UATExtraArgs }
-    if ($TestFilter -and $TestFilter -ne 'All') { $dtArgs += "-testname=`"$TestFilter`"" }
-    $dtArgs += "-project=`"$ProjectPath`""
-    $dtArgs += "-reportoutputpath=`"$ReportOutputPath`""
-    $dtArgs += "-log=`"$logPath`""
+    # Only use AutomationTool.dll if we have a specific test filter
+    if ($TestFilter -and $TestFilter -ne 'All') {
+        $dotnet = (Get-Command dotnet -ErrorAction SilentlyContinue).Path
+        if (-not $dotnet) { throw "dotnet not found to run AutomationTool.dll" }
+        $dtArgs = @('RunEditorTests', "-Test=`"$UATTest`"")
+        if ($UATExtraArgs) { $dtArgs += $UATExtraArgs }
+        $dtArgs += "-testname=`"$TestFilter`""
+        $dtArgs += "-project=`"$ProjectPath`""
+        $dtArgs += "-reportoutputpath=`"$ReportOutputPath`""
+        $dtArgs += "-log=`"$logPath`""
 
-    Write-Host "Invoking AutomationTool.dll via dotnet: $automationDll $($dtArgs -join ' ')"
-    & $dotnet "$automationDll" @dtArgs
-    $exitCode = $LASTEXITCODE
+        Write-Host "Invoking AutomationTool.dll via dotnet: $automationDll $($dtArgs -join ' ')"
+        & $dotnet "$automationDll" @dtArgs
+        $exitCode = $LASTEXITCODE
+    } else {
+        # For "All" tests, skip AutomationTool and go straight to fallback
+        Write-Host "Running all tests; skipping AutomationTool.dll. Using fallback editor launch."
+        $exitCode = -1  # Force fallback
+    }
 } else {
     Write-Warning "RunUAT or AutomationTool not found under UE root '$ueRoot'. Falling back to launching UnrealEditor directly."
 
