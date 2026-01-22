@@ -153,6 +153,17 @@ jobs:
           name: VrmToolchain-Package
           path: VrmToolchain-Package.zip
 
+      - name: Build HostProjectEditor (Win64, Development)
+        shell: pwsh
+        env:
+          UE_ENGINE_PATH: ${{ secrets.UE_ENGINE_PATH }}
+        run: |
+          if (-not $env:UE_ENGINE_PATH) { throw "UE_ENGINE_PATH secret is not set." }
+          $build = Join-Path $env:UE_ENGINE_PATH 'Engine\Build\BatchFiles\Build.bat'
+          if (-not (Test-Path $build)) { throw "Build.bat not found: $build" }
+          & $build 'HostProjectEditor' 'Win64' 'Development' -project="$PWD\HostProject\HostProject.uproject"
+          if ($LASTEXITCODE -ne 0) { throw "HostProjectEditor build failed (exit $LASTEXITCODE)" }
+
       - name: Run Automation Tests (headless, targeted)
         shell: pwsh
         env:
