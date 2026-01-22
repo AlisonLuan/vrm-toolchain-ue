@@ -160,7 +160,7 @@ jobs:
         run: |
           if (-not $env:UE_ENGINE_PATH) { throw "UE_ENGINE_PATH secret is not set." }
           $editor = Join-Path $env:UE_ENGINE_PATH 'Engine\Binaries\Win64\UnrealEditor.exe'
-          $project = Join-Path $PWD 'build\PackageRaw\VrmToolchain\HostProject\HostProject.uproject'
+          $project = Join-Path $PWD 'HostProject\HostProject.uproject'
           # Target tests under the VrmToolchain namespace to keep CI fast
           $testFilter = "VrmToolchain"
           $reports = Join-Path $PWD 'build\AutomationReports'
