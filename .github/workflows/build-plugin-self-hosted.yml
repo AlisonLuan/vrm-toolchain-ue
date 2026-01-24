@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: build-plugin-${{ github.ref }}
+  group: build-plugin-self-hosted-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
