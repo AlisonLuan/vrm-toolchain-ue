@@ -1,6 +1,7 @@
 #include "VrmConversionService.h"
 #include "VrmSourceAsset.h"
 #include "VrmToolchain/VrmMetadataAsset.h"
+#include "VrmToolchain/VrmMetadata.h"
 #include "VrmToolchainEditor.h"
 #include "VrmSdkFacadeEditor.h"
 #include "AssetRegistry/AssetRegistryModule.h"
@@ -135,11 +136,27 @@ t	{
 	NewSkeleton->MarkPackageDirty();
 	NewMesh->MarkPackageDirty();
 
-	// Attach metadata if Source->Descriptor exists
-	if (Source->Descriptor)
+	// Attach metadata (canonical path: mesh-owned UAssetUserData via facade)
 	{
-		UVrmMetadataAsset* Meta = Source->Descriptor;
-        // Duplicate the metadata asset into the new mesh as user data so the asset carries the same descriptor
+		FVrmMetadata Parsed;
+
+		if (UVrmMetadataAsset* Desc = Source->Descriptor.Get())
+		{
+			Parsed.Version = Desc->SpecVersion;
+			Parsed.Name = Desc->Metadata.Title;
+			Parsed.ModelVersion = Desc->Metadata.Version;
+
+			if (!Desc->Metadata.Author.IsEmpty())
+			{
+				Parsed.Authors = { Desc->Metadata.Author };
+			}
+
+			Parsed.License = Desc->Metadata.LicenseName;
+		}
+
+		FVrmSdkFacadeEditor::UpsertVrmMetadata(NewMesh, Parsed);
+	}
+
 	// Add provenance note as package metadata
 	NewMesh->GetOutermost()->SetMetaData(TEXT("VrmToolchain.PlaceholderConversion"), TEXT("true"));
 
@@ -147,4 +164,4 @@ t	{
 	OutSkeleton = NewSkeleton;
 
 	return true;
-}
+} 
