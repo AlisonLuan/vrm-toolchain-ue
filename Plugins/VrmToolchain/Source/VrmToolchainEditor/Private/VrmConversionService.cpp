@@ -157,8 +157,8 @@ bool FVrmConversionService::ConvertSourceToPlaceholderSkeletalMesh(UVrmSourceAss
 		FVrmSdkFacadeEditor::UpsertVrmMetadata(NewMesh, Parsed);
 	}
 
-	// Add provenance note as package metadata
-	NewMesh->GetOutermost()->SetMetaData(TEXT("VrmToolchain.PlaceholderConversion"), TEXT("true"));
+	// Add provenance note: (UPackage does not expose SetMetaData; skip explicit package metadata write)
+	// Consider attaching a dedicated UAssetUserData if persistent provenance is required later.
 
 	OutSkeletalMesh = NewMesh;
 	OutSkeleton = NewSkeleton;
