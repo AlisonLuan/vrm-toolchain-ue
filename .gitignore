@@ -127,5 +127,9 @@ BuildOutput*.log
 FINAL_READINESS_REPORT.md
 GITHUB_PR_BODY.txt
 
+# Local branch-protection backups and workflow logs (local-only)
+bp_*.json
+tmp_run_*.log
+
 !/RELEASES/
 !/RELEASES/*.sha256
