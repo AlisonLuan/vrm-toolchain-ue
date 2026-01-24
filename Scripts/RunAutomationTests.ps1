@@ -141,11 +141,11 @@ if ($exitCode -ne $null -and $exitCode -ne 0) {
     Write-Host "Automation runner exit code: $exitCode"
 }
 
-# If we invoked RunUAT/AutomationTool but it failed to produce a usable report, fall back to launching the editor directly
+# If we invoked RunUAT/AutomationTool and it FAILED (non-zero exit), fall back to launching the editor directly
+# Note: if RunUAT succeeds (exit 0), we accept that even if no JSON reports were produced.
 $hadUATRun = (($uat -ne $null) -and (Test-Path $uat)) -or (($automationDll -ne $null) -and (Test-Path $automationDll))
-$foundReports = (Get-ChildItem -Path $ReportOutputPath -Filter '*.json' -File -Recurse -ErrorAction SilentlyContinue)
-if ($hadUATRun -and (($exitCode -ne $null -and $exitCode -ne 0) -or (-not $foundReports))) {
-    Write-Warning "RunUAT/AutomationTool invocation failed or produced no reports. Falling back to launching the editor directly."
+if ($hadUATRun -and ($exitCode -ne $null -and $exitCode -ne 0)) {
+    Write-Warning "RunUAT/AutomationTool invocation failed with exit code $exitCode. Falling back to launching the editor directly."
 
     # Fallback launch (headless) - prefer UnrealEditor-Cmd.exe
     $editorCmdCandidate = Join-Path (Split-Path $EditorPath -Parent) 'UnrealEditor-Cmd.exe'
