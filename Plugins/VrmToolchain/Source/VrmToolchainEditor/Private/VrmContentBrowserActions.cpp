@@ -94,7 +94,7 @@ bool FVrmContentBrowserActions::CanNormalizeVrm(const TArray<FAssetData>& Select
 		&& AssetData.AssetClassPath != UVrmSourceAsset::StaticClass()->GetClassPathName())
 	{
 		return false;
-	} 
+	}
 
 	// Check if import data exists by reading asset registry tags
 	// This avoids loading the full asset and potentially freezing the UI
