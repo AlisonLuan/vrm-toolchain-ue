@@ -16,6 +16,8 @@ jobs:
     runs-on: [self-hosted, windows, ue-5.7]
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Determine changed files
         id: changed
@@ -29,13 +31,27 @@ jobs:
             $changed = git diff --name-only HEAD~1 HEAD | Out-String
           }
           Write-Host "Changed files:`n$changed"
-          $nonDocs = @($changed -split "`n" | Where-Object { $_ -and -not ($_ -match '^(Docs/|\\.github/|README.md|LICENSE|CHANGELOG)') })
+
+          # Normalize and trim
+          $files = ($changed -split "`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' })
+          $nonDocs = @()
+          foreach ($f in $files) {
+            # Treat workflow edits as non-doc changes (force full CI)
+            if ($f -match '^\.github/workflows/') { $nonDocs += $f; continue }
+            # Files considered docs-only
+            if ($f -match '^(Docs/|README.md$|LICENSE$|CHANGELOG$)') { continue }
+            # Other .github/meta files are docs-like (allowed)
+            if ($f -match '^\.github/') { continue }
+            # Anything else is non-doc
+            $nonDocs += $f
+          }
+
           if ($nonDocs.Count -eq 0) {
             echo "docs_only=true" >> $env:GITHUB_OUTPUT
             Write-Host "Docs-only change detected"
           } else {
             echo "docs_only=false" >> $env:GITHUB_OUTPUT
-            Write-Host "Non-doc changes detected"
+            Write-Host "Non-doc changes detected: $($nonDocs -join ', ')"
           }
 
       - name: "Lint workflows: forbid -AllowBinaries"
