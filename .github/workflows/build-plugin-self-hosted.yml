@@ -24,12 +24,51 @@ jobs:
         shell: pwsh
         run: |
           # Determine files changed against main and set docs_only output if only Docs/ or meta files changed
+          $changed = ""
+
           if ($env:GITHUB_EVENT_NAME -eq 'pull_request') {
-            git fetch origin main
-            $changed = git diff --name-only origin/main...HEAD | Out-String
+            git fetch origin main --no-tags --prune
+            $out = & git diff --name-only origin/main...HEAD 2>&1
+            if ($LASTEXITCODE -ne 0) {
+              Write-Warning "git diff origin/main...HEAD failed ($LASTEXITCODE): $out"
+              # Try GitHub API fallback to list PR files
+              try {
+                if ($env:GITHUB_EVENT_PATH) {
+                  $event = Get-Content $env:GITHUB_EVENT_PATH | ConvertFrom-Json
+                  $filesUrl = $event.pull_request.url + "/files"
+                  $files = gh api $filesUrl -q '.[].filename' 2>$null | Out-String
+                  $changed = $files
+                } else {
+                  $changed = ""
+                }
+              } catch {
+                Write-Warning "Failed to query PR files via gh api: $_"
+                $changed = ""
+              }
+            } else {
+              $changed = $out
+            }
           } else {
-            $changed = git diff --name-only HEAD~1 HEAD | Out-String
+            # Non-PR: prefer HEAD~1, but fall back to origin/main if history is shallow
+            $useOrigin = $false
+            $revCheck = & git rev-parse --verify HEAD~1 2>&1
+            if ($LASTEXITCODE -ne 0) { $useOrigin = $true }
+
+            if (-not $useOrigin) {
+              $out = & git diff --name-only HEAD~1 HEAD 2>&1
+              if ($LASTEXITCODE -ne 0) {
+                Write-Warning "git diff HEAD~1 HEAD failed ($LASTEXITCODE): $out; falling back to origin/main...HEAD"
+                git fetch origin main --no-tags --prune
+                $changed = (& git diff --name-only origin/main...HEAD 2>&1)
+              } else {
+                $changed = $out
+              }
+            } else {
+              git fetch origin main --no-tags --prune
+              $changed = (& git diff --name-only origin/main...HEAD 2>&1)
+            }
           }
+
           Write-Host "Changed files:`n$changed"
 
           # Normalize and trim
@@ -53,6 +92,9 @@ jobs:
             echo "docs_only=false" >> $env:GITHUB_OUTPUT
             Write-Host "Non-doc changes detected: $($nonDocs -join ', ')"
           }
+
+          # Ensure script exits successfully even if git commands had recoverable errors
+          exit 0
 
       - name: "Lint workflows: forbid -AllowBinaries"
         shell: pwsh
