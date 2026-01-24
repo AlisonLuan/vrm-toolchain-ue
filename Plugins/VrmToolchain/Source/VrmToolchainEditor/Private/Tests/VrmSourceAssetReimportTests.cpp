@@ -10,6 +10,7 @@
 #include "VrmSourceAsset.h"
 #include "VrmSourceAssetReimportHandler.h"
 #include "VrmToolchain/VrmMetadataAsset.h"
+#include "EditorFramework/AssetImportData.h"
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmSourceAssetReimport_RefreshesBytes,
     "VrmToolchain.Editor.Reimport.VrmSourceAsset.RefreshesBytes",
