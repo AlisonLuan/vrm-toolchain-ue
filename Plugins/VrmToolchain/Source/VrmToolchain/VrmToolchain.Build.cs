@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.IO;
 using UnrealBuildTool;
 
@@ -18,7 +18,7 @@ public class VrmToolchain : ModuleRules
             "IKRig",
         });
 
-        // Editor-only functionality (Kismet) is provided by the Editor module; keep runtime module editor-free.
+        // Editor-only functionality is provided by the Editor module; keep runtime module editor-free.
 
         PrivateDependencyModuleNames.AddRange(new string[]
         {
@@ -105,3 +105,4 @@ string sdkRoot = LocateVrmSdkRoot();
             "Unable to locate the VRM SDK. Set VRM_SDK_ROOT or stage the SDK inside Plugins/VrmToolchain/Source/ThirdParty/VrmSdk.");
     }
 }
+
