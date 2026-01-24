@@ -90,7 +90,7 @@ bool FVrmConversionService::ConvertSourceToPlaceholderSkeletalMesh(UVrmSourceAss
 	FString MeshPackageName = FolderPath + TEXT("/") + MeshName;
 
 	// Check existing
-t	{
+	{
 		FAssetRegistryModule& ARM = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
 		if (!Options.bOverwriteExisting)
 		{

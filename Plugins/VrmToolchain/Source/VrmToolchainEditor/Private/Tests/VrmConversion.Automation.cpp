@@ -23,7 +23,7 @@ bool FVrmConversionPathDerivationTest::RunTest(const FString& Parameters)
 	Desc->Metadata.Version = TEXT("1.0");
 	Desc->Metadata.Author = TEXT("Author A");
 	Desc->Metadata.LicenseName = TEXT("MIT");
-	Desc->SpecVersion = TEXT("1.0");
+	Desc->SpecVersion = EVrmVersion::VRM1;
 
 	Source->Descriptor = Desc;
 

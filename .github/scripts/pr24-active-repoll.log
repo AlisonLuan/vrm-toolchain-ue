@@ -1,0 +1,61 @@
+[2026-01-24T22:07:35.4359970+01:00] Starting active re-run and poller
+[2026-01-24T22:07:35.4911127+01:00] Attempt 1: head=, mergeable=, state=, merged=
+[2026-01-24T22:07:35.9101492+01:00] Pending checks: :422/
+
+[2026-01-24T22:08:05.9744426+01:00] Attempt 2: head=, mergeable=, state=, merged=
+[2026-01-24T22:08:06.3062741+01:00] Pending checks: :422/
+
+[2026-01-24T22:08:36.3568123+01:00] Attempt 3: head=, mergeable=, state=, merged=
+[2026-01-24T22:08:36.7213444+01:00] Pending checks: :422/
+
+[2026-01-24T22:09:06.7858708+01:00] Attempt 4: head=, mergeable=, state=, merged=
+[2026-01-24T22:09:07.1388664+01:00] Pending checks: :422/
+
+[2026-01-24T22:09:37.1973953+01:00] Attempt 5: head=, mergeable=, state=, merged=
+[2026-01-24T22:09:37.5400542+01:00] Pending checks: :422/
+
+[2026-01-24T22:10:07.5919982+01:00] Attempt 6: head=, mergeable=, state=, merged=
+[2026-01-24T22:10:07.9803239+01:00] Pending checks: :422/
+
+[2026-01-24T22:10:38.0462307+01:00] Attempt 7: head=, mergeable=, state=, merged=
+[2026-01-24T22:10:38.4074311+01:00] Pending checks: :422/
+
+[2026-01-24T22:11:08.4616497+01:00] Attempt 8: head=, mergeable=, state=, merged=
+[2026-01-24T22:11:08.8003212+01:00] Pending checks: :422/
+
+[2026-01-24T22:11:38.8709054+01:00] Attempt 9: head=, mergeable=, state=, merged=
+[2026-01-24T22:11:39.2150621+01:00] Pending checks: :422/
+
+[2026-01-24T22:12:09.2846515+01:00] Attempt 10: head=, mergeable=, state=, merged=
+[2026-01-24T22:12:09.6131457+01:00] Pending checks: :422/
+
+[2026-01-24T22:12:39.6793068+01:00] Attempt 11: head=, mergeable=, state=, merged=
+[2026-01-24T22:12:40.0258165+01:00] Pending checks: :422/
+
+[2026-01-24T22:13:10.0956860+01:00] Attempt 12: head=, mergeable=, state=, merged=
+[2026-01-24T22:13:10.4405053+01:00] Pending checks: :422/
+
+[2026-01-24T22:13:40.5036935+01:00] Attempt 13: head=, mergeable=, state=, merged=
+[2026-01-24T22:13:40.8761919+01:00] Pending checks: :422/
+
+[2026-01-24T22:14:10.9504717+01:00] Attempt 14: head=, mergeable=, state=, merged=
+[2026-01-24T22:14:11.5229062+01:00] Pending checks: :422/
+
+[2026-01-24T22:14:41.5935758+01:00] Attempt 15: head=, mergeable=, state=, merged=
+[2026-01-24T22:14:41.9319246+01:00] Pending checks: :422/
+
+[2026-01-24T22:15:11.9990075+01:00] Attempt 16: head=, mergeable=, state=, merged=
+[2026-01-24T22:15:12.3466993+01:00] Pending checks: :422/
+
+[2026-01-24T22:15:42.4152823+01:00] Attempt 17: head=, mergeable=, state=, merged=
+[2026-01-24T22:15:42.7314891+01:00] Pending checks: :422/
+
+[2026-01-24T22:16:12.7902614+01:00] Attempt 18: head=, mergeable=, state=, merged=
+[2026-01-24T22:16:13.1060327+01:00] Pending checks: :422/
+
+[2026-01-24T22:16:43.1665871+01:00] Attempt 19: head=, mergeable=, state=, merged=
+[2026-01-24T22:16:43.4931316+01:00] Pending checks: :422/
+
+[2026-01-24T22:17:13.5464082+01:00] Attempt 20: head=, mergeable=, state=, merged=
+[2026-01-24T22:17:13.8831335+01:00] Pending checks: :422/
+
