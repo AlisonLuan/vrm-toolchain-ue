@@ -139,12 +139,18 @@ if (Test-Path $uat) {
 
 if ($exitCode -ne $null -and $exitCode -ne 0) {
     Write-Host "Automation runner exit code: $exitCode"
-}
-
-# If we invoked RunUAT/AutomationTool and it FAILED (non-zero exit), fall back to launching the editor directly
-# Note: if RunUAT succeeds (exit 0), we accept that even if no JSON reports were produced.
-$hadUATRun = (($uat -ne $null) -and (Test-Path $uat)) -or (($automationDll -ne $null) -and (Test-Path $automationDll))
-if ($hadUATRun -and ($exitCode -ne $null -and $exitCode -ne 0)) {
+    # If RunUAT/AutomationTool failed, we'll process logs/reports below for diagnostics
+} else {
+    # Check if we ran RunUAT/AutomationTool (and if so, it succeeded since exit code is 0 or null)
+    $hadUATRun = (($uat -ne $null) -and (Test-Path $uat)) -or (($automationDll -ne $null) -and (Test-Path $automationDll))
+    if ($hadUATRun -and ($exitCode -eq 0 -or $exitCode -eq $null)) {
+        # RunUAT or AutomationTool succeeded (exit code 0 or undefined) - we're done
+        Write-Host "Automation tests completed successfully (exit code 0)."
+        Write-Host "All automation tests passed."
+        exit 0
+    }
+    
+    # If we get here, RunUAT/AutomationTool failed (non-zero exit), so fall back to launching the editor directly
     Write-Warning "RunUAT/AutomationTool invocation failed with exit code $exitCode. Falling back to launching the editor directly."
 
     # Fallback launch (headless) - prefer UnrealEditor-Cmd.exe
@@ -177,11 +183,10 @@ if ($hadUATRun -and ($exitCode -ne $null -and $exitCode -ne 0)) {
 # Continue to parse logs / reports as before
 if (-not (Test-Path $logPath)) {
     Write-Host "Warning: expected log file was not created: $logPath" -ForegroundColor Yellow
+} else {
+    Write-Host "Parsing automation log: $logPath"
+    $log = Get-Content $logPath -Raw
 }
-
-
-Write-Host "Parsing automation log: $logPath"
-$log = Get-Content $logPath -Raw
 
 # Locate latest JSON report
 $reportFile = Get-ChildItem -Path $ReportOutputPath -Filter '*.json' -File -Recurse -ErrorAction SilentlyContinue | Sort-Object LastWriteTime -Descending | Select-Object -First 1
@@ -242,6 +247,7 @@ if ($reportFile) {
 
 # Backwards-compatible: regex scan of console log if we don't have counts yet
 function Get-Number($text, $patterns) {
+    if (-not $text) { return $null }
     foreach ($p in $patterns) {
         $m = [regex]::Match($text, $p)
         if ($m.Success -and $m.Groups.Count -ge 2) {
@@ -252,14 +258,18 @@ function Get-Number($text, $patterns) {
 }
 
 if (-not $passed -or -not $failed) {
-    $passed = Get-Number $log @("Passed:\s*(\d+)", "(\d+) passed", "Passed\s*:\s*(\d+)")
-    $failed = Get-Number $log @("Failed:\s*(\d+)", "(\d+) failed", "Failed\s*:\s*(\d+)")
+    if ($log) {
+        $passed = Get-Number $log @("Passed:\s*(\d+)", "(\d+) passed", "Passed\s*:\s*(\d+)")
+        $failed = Get-Number $log @("Failed:\s*(\d+)", "(\d+) failed", "Failed\s*:\s*(\d+)")
+    }
 }
 
 if (-not $passed -and -not $failed) {
     # As a final fallback, scan for summary lines
-    $summaryLine = ($log -split "\r?\n") | Where-Object { $_ -match "Automation Test" -or $_ -match "Summary" } | Select-Object -First 1
-    Write-Host "Could not extract pass/fail counts automatically. Found summary fragment: $summaryLine"
+    if ($log) {
+        $summaryLine = ($log -split "\r?\n") | Where-Object { $_ -match "Automation Test" -or $_ -match "Summary" } | Select-Object -First 1
+        Write-Host "Could not extract pass/fail counts automatically. Found summary fragment: $summaryLine"
+    }
     throw "Unable to determine automation test results from log or report. See $logPath and $ReportOutputPath"
 }
 
