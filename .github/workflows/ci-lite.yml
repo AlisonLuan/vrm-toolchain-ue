@@ -69,12 +69,21 @@ jobs:
             "Kismet","KismetCompiler","BlueprintGraph","EditorSubsystem","EditorFramework"
           )
 
+          function Strip-CSharpComments([string]$Text) {
+            # Remove /* */ block comments
+            $noBlock = [regex]::Replace($Text, '/\*.*?\*/', '', 'Singleline')
+            # Remove // line comments
+            $noLine  = [regex]::Replace($noBlock, '//.*$', '', 'Multiline')
+            return $noLine
+          }
+
           $RuntimeBuildCs = Get-ChildItem "Plugins\VrmToolchain\Source" -Recurse -Filter "*.Build.cs" |
             Where-Object { $_.FullName -match "\\VrmToolchain(?!Editor)\\" -or $_.Name -match "VrmToolchain\.Build\.cs" }
 
           $bad = @()
           foreach($f in $RuntimeBuildCs){
-            $t = Get-Content $f.FullName -Raw
+            $raw = Get-Content $f.FullName -Raw
+            $t = Strip-CSharpComments $raw
             foreach($m in $EditorOnly){
               if($t -match [regex]::Escape($m)){
                 $bad += ("{0}: contains '{1}'" -f $f.FullName,$m)
