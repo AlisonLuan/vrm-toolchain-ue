@@ -4,6 +4,7 @@
 #include "Misc/Paths.h"
 #include "Misc/FileHelper.h"
 #include "UObject/Package.h"
+#include "EditorFramework/AssetImportData.h"
 
 #include "VrmSourceFactory.h"
 #include "VrmSourceAsset.h"
