@@ -5,6 +5,7 @@
 #include "IContentBrowserSingleton.h"
 #include "Engine/SkeletalMesh.h"
 #include "EditorFramework/AssetImportData.h"
+#include "VrmSourceAsset.h"
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
 #include "ToolMenus.h"
@@ -88,11 +89,12 @@ bool FVrmContentBrowserActions::CanNormalizeVrm(const TArray<FAssetData>& Select
 
 	const FAssetData& AssetData = SelectedAssets[0];
 
-	// Check if this is a skeletal mesh (without loading the asset)
-	if (AssetData.AssetClassPath != USkeletalMesh::StaticClass()->GetClassPathName())
+	// Check if this is a skeletal mesh or a source asset (without loading the asset)
+	if (AssetData.AssetClassPath != USkeletalMesh::StaticClass()->GetClassPathName()
+		&& AssetData.AssetClassPath != UVrmSourceAsset::StaticClass()->GetClassPathName())
 	{
 		return false;
-	}
+	} 
 
 	// Check if import data exists by reading asset registry tags
 	// This avoids loading the full asset and potentially freezing the UI
@@ -120,26 +122,43 @@ bool FVrmContentBrowserActions::GetSourceFilePathFromAsset(const FAssetData& Ass
 		return false;
 	}
 
+	// Support both Skeletal Mesh assets and the editor-only UVrmSourceAsset
+	UAssetImportData* ImportData = nullptr;
+	FString SourceFilePath;
+
 	USkeletalMesh* SkeletalMesh = Cast<USkeletalMesh>(Asset);
-	if (!SkeletalMesh)
+	if (SkeletalMesh)
 	{
-		return false;
+		ImportData = SkeletalMesh->GetAssetImportData();
+	}
+	else
+	{
+		UVrmSourceAsset* SourceAsset = Cast<UVrmSourceAsset>(Asset);
+		if (!SourceAsset)
+		{
+			return false;
+		}
+		ImportData = SourceAsset->AssetImportData;
+		// Prefer AssetImportData; fall back to SourceFilename property
+		if (!ImportData)
+		{
+			if (SourceAsset->SourceFilename.IsEmpty())
+			{
+				return false;
+			}
+			SourceFilePath = SourceAsset->SourceFilename;
+		}
 	}
 
-	// Get asset import data
-	UAssetImportData* ImportData = SkeletalMesh->GetAssetImportData();
-	if (!ImportData)
+	// If we have import data, use it to get the first source filename
+	if (ImportData)
 	{
-		return false;
+		if (ImportData->GetSourceFileCount() == 0)
+		{
+			return false;
+		}
+		SourceFilePath = ImportData->GetFirstFilename();
 	}
-	// Get the source file path from import data
-	// UE 5.7: Use GetFirstFilename() or ExtractFilenames() to get source path
-	if (!ImportData || ImportData->GetSourceFileCount() == 0)
-	{
-		return false;
-	}
-
-	FString SourceFilePath = ImportData->GetFirstFilename();
 
 	if (SourceFilePath.IsEmpty())
 	{
