@@ -122,36 +122,32 @@ bool FVrmContentBrowserActions::GetSourceFilePathFromAsset(const FAssetData& Ass
 		return false;
 	}
 
-	// Support both Skeletal Mesh assets and the editor-only UVrmSourceAsset
 	UAssetImportData* ImportData = nullptr;
 	FString SourceFilePath;
 
-	USkeletalMesh* SkeletalMesh = Cast<USkeletalMesh>(Asset);
-	if (SkeletalMesh)
+	// Support both Skeletal Mesh assets and the editor-only UVrmSourceAsset
+	if (USkeletalMesh* SkeletalMesh = Cast<USkeletalMesh>(Asset))
 	{
 		ImportData = SkeletalMesh->GetAssetImportData();
 	}
-	else
+	else if (UVrmSourceAsset* SourceAsset = Cast<UVrmSourceAsset>(Asset))
 	{
-		UVrmSourceAsset* SourceAsset = Cast<UVrmSourceAsset>(Asset);
-		if (!SourceAsset)
+		// Prefer explicit SourceFilename (can be more reliable than import data)
+		if (!SourceAsset->SourceFilename.IsEmpty())
 		{
-			return false;
-		}
-		ImportData = SourceAsset->AssetImportData;
-		// Prefer AssetImportData; fall back to SourceFilename property
-		if (!ImportData)
-		{
-			if (SourceAsset->SourceFilename.IsEmpty())
-			{
-				return false;
-			}
 			SourceFilePath = SourceAsset->SourceFilename;
 		}
+
+		// Fall back to import data if SourceFilename is empty
+		ImportData = SourceAsset->AssetImportData;
+	}
+	else
+	{
+		return false;
 	}
 
-	// If we have import data, use it to get the first source filename
-	if (ImportData)
+	// If we have import data and no explicit path yet, use it
+	if (SourceFilePath.IsEmpty() && ImportData)
 	{
 		if (ImportData->GetSourceFileCount() == 0)
 		{
@@ -168,7 +164,6 @@ bool FVrmContentBrowserActions::GetSourceFilePathFromAsset(const FAssetData& Ass
 	// Ensure it's a valid absolute path
 	if (FPaths::IsRelative(SourceFilePath))
 	{
-		// Convert relative path to absolute
 		SourceFilePath = FPaths::ConvertRelativePathToFull(SourceFilePath);
 	}
 
