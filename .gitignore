@@ -126,3 +126,6 @@ BuildOutput*.log
 # Local PR prep artifacts
 FINAL_READINESS_REPORT.md
 GITHUB_PR_BODY.txt
+
+!/RELEASES/
+!/RELEASES/*.sha256
