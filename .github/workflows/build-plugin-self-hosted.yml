@@ -3,6 +3,8 @@ name: Build plugin (self-hosted)
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
 
 concurrency:
@@ -14,6 +16,91 @@ jobs:
     runs-on: [self-hosted, windows, ue-5.7]
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Determine changed files (PR files via API)
+        id: changed
+        shell: pwsh
+        run: |
+          # Use GitHub API to list PR files for pull_request events; fall back to git diffs only when needed
+          $changed = ""
+
+          if ($env:GITHUB_EVENT_NAME -eq 'pull_request') {
+            try {
+              if ($env:GITHUB_EVENT_PATH) {
+                $event = Get-Content $env:GITHUB_EVENT_PATH | ConvertFrom-Json
+                $prnum = $event.pull_request.number
+                $repo = $env:GITHUB_REPOSITORY
+                Write-Host "Querying PR files for PR #$prnum in $repo via GitHub API"
+                $files = gh api repos/$repo/pulls/$prnum/files -q '.[].filename' 2>$null | Out-String
+                if ($files -and $files.Trim()) {
+                  $changed = $files
+                } else {
+                  Write-Warning "GitHub API returned no files; falling back to git diff origin/main...HEAD"
+                  git fetch origin main --no-tags --prune
+                  $changed = (& git diff --name-only origin/main...HEAD 2>&1)
+                }
+              } else {
+                Write-Warning "GITHUB_EVENT_PATH not set; falling back to git diff origin/main...HEAD"
+                git fetch origin main --no-tags --prune
+                $changed = (& git diff --name-only origin/main...HEAD 2>&1)
+              }
+            } catch {
+              Write-Warning "Error while querying GitHub API for PR files: $_; falling back to git diff origin/main...HEAD"
+              git fetch origin main --no-tags --prune
+              $changed = (& git diff --name-only origin/main...HEAD 2>&1)
+            }
+          } else {
+            # Non-PR: prefer HEAD~1, but fall back to origin/main if history is shallow
+            $useOrigin = $false
+            $revCheck = & git rev-parse --verify HEAD~1 2>&1
+            if ($LASTEXITCODE -ne 0) { $useOrigin = $true }
+
+            if (-not $useOrigin) {
+              $out = & git diff --name-only HEAD~1 HEAD 2>&1
+              if ($LASTEXITCODE -ne 0) {
+                Write-Warning "git diff HEAD~1 HEAD failed ($LASTEXITCODE): $out; falling back to origin/main...HEAD"
+                git fetch origin main --no-tags --prune
+                $changed = (& git diff --name-only origin/main...HEAD 2>&1)
+              } else {
+                $changed = $out
+              }
+            } else {
+              git fetch origin main --no-tags --prune
+              $changed = (& git diff --name-only origin/main...HEAD 2>&1)
+            }
+          }
+
+          Write-Host "Changed files:`n$changed"
+
+          # Normalize and trim
+          $files = ($changed -split "`n" | ForEach-Object { $_.Trim() } | Where-Object { $_ -ne '' })
+          $nonDocs = @()
+          foreach ($f in $files) {
+            # Treat workflow edits as non-doc changes (force full CI)
+            if ($f -match '^\.github/workflows/') { $nonDocs += $f; continue }
+            # Files considered docs-only
+            if ($f -match '^(Docs/|README.md$|LICENSE$|CHANGELOG$)') { continue }
+            # Other .github/meta files are docs-like (allowed)
+            if ($f -match '^\.github/') { continue }
+            # Anything else is non-doc
+            $nonDocs += $f
+          }
+
+          if ($nonDocs.Count -eq 0) {
+            echo "docs_only=true" >> $env:GITHUB_OUTPUT
+            Write-Host "Docs-only change detected"
+          } else {
+            echo "docs_only=false" >> $env:GITHUB_OUTPUT
+            Write-Host "Non-doc changes detected: $($nonDocs -join ', ')"
+          }
+
+          # Ensure script exits successfully even if git commands had recoverable errors
+          exit 0
+
+          # Ensure script exits successfully even if git commands had recoverable errors
+          exit 0
 
       - name: "Lint workflows: forbid -AllowBinaries"
         shell: pwsh
@@ -40,12 +127,14 @@ jobs:
           Write-Host "OK: Workflows do not call PackagePlugin.ps1 with -AllowBinaries"
 
       - name: Fetch VRM SDK
+        if: steps.changed.outputs.docs_only != 'true'
         shell: pwsh
         env:
           VRM_SDK_TOKEN: ${{ secrets.VRM_SDK_TOKEN }}
         run: .\Scripts\FetchVrmSdk.ps1
 
       - name: Verify SDK lib layout (Debug/Release present)
+        if: steps.changed.outputs.docs_only != 'true'
         shell: pwsh
         run: |
           $root = Join-Path $PWD 'Plugins\VrmToolchain\Source\ThirdParty\VrmSdk'
@@ -90,10 +179,12 @@ jobs:
           }
 
       - name: Verify vrm_validate contract-smoke
+        if: steps.changed.outputs.docs_only != 'true'
         shell: pwsh
         run: .\Scripts\CheckVrmValidate.ps1
 
       - name: Verify UE_ENGINE_PATH
+        if: steps.changed.outputs.docs_only != 'true'
         shell: pwsh
         env:
           UE_ENGINE_PATH: ${{ secrets.UE_ENGINE_PATH }}
@@ -103,17 +194,20 @@ jobs:
           Write-Host "UE_ENGINE_PATH OK: $env:UE_ENGINE_PATH"
 
       - name: Assert dev-tool staging disabled
+        if: steps.changed.outputs.docs_only != 'true'
         shell: pwsh
         run: |
           if ($env:VRM_TOOLCHAIN_STAGE_DEV_TOOLS) { throw "VRM_TOOLCHAIN_STAGE_DEV_TOOLS must not be set in CI (policy: no dev binaries staged)." }
 
       - name: Package plugin (BuildPlugin + strip dev exe + leak gate)
+        if: steps.changed.outputs.docs_only != 'true'
         shell: pwsh
         env:
           UE_ENGINE_PATH: ${{ secrets.UE_ENGINE_PATH }}
         run: .\Scripts\PackagePlugin.ps1 -UE "$env:UE_ENGINE_PATH" -RepoRoot "$PWD" -PluginName "VrmToolchain"
 
       - name: Verify packaged output contains no SDK binaries and includes headers/libs
+        if: steps.changed.outputs.docs_only != 'true'
         shell: pwsh
         run: |
           $out = Join-Path $PWD 'build\Package\VrmToolchain'
@@ -139,6 +233,7 @@ jobs:
 
           Write-Host "OK: Packaged output audit passed (no SDK binaries; include/lib present)."
       - name: Zip packaged output
+        if: steps.changed.outputs.docs_only != 'true'
         shell: pwsh
         run: |
           $out = Join-Path $PWD 'build\Package\VrmToolchain'
@@ -148,12 +243,14 @@ jobs:
           Compress-Archive -Path $out -DestinationPath $zip -Force
 
       - name: Upload artifact
+        if: steps.changed.outputs.docs_only != 'true'
         uses: actions/upload-artifact@v4
         with:
           name: VrmToolchain-Package
           path: VrmToolchain-Package.zip
 
       - name: Stage VrmToolchain into HostProject Plugins
+        if: steps.changed.outputs.docs_only != 'true'
         shell: pwsh
         run: |
           $src = Join-Path $PWD 'Plugins\VrmToolchain'
@@ -166,6 +263,7 @@ jobs:
           if (-not (Test-Path (Join-Path $dst 'VrmToolchain.uplugin'))) { throw "Plugin copy failed: $dst" }
 
       - name: Build HostProjectEditor (Win64, Development)
+        if: steps.changed.outputs.docs_only != 'true'
         shell: pwsh
         env:
           UE_ENGINE_PATH: ${{ secrets.UE_ENGINE_PATH }}
@@ -177,6 +275,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { throw "HostProjectEditor build failed (exit $LASTEXITCODE)" }
 
       - name: Run automation tests
+        if: steps.changed.outputs.docs_only != 'true'
         shell: pwsh
         env:
           UE_ENGINE_PATH: ${{ secrets.UE_ENGINE_PATH }}
