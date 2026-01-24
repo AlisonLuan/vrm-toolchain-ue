@@ -1,0 +1,81 @@
+name: CI Lite (No UE)
+
+on:
+  pull_request:
+  push:
+    branches: [ main ]
+
+jobs:
+  gates:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: No tracked artifacts gate
+        shell: pwsh
+        run: |
+          $errors = @()
+
+          if (git ls-files | Select-String -Pattern '^build/') { $errors += "Tracked files under build/ (must be untracked)." }
+          if (git ls-files | Select-String -Pattern 'BuildOutput\.log') { $errors += "BuildOutput.log is tracked (must be ignored)." }
+          if (git ls-files | Select-String -Pattern '\.zip$') { $errors += "A .zip is tracked (must be untracked)." }
+
+          if ($errors.Count -gt 0) {
+            $errors | ForEach-Object { Write-Error $_ }
+            exit 1
+          }
+
+      - name: Header + include style gates
+        shell: pwsh
+        run: |
+          $m1 = (git ls-files | Select-String "VrmMetadata\.h").Count
+          $m2 = (git ls-files | Select-String "VrmMetadataAsset\.h").Count
+          if ($m1 -ne 1) { throw "Expected exactly 1 tracked VrmMetadata.h, found $m1" }
+          if ($m2 -ne 1) { throw "Expected exactly 1 tracked VrmMetadataAsset.h, found $m2" }
+
+          $legacy1 = (git grep -n '#include "VrmMetadata\.h"' Plugins/VrmToolchain/Source | Measure-Object).Count
+          $legacy2 = (git grep -n '#include "VrmMetadataAsset\.h"' Plugins/VrmToolchain/Source | Measure-Object).Count
+          if ($legacy1 -gt 0) { throw "Found legacy include '#include ""VrmMetadata.h""' ($legacy1 hits)" }
+          if ($legacy2 -gt 0) { throw "Found legacy include '#include ""VrmMetadataAsset.h""' ($legacy2 hits)" }
+
+          $ns1 = (git grep -n 'VrmToolchain/VrmMetadata\.h' Plugins/VrmToolchain/Source | Measure-Object).Count
+          $ns2 = (git grep -n 'VrmToolchain/VrmMetadataAsset\.h' Plugins/VrmToolchain/Source | Measure-Object).Count
+          if ($ns1 -lt 1) { throw "Missing namespaced include usage for VrmToolchain/VrmMetadata.h" }
+          if ($ns2 -lt 1) { throw "Missing namespaced include usage for VrmToolchain/VrmMetadataAsset.h" }
+
+      - name: Runtime must not reference editor-only modules
+        shell: pwsh
+        run: |
+          $EditorOnly = @(
+            "UnrealEd","ToolMenus","ContentBrowser","AssetTools","LevelEditor",
+            "Kismet","KismetCompiler","BlueprintGraph","EditorSubsystem","EditorFramework"
+          )
+
+          $RuntimeBuildCs = Get-ChildItem "Plugins\VrmToolchain\Source" -Recurse -Filter "*.Build.cs" |
+            Where-Object { $_.FullName -match "\\VrmToolchain(?!Editor)\\" -or $_.Name -match "VrmToolchain\.Build\.cs" }
+
+          $bad = @()
+          foreach($f in $RuntimeBuildCs){
+            $t = Get-Content $f.FullName -Raw
+            foreach($m in $EditorOnly){
+              if($t -match [regex]::Escape($m)){
+                $bad += ("{0}: contains '{1}'" -f $f.FullName,$m)
+              }
+            }
+          }
+
+          if($bad.Count -gt 0){
+            $bad | ForEach-Object { Write-Error $_ }
+            exit 1
+          }
+
+      - name: PackagePlugin must call ValidatePackage (static check)
+        shell: pwsh
+        run: |
+          $pkg = Get-Content "Scripts\PackagePlugin.ps1" -Raw
+          if ($pkg -notmatch "ValidatePackage\.ps1") {
+            throw "Scripts/PackagePlugin.ps1 does not appear to call Scripts/ValidatePackage.ps1"
+          }
