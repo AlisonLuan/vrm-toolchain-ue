@@ -5,6 +5,7 @@
 #include "IContentBrowserSingleton.h"
 #include "Engine/SkeletalMesh.h"
 #include "EditorFramework/AssetImportData.h"
+#include "VrmSourceAsset.h"
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
 #include "ToolMenus.h"
@@ -88,8 +89,9 @@ bool FVrmContentBrowserActions::CanNormalizeVrm(const TArray<FAssetData>& Select
 
 	const FAssetData& AssetData = SelectedAssets[0];
 
-	// Check if this is a skeletal mesh (without loading the asset)
-	if (AssetData.AssetClassPath != USkeletalMesh::StaticClass()->GetClassPathName())
+	// Check if this is a skeletal mesh or a source asset (without loading the asset)
+	if (AssetData.AssetClassPath != USkeletalMesh::StaticClass()->GetClassPathName()
+		&& AssetData.AssetClassPath != UVrmSourceAsset::StaticClass()->GetClassPathName())
 	{
 		return false;
 	}
@@ -120,26 +122,39 @@ bool FVrmContentBrowserActions::GetSourceFilePathFromAsset(const FAssetData& Ass
 		return false;
 	}
 
-	USkeletalMesh* SkeletalMesh = Cast<USkeletalMesh>(Asset);
-	if (!SkeletalMesh)
+	UAssetImportData* ImportData = nullptr;
+	FString SourceFilePath;
+
+	// Support both Skeletal Mesh assets and the editor-only UVrmSourceAsset
+	if (USkeletalMesh* SkeletalMesh = Cast<USkeletalMesh>(Asset))
+	{
+		ImportData = SkeletalMesh->GetAssetImportData();
+	}
+	else if (UVrmSourceAsset* SourceAsset = Cast<UVrmSourceAsset>(Asset))
+	{
+		// Prefer explicit SourceFilename (can be more reliable than import data)
+		if (!SourceAsset->SourceFilename.IsEmpty())
+		{
+			SourceFilePath = SourceAsset->SourceFilename;
+		}
+
+		// Fall back to import data if SourceFilename is empty
+		ImportData = SourceAsset->AssetImportData;
+	}
+	else
 	{
 		return false;
 	}
 
-	// Get asset import data
-	UAssetImportData* ImportData = SkeletalMesh->GetAssetImportData();
-	if (!ImportData)
+	// If we have import data and no explicit path yet, use it
+	if (SourceFilePath.IsEmpty() && ImportData)
 	{
-		return false;
+		if (ImportData->GetSourceFileCount() == 0)
+		{
+			return false;
+		}
+		SourceFilePath = ImportData->GetFirstFilename();
 	}
-	// Get the source file path from import data
-	// UE 5.7: Use GetFirstFilename() or ExtractFilenames() to get source path
-	if (!ImportData || ImportData->GetSourceFileCount() == 0)
-	{
-		return false;
-	}
-
-	FString SourceFilePath = ImportData->GetFirstFilename();
 
 	if (SourceFilePath.IsEmpty())
 	{
@@ -149,7 +164,6 @@ bool FVrmContentBrowserActions::GetSourceFilePathFromAsset(const FAssetData& Ass
 	// Ensure it's a valid absolute path
 	if (FPaths::IsRelative(SourceFilePath))
 	{
-		// Convert relative path to absolute
 		SourceFilePath = FPaths::ConvertRelativePathToFull(SourceFilePath);
 	}
 
