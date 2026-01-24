@@ -18,11 +18,7 @@ public class VrmToolchain : ModuleRules
             "IKRig",
         });
 
-        // Kismet provides BlueprintFunctionLibrary support; only link it for editor builds to avoid requiring editor-only modules
-        if (Target.bBuildEditor)
-        {
-            PublicDependencyModuleNames.Add("Kismet");
-        }
+        // Editor-only functionality (Kismet) is provided by the Editor module; keep runtime module editor-free.
 
         PrivateDependencyModuleNames.AddRange(new string[]
         {

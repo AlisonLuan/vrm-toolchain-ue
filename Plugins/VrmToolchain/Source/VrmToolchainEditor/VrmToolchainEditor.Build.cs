@@ -22,6 +22,7 @@ public class VrmToolchainEditor : ModuleRules
             "Engine",
             "VrmToolchain",
             "UnrealEd",
+            "Kismet",
             "Slate",
             "SlateCore",
             // Needed for IPluginManager & plugin discovery at editor startup
