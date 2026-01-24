@@ -4,5 +4,6 @@
 
 UVrmSourceAsset::UVrmSourceAsset()
 {
-    AssetImportData = CreateDefaultSubobject<UAssetImportData>(TEXT("AssetImportData"));
+    // Use NewObject to create instanced import data for UObject assets (safer than CreateDefaultSubobject)
+    AssetImportData = NewObject<UAssetImportData>(this, TEXT("AssetImportData"));
 }
