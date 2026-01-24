@@ -37,6 +37,7 @@ public class VrmToolchainEditor : ModuleRules
             "AssetTools",
             "AssetRegistry",
             "EditorSubsystem",
+            "EditorFramework",
             "UnrealEd",
             "IKRig",
             "IKRigEditor",
