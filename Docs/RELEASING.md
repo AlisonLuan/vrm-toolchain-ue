@@ -172,8 +172,5 @@ If it’s not:
 * published with a tracked SHA256
 
 …it is **not** a real release.
-<<<<<<< HEAD
-=======
-docs-only test 2026-01-24T15:39:52
->>>>>>> origin/main
+
 
