@@ -46,6 +46,12 @@ jobs:
           if ($m1 -ne 1) { throw "Expected exactly 1 tracked VrmMetadata.h, found $m1" }
           if ($m2 -ne 1) { throw "Expected exactly 1 tracked VrmMetadataAsset.h, found $m2" }
 
+          # Explicit canonical path checks to prevent regression
+          $canonMeta  = 'Plugins/VrmToolchain/Source/VrmToolchain/Public/VrmToolchain/VrmMetadata.h'
+          $canonAsset = 'Plugins/VrmToolchain/Source/VrmToolchain/Public/VrmToolchain/VrmMetadataAsset.h'
+          if (-not (git ls-files -- $canonMeta))  { throw "Missing canonical header: $canonMeta" }
+          if (-not (git ls-files -- $canonAsset)) { throw "Missing canonical header: $canonAsset" }
+
           # Legacy includes must be absent
           $legacy1 = Get-GrepLines '#include "VrmMetadata\.h"' 'Plugins/VrmToolchain/Source'
           $legacy2 = Get-GrepLines '#include "VrmMetadataAsset\.h"' 'Plugins/VrmToolchain/Source'
