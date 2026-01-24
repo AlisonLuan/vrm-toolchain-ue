@@ -1,5 +1,6 @@
 #include "VrmContentBrowserActions.h"
 #include "VrmNormalizationService.h"
+#include "VrmConversionService.h"
 #include "VrmToolchainEditor.h"
 #include "ContentBrowserModule.h"
 #include "IContentBrowserSingleton.h"

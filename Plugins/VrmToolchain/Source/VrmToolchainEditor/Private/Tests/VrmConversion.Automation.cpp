@@ -4,7 +4,7 @@
 #include "VrmConversionService.h"
 #include "VrmSourceAsset.h"
 #include "Engine/SkeletalMesh.h"
-#include "Engine/Skeleton.h"
+class USkeleton;
 #include "VrmToolchain/VrmMetadataAsset.h"
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmConversionPathDerivationTest, "VrmToolchain.Conversion.PathDerivation", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)

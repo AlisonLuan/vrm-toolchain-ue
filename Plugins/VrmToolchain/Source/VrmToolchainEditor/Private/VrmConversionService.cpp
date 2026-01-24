@@ -10,7 +10,7 @@
 #include "Misc/PackageName.h"
 #include "UObject/Package.h"
 #include "Engine/SkeletalMesh.h"
-#include "Engine/Skeleton.h"
+class USkeleton;
 #include "Misc/MessageDialog.h"
 #include "Misc/Paths.h"
 
