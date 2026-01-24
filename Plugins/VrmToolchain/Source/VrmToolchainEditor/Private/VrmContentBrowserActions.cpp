@@ -1,5 +1,6 @@
 #include "VrmContentBrowserActions.h"
 #include "VrmNormalizationService.h"
+#include "VrmConversionService.h"
 #include "VrmToolchainEditor.h"
 #include "ContentBrowserModule.h"
 #include "IContentBrowserSingleton.h"
@@ -69,6 +70,21 @@ TSharedRef<FExtender> FVrmContentBrowserActions::CreateAssetContextMenuExtender(
 						NSLOCTEXT("VrmToolchain", "NormalizeSourceVRMTooltip", "Normalize the source VRM/GLB file and write a cleaned copy"),
 						FSlateIcon(),
 						UIAction
+					);
+				}
+
+				// Add experimental create skeletal mesh action when appropriate
+				if (CanCreateSkeletalMeshFromSource(SelectedAssets))
+				{
+					FUIAction CreateAction(
+						FExecuteAction::CreateLambda([SelectedAssets]() { ExecuteCreateSkeletalMeshFromSource(SelectedAssets); }),
+						FCanExecuteAction::CreateLambda([SelectedAssets]() { return CanCreateSkeletalMeshFromSource(SelectedAssets); })
+					);
+					MenuBuilder.AddMenuEntry(
+						NSLOCTEXT("VrmToolchain", "CreateSkeletalMeshExperimental", "Create SkeletalMesh (Experimental)"),
+						NSLOCTEXT("VrmToolchain", "CreateSkeletalMeshExperimentalTooltip", "Create a placeholder SkeletalMesh and Skeleton from this UVrmSourceAsset"),
+						FSlateIcon(),
+						CreateAction
 					);
 				}
 				MenuBuilder.EndSection();
@@ -171,7 +187,8 @@ bool FVrmContentBrowserActions::GetSourceFilePathFromAsset(const FAssetData& Ass
 	FString ValidationError;
 	if (!FVrmNormalizationService::ValidateSourceFile(SourceFilePath, ValidationError))
 	{
-		return false;
+		// Allow placeholder conversion even when there is no valid source file (experimental)
+		return true;
 	}
 
 	OutSourcePath = SourceFilePath;
@@ -232,4 +249,61 @@ void FVrmContentBrowserActions::ExecuteNormalizeVrm(const TArray<FAssetData>& Se
 	}
 
 	FSlateNotificationManager::Get().AddNotification(Info);
+}
+
+bool FVrmContentBrowserActions::CanCreateSkeletalMeshFromSource(const TArray<FAssetData>& SelectedAssets)
+{
+	if (SelectedAssets.Num() != 1)
+	{
+		return false;
+	}
+
+	const FAssetData& AssetData = SelectedAssets[0];
+	if (AssetData.AssetClassPath != UVrmSourceAsset::StaticClass()->GetClassPathName())
+	{
+		return false;
+	}
+
+	return true;
+}
+
+void FVrmContentBrowserActions::ExecuteCreateSkeletalMeshFromSource(const TArray<FAssetData>& SelectedAssets)
+{
+	if (SelectedAssets.Num() != 1)
+	{
+		return;
+	}
+
+	const FAssetData& AssetData = SelectedAssets[0];
+
+	UVrmSourceAsset* Source = Cast<UVrmSourceAsset>(AssetData.GetAsset());
+	if (!Source)
+	{
+		FNotificationInfo Info(NSLOCTEXT("VrmToolchain", "CreatePlaceholderFailed", "Failed to load selected UVrmSourceAsset"));
+		Info.ExpireDuration = 5.0f;
+		Info.bFireAndForget = true;
+		FSlateNotificationManager::Get().AddNotification(Info);
+		return;
+	}
+
+	USkeletalMesh* OutMesh = nullptr;
+	USkeleton* OutSkeleton = nullptr;
+	FString Error;
+	FVrmConvertOptions Options;
+	Options.bOverwriteExisting = false;
+
+	if (!FVrmConversionService::ConvertSourceToPlaceholderSkeletalMesh(Source, Options, OutMesh, OutSkeleton, Error))
+	{
+		FNotificationInfo Info(FText::Format(NSLOCTEXT("VrmToolchain", "CreatePlaceholderFailedFmt", "Failed to create placeholder skeletal mesh: {0}"), FText::FromString(Error)));
+		Info.ExpireDuration = 5.0f;
+		Info.bFireAndForget = true;
+		FSlateNotificationManager::Get().AddNotification(Info);
+		UE_LOG(LogVrmToolchainEditor, Error, TEXT("Failed to create placeholder: %s"), *Error);
+		return;
+	}
+
+	FNotificationInfo SuccessInfo(FText::Format(NSLOCTEXT("VrmToolchain", "CreatePlaceholderSuccessFmt", "Created placeholder assets: {0}, {1}"), FText::FromString(OutMesh->GetName()), FText::FromString(OutSkeleton->GetName())));
+	SuccessInfo.ExpireDuration = 5.0f;
+	SuccessInfo.bFireAndForget = true;
+	FSlateNotificationManager::Get().AddNotification(SuccessInfo);
 }

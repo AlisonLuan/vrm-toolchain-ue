@@ -24,6 +24,12 @@ private:
 	/** Execute the Normalize VRM action */
 	static void ExecuteNormalizeVrm(const TArray<FAssetData>& SelectedAssets);
 
+	/** Check if Create Skeletal Mesh (Experimental) should be visible */
+	static bool CanCreateSkeletalMeshFromSource(const TArray<FAssetData>& SelectedAssets);
+
+	/** Execute Create Skeletal Mesh (Experimental) */
+	static void ExecuteCreateSkeletalMeshFromSource(const TArray<FAssetData>& SelectedAssets);
+
 	/**
 	 * Resolve the source file path from asset import data.
 	 *
