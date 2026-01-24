@@ -78,7 +78,7 @@ jobs:
           }
 
           $RuntimeBuildCs = Get-ChildItem "Plugins\VrmToolchain\Source" -Recurse -Filter "*.Build.cs" |
-            Where-Object { $_.FullName -match "\\VrmToolchain(?!Editor)\\" -or $_.Name -match "VrmToolchain\.Build\.cs" }
+            Where-Object { $_.FullName -notmatch "Editor" -and $_.Name -match "\.Build\.cs" }
 
           $bad = @()
           foreach($f in $RuntimeBuildCs){
