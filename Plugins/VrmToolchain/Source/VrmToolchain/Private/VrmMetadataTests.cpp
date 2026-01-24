@@ -1,4 +1,4 @@
-#include "VrmMetadata.h"
+#include "VrmToolchain/VrmMetadata.h"
 #include "Misc/AutomationTest.h"
 #include "Serialization/JsonSerializer.h"
 #include "Dom/JsonObject.h"

@@ -2,7 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Engine/AssetUserData.h"
-#include "VrmMetadata.h"
+#include "VrmToolchain/VrmMetadata.h"
 #include "VrmMetadataAsset.generated.h"
 
 /**
