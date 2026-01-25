@@ -44,6 +44,8 @@ bool FVrmConversionPathDerivationTest::RunTest(const FString& Parameters)
 	TestTrue(TEXT("Conversion should succeed for transient source"), bOk);
 	TestNotNull(TEXT("Mesh created"), Mesh);
 	TestNotNull(TEXT("Skeleton created"), Skeleton);
+	// B1.1: when apply is enabled by default and no source path was provided, a warning should be recorded
+	TestTrue(TEXT("ImportWarnings should contain at least one warning"), Source->ImportWarnings.Num() > 0);
 
 	// Metadata was attached
 	UVrmMetadataAsset* Attached = Mesh->GetAssetUserData<UVrmMetadataAsset>();

@@ -11,7 +11,7 @@ struct FVrmConvertOptions
 {
 	bool bOverwriteExisting = false;
 	// When true, attempt to parse the source GLB/VRM and apply the skeleton to generated assets
-	bool bApplyGltfSkeleton = false;
+	bool bApplyGltfSkeleton = true; // B1.1: default on
 };
 
 class VRMTOOLCHAINEDITOR_API FVrmConversionService
