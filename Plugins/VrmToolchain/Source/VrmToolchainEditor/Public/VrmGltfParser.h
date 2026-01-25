@@ -2,7 +2,6 @@
 
 #include "CoreMinimal.h"
 #include "VrmGltfTypes.h"
-#include "VrmGltfParser.generated.h"
 
 class VRMTOOLCHAINEDITOR_API FVrmGltfParser
 {

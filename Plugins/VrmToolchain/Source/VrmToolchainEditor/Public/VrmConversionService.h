@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "VrmGltfTypes.h"
 
 class UVrmSourceAsset;
 class USkeletalMesh;
