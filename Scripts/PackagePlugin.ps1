@@ -99,13 +99,15 @@ try {
     $outLog = Join-Path $env:TEMP ("validate_$([Guid]::NewGuid().ToString()).out")
     $errLog = Join-Path $env:TEMP ("validate_$([Guid]::NewGuid().ToString()).err")
     if ($pwshCmd) {
-        $proc = Start-Process -FilePath $pwshCmd.Path -ArgumentList @('-NoProfile','-NonInteractive','-File',$ValidateScript,'-PackagePath',$OutPkg) -RedirectStandardOutput $outLog -RedirectStandardError $errLog -NoNewWindow -Wait -PassThru
+        $procArgs = @('-NoProfile', '-NonInteractive', '-File', "`"$ValidateScript`"", '-PackagePath', "`"$OutPkg`"")
+        $proc = Start-Process -FilePath $pwshCmd.Path -ArgumentList $procArgs -RedirectStandardOutput $outLog -RedirectStandardError $errLog -NoNewWindow -Wait -PassThru
         $valExit = $proc.ExitCode
     } else {
         # Fall back to Windows PowerShell if pwsh is not available
         $pw = (Get-Command powershell -ErrorAction SilentlyContinue)
         if (-not $pw) { throw "No PowerShell interpreter available to run validator" }
-        $proc = Start-Process -FilePath $pw.Path -ArgumentList @('-NoProfile','-NonInteractive','-File',$ValidateScript,'-PackagePath',$OutPkg) -RedirectStandardOutput $outLog -RedirectStandardError $errLog -NoNewWindow -Wait -PassThru
+        $procArgs = @('-NoProfile', '-NonInteractive', '-File', "`"$ValidateScript`"", '-PackagePath', "`"$OutPkg`"")
+        $proc = Start-Process -FilePath $pw.Path -ArgumentList $procArgs -RedirectStandardOutput $outLog -RedirectStandardError $errLog -NoNewWindow -Wait -PassThru
         $valExit = $proc.ExitCode
     }
     # If proc.ExitCode is not set (strange edge), attempt to parse logs for failures
