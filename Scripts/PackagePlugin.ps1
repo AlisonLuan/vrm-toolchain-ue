@@ -91,10 +91,20 @@ Write-Host "✓ Raw staging cleaned" -ForegroundColor Green
 # 5) Validate final dist folder using the contract validation script
 Write-Host "Running package contract validation..." -ForegroundColor Cyan
 $ValidateScript = Join-Path (Split-Path $PSScriptRoot) "Scripts\ValidatePackage.ps1"
-& $ValidateScript -PackagePath $OutPkg
 
-if ($LASTEXITCODE -ne 0) {
-    throw "Package contract validation failed (exit code: $LASTEXITCODE)"
+# Run validator in a separate pwsh process to ensure 'exit' codes are propagated reliably
+$pwshCmd = (Get-Command pwsh -ErrorAction SilentlyContinue)
+if ($pwshCmd) {
+    & $pwshCmd.Path -NoProfile -NonInteractive -File $ValidateScript -PackagePath $OutPkg
+    $valExit = $LASTEXITCODE
+} else {
+    # Fall back to Windows PowerShell if pwsh is not available
+    & powershell -NoProfile -NonInteractive -File $ValidateScript -PackagePath $OutPkg
+    $valExit = $LASTEXITCODE
+}
+
+if ($valExit -ne 0) {
+    throw "Package contract validation failed (exit code: $valExit)"
 }
 
 Write-Host "`n✓ Package output: $OutPkg" -ForegroundColor Green
