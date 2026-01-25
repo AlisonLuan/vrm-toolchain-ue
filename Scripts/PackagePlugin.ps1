@@ -129,11 +129,11 @@ try {
 if (-not ($valExit -is [int])) {
     Write-Error "Package contract validator did not return a numeric exit code. See validator output above."
     $valExit = 1
-    throw "Package contract validation failed (invalid exit code)"
+    throw "Package contract validation failed: invalid exit code"
 }
 
 if ($valExit -ne 0) {
-    throw "Package contract validation failed (exit code: $valExit)"
+    throw "Package contract validation failed: exit code $valExit"
 }
 
 Write-Host "`n✓ Package output: $OutPkg" -ForegroundColor Green
