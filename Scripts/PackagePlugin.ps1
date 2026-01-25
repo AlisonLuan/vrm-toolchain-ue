@@ -110,8 +110,9 @@ try {
 }
 
 if (-not ($valExit -is [int])) {
-    Write-Error "Package contract validator did not return a numeric exit code. Treating as failure.";
-    throw "Package contract validation failed (invalid exit: $valExit)"
+    Write-Error "Package contract validator did not return a numeric exit code. See validator output above."
+    $valExit = 1
+    throw "Package contract validation failed (invalid exit code)"
 }
 
 if ($valExit -ne 0) {
