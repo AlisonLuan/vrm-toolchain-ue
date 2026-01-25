@@ -6,6 +6,12 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+# Clean up any stray AutomationTool/dotnet processes from previous runs (CI safety)
+Write-Host "Cleaning up stray processes..." -ForegroundColor Gray
+Stop-Process -Name "AutomationTool*" -Force -ErrorAction SilentlyContinue | Out-Null
+Stop-Process -Name "dotnet" -Force -ErrorAction SilentlyContinue | Out-Null
+Start-Sleep -Seconds 2
+
 $UAT      = Join-Path $UE "Engine\Build\BatchFiles\RunUAT.bat"
 $Uplugin  = Join-Path $RepoRoot "Plugins\$PluginName\$PluginName.uplugin"
 $RawPkg   = Join-Path $RepoRoot "build\PackageRaw\$PluginName"
