@@ -2,6 +2,7 @@
 
 #include "Misc/AutomationTest.h"
 #include "VrmConversionService.h"
+#include "VrmGltfParser.h"
 #include "VrmSourceAsset.h"
 #include "Engine/SkeletalMesh.h"
 class USkeleton;
@@ -58,6 +59,23 @@ bool FVrmConversionPathDerivationTest::RunTest(const FString& Parameters)
 	Options.bOverwriteExisting = false;
 	bool bOk2 = FVrmConversionService::ConvertSourceToPlaceholderSkeletalMesh(Source, Options, Mesh2, Skeleton2, Error);
 	TestFalse(TEXT("Conversion without overwrite should fail when assets exist"), bOk2);
+
+	// Note: skeleton application test deferred to follow-up; keep parser JSON test only
+	{
+		// Minimal GLTF JSON with two nodes: root (0) and child (1)
+		FString Json = R"({
+		  "nodes": [
+		    { "name": "Hips", "translation": [0,0,0], "children": [1] },
+		    { "name": "Spine", "translation": [0,10,0] }
+		  ]
+		})";
+
+		FVrmGltfSkeleton Skel;
+		FString ParseErr;
+		bool bParsed = FVrmGltfParser::ExtractSkeletonFromGltfJsonString(Json, Skel, ParseErr);
+		TestTrue(TEXT("Parse GLTF JSON string succeeds"), bParsed);
+		TestEqual(TEXT("Parsed bone count"), Skel.Bones.Num(), 2);
+	}
 
 	return true;
 }

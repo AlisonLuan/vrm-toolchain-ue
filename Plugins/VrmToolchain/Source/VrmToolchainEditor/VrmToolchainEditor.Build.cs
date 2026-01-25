@@ -43,7 +43,10 @@ public class VrmToolchainEditor : ModuleRules
             "IKRigEditor",
             "Json",
             "JsonUtilities",
-            "DeveloperSettings"
+            "DeveloperSettings",
+            // Ensure animation/reference skeleton headers are resolvable in editor builds
+            "AnimationCore",
+            "Engine"
         });
     }
 }

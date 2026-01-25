@@ -10,9 +10,16 @@
 #include "Misc/PackageName.h"
 #include "UObject/Package.h"
 #include "Engine/SkeletalMesh.h"
-class USkeleton;
+#include "VrmGltfParser.h"
 #include "Misc/MessageDialog.h"
 #include "Misc/Paths.h"
+
+#if WITH_EDITOR
+// Editor-only APIs are needed for applying skeletons in a follow-up PR; keep includes minimal here
+#include "ReferenceSkeleton.h"
+#include "Animation/Skeleton.h"
+#endif
+
 
 bool FVrmConversionService::DeriveGeneratedPaths(UVrmSourceAsset* Source, FString& OutFolderPath, FString& OutBaseName, FString& OutError)
 {
@@ -61,6 +68,10 @@ bool FVrmConversionService::DeriveGeneratedPaths(UVrmSourceAsset* Source, FStrin
 	OutFolderPath = FolderPath / (OutBaseName + TEXT("_Generated"));
 	return true;
 }
+
+// NOTE: ApplyGltfBonesToGeneratedAssets was removed from this PR to avoid editor-only
+// include resolution issues during packaging CI. The parser/types remain and are still
+// useful for B2 implementation (application of bones will be added in a follow-up PR).
 
 bool FVrmConversionService::ConvertSourceToPlaceholderSkeletalMesh(UVrmSourceAsset* Source, const FVrmConvertOptions& Options, USkeletalMesh*& OutSkeletalMesh, USkeleton*& OutSkeleton, FString& OutError)
 {
@@ -160,8 +171,20 @@ bool FVrmConversionService::ConvertSourceToPlaceholderSkeletalMesh(UVrmSourceAss
 	// Add provenance note: (UPackage does not expose SetMetaData; skip explicit package metadata write)
 	// Consider attaching a dedicated UAssetUserData if persistent provenance is required later.
 
+	// Note: parsing support remains available via FVrmGltfParser, but applying the skeleton
+	// to generated assets is deferred to a follow-up PR to avoid introducing packaging
+	// dependencies in this PR. To enable later, add code that calls FVrmGltfParser::ExtractSkeletonFromGlbFile
+	// and applies bones to the created assets using editor-only APIs (e.g., FReferenceSkeletonModifier).
+
 	OutSkeletalMesh = NewMesh;
 	OutSkeleton = NewSkeleton;
 
 	return true;
-} 
+}
+
+bool FVrmConversionService::ApplyGltfSkeletonToAssets(const FVrmGltfSkeleton& GltfSkel, USkeleton* TargetSkeleton, USkeletalMesh* TargetMesh, FString& OutError)
+{
+	OutError = TEXT("ApplyGltfSkeletonToAssets is deferred to a follow-up PR (editor-only implementation)");
+	return false;
+}
+ 
