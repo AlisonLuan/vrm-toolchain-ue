@@ -34,7 +34,7 @@ private:
 public:
 	// Exposed for tests: apply a parsed GLTF skeleton to generated assets (editor-only)
 #if WITH_EDITOR
-	// ApplyGltfSkeletonToAssets has been removed from this PR to avoid packaging
-	// include issues; it will be introduced in a follow-up focused on applying bones.
+	// NOTE: Implementation is deferred to a follow-up PR; stub exists to avoid build failures
+	static bool ApplyGltfSkeletonToAssets(const FVrmGltfSkeleton& GltfSkel, USkeleton* TargetSkeleton, USkeletalMesh* TargetMesh, FString& OutError);
 #endif
 };
