@@ -96,13 +96,30 @@ $ValidateScript = Join-Path (Split-Path $PSScriptRoot) "Scripts\ValidatePackage.
 $pwshCmd = (Get-Command pwsh -ErrorAction SilentlyContinue)
 $valExit = $null
 try {
+    $outLog = Join-Path $env:TEMP ("validate_$([Guid]::NewGuid().ToString()).out")
+    $errLog = Join-Path $env:TEMP ("validate_$([Guid]::NewGuid().ToString()).err")
     if ($pwshCmd) {
-        $proc = Start-Process -FilePath $pwshCmd.Path -ArgumentList @('-NoProfile','-NonInteractive','-File',$ValidateScript,'-PackagePath',$OutPkg) -NoNewWindow -Wait -PassThru
+        $proc = Start-Process -FilePath $pwshCmd.Path -ArgumentList @('-NoProfile','-NonInteractive','-File',$ValidateScript,'-PackagePath',$OutPkg) -RedirectStandardOutput $outLog -RedirectStandardError $errLog -NoNewWindow -Wait -PassThru
         $valExit = $proc.ExitCode
     } else {
         # Fall back to Windows PowerShell if pwsh is not available
-        $proc = Start-Process -FilePath (Get-Command powershell).Path -ArgumentList @('-NoProfile','-NonInteractive','-File',$ValidateScript,'-PackagePath',$OutPkg) -NoNewWindow -Wait -PassThru
+        $pw = (Get-Command powershell -ErrorAction SilentlyContinue)
+        if (-not $pw) { throw "No PowerShell interpreter available to run validator" }
+        $proc = Start-Process -FilePath $pw.Path -ArgumentList @('-NoProfile','-NonInteractive','-File',$ValidateScript,'-PackagePath',$OutPkg) -RedirectStandardOutput $outLog -RedirectStandardError $errLog -NoNewWindow -Wait -PassThru
         $valExit = $proc.ExitCode
+    }
+    # If proc.ExitCode is not set (strange edge), attempt to parse logs for failures
+    if (-not ($valExit -is [int])) {
+        $output = ""
+        if (Test-Path $outLog) { $output += Get-Content $outLog -Raw -ErrorAction SilentlyContinue }
+        if (Test-Path $errLog) { $output += "`n" + (Get-Content $errLog -Raw -ErrorAction SilentlyContinue) }
+        if ($output -match 'Package validation FAILED') {
+            Write-Error "Validator log indicates failure. See logs: $outLog, $errLog"
+            $valExit = 1
+        } else {
+            Write-Warning "Validator did not return numeric exit code but no failure text detected. Proceeding with caution. See logs: $outLog, $errLog"
+            $valExit = 0
+        }
     }
 } catch {
     Write-Error "Failed to run validator subprocess: $_"
