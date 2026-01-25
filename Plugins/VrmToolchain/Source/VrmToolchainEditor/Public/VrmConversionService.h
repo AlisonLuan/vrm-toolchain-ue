@@ -34,6 +34,7 @@ private:
 public:
 	// Exposed for tests: apply a parsed GLTF skeleton to generated assets (editor-only)
 #if WITH_EDITOR
-	static bool ApplyGltfSkeletonToAssets(const FVrmGltfSkeleton& GltfSkel, USkeleton* TargetSkeleton, USkeletalMesh* TargetMesh, FString& OutError);
+	// ApplyGltfSkeletonToAssets has been removed from this PR to avoid packaging
+	// include issues; it will be introduced in a follow-up focused on applying bones.
 #endif
 };
