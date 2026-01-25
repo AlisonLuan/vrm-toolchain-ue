@@ -130,6 +130,8 @@ GITHUB_PR_BODY.txt
 # Local branch-protection backups and workflow logs (local-only)
 bp_*.json
 tmp_run_*.log
+# Local branch-protection JSON backups (do NOT commit)
+.github/scripts/branch-protection-*.json
 # Local scripts logs
 .github/scripts/*.log
 
