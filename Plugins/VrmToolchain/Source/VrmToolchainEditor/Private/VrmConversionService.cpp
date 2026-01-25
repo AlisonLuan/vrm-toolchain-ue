@@ -18,7 +18,7 @@
 // Editor-only APIs are needed for applying skeletons in a follow-up PR; keep includes minimal here
 #include "ReferenceSkeleton.h"
 #include "Animation/Skeleton.h"
-#include "ReferenceSkeletonModifier.h"
+#include "EditorFramework/AssetImportData.h"
 #endif
 
 
@@ -270,8 +270,8 @@ bool FVrmConversionService::ApplyGltfSkeletonToAssets(const FVrmGltfSkeleton& Gl
 			ParentName = GltfSkel.Bones[Bone.ParentIndex].Name;
 		}
 
-		// FMeshBoneInfo: (Name, ParentName, ParentIndex)
-		FMeshBoneInfo BoneInfo(BoneName, ParentName, Bone.ParentIndex);
+		// FMeshBoneInfo: (Name, ExportName, ParentIndex)
+		FMeshBoneInfo BoneInfo(BoneName, BoneName.ToString(), Bone.ParentIndex);
 		RefSkelModifier.Add(BoneInfo, Bone.LocalTransform);
 	}
 
