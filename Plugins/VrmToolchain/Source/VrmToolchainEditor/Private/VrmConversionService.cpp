@@ -172,10 +172,66 @@ bool FVrmConversionService::ConvertSourceToPlaceholderSkeletalMesh(UVrmSourceAss
 	// Add provenance note: (UPackage does not expose SetMetaData; skip explicit package metadata write)
 	// Consider attaching a dedicated UAssetUserData if persistent provenance is required later.
 
-	// Note: parsing support remains available via FVrmGltfParser, but applying the skeleton
-	// to generated assets is deferred to a follow-up PR to avoid introducing packaging
-	// dependencies in this PR. To enable later, add code that calls FVrmGltfParser::ExtractSkeletonFromGlbFile
-	// and applies bones to the created assets using editor-only APIs (e.g., FReferenceSkeletonModifier).
+	// B1.1: Apply glTF skeleton by default when possible (fail-soft with warnings)
+	if (Options.bApplyGltfSkeleton)
+	{
+		auto ResolveSourcePath = [](UVrmSourceAsset* InSource, FString& OutPath) -> bool
+		{
+			OutPath.Reset();
+			if (!InSource)
+			{
+				return false;
+			}
+
+			if (!InSource->SourceFilename.IsEmpty())
+			{
+				OutPath = InSource->SourceFilename;
+				return true;
+			}
+
+			if (InSource->AssetImportData)
+			{
+				const FString First = InSource->AssetImportData->GetFirstFilename();
+				if (!First.IsEmpty())
+				{
+					OutPath = First;
+					return true;
+				}
+			}
+
+			return false;
+		};
+
+		FString SourcePath;
+		if (!ResolveSourcePath(Source, SourcePath))
+		{
+			Source->ImportWarnings.Add(TEXT("B1.1: Skeleton not applied (no source path resolved)."));
+		}
+		else
+		{
+			FVrmGltfSkeleton GltfSkel;
+			FString ParseError;
+
+			if (!FVrmGltfParser::ExtractSkeletonFromGlbFile(SourcePath, GltfSkel, ParseError))
+			{
+				Source->ImportWarnings.Add(FString::Printf(TEXT("B1.1: Skeleton not applied (parse failed): %s"), *ParseError));
+			}
+			else if (GltfSkel.Bones.Num() == 0)
+			{
+				Source->ImportWarnings.Add(TEXT("B1.1: Skeleton not applied (zero bones)."));
+			}
+			else
+			{
+				FString ApplyError;
+				if (!FVrmConversionService::ApplyGltfSkeletonToAssets(GltfSkel, NewSkeleton, NewMesh, ApplyError))
+				{
+					Source->ImportWarnings.Add(FString::Printf(TEXT("B1.1: Skeleton not applied (apply failed): %s"), *ApplyError));
+				}
+			}
+		}
+
+		Source->MarkPackageDirty();
+	}
 
 	OutSkeletalMesh = NewMesh;
 	OutSkeleton = NewSkeleton;
