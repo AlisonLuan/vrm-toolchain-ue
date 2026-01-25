@@ -92,46 +92,25 @@ Write-Host "✓ Raw staging cleaned" -ForegroundColor Green
 Write-Host "Running package contract validation..." -ForegroundColor Cyan
 $ValidateScript = Join-Path (Split-Path $PSScriptRoot) "Scripts\ValidatePackage.ps1"
 
-# Run validator in a separate pwsh process to ensure exit codes are captured reliably
-$pwshCmd = (Get-Command pwsh -ErrorAction SilentlyContinue)
 $valExit = $null
 try {
-    $outLog = Join-Path $env:TEMP ("validate_$([Guid]::NewGuid().ToString()).out")
-    $errLog = Join-Path $env:TEMP ("validate_$([Guid]::NewGuid().ToString()).err")
-    if ($pwshCmd) {
-        $procArgs = "-NoProfile -NonInteractive -File `"$ValidateScript`" -PackagePath `"$OutPkg`""
-        $proc = Start-Process -FilePath $pwshCmd.Path -ArgumentList $procArgs -RedirectStandardOutput $outLog -RedirectStandardError $errLog -NoNewWindow -Wait -PassThru
-        $valExit = $proc.ExitCode
-    } else {
-        # Fall back to Windows PowerShell if pwsh is not available
-        $pw = (Get-Command powershell -ErrorAction SilentlyContinue)
-        if (-not $pw) { throw "No PowerShell interpreter available to run validator" }
-        $procArgs = "-NoProfile -NonInteractive -File `"$ValidateScript`" -PackagePath `"$OutPkg`""
-        $proc = Start-Process -FilePath $pw.Path -ArgumentList $procArgs -RedirectStandardOutput $outLog -RedirectStandardError $errLog -NoNewWindow -Wait -PassThru
-        $valExit = $proc.ExitCode
-    }
-    # If proc.ExitCode is not set (strange edge), attempt to parse logs for failures
-    if (-not ($valExit -is [int])) {
-        $output = ""
-        if (Test-Path $outLog) { $output += Get-Content $outLog -Raw -ErrorAction SilentlyContinue }
-        if (Test-Path $errLog) { $output += "`n" + (Get-Content $errLog -Raw -ErrorAction SilentlyContinue) }
-        if ($output -match 'Package validation FAILED') {
-            Write-Error "Validator log indicates failure. See logs: $outLog, $errLog"
-            $valExit = 1
-        } else {
-            Write-Warning "Validator did not return numeric exit code but no failure text detected. Proceeding with caution. See logs: $outLog, $errLog"
-            $valExit = 0
-        }
+    # Invoke validator directly in a child scope to capture exit code
+    & pwsh -NoProfile -NonInteractive -File $ValidateScript -PackagePath $OutPkg
+    $valExit = $LASTEXITCODE
+    
+    # If that fails (pwsh not available), try powershell
+    if (-not $?) {
+        & powershell -NoProfile -NonInteractive -File $ValidateScript -PackagePath $OutPkg
+        $valExit = $LASTEXITCODE
     }
 } catch {
-    Write-Error "Failed to run validator subprocess: $_"
+    Write-Error "Failed to run validator: $_"
     $valExit = 1
 }
 
 if (-not ($valExit -is [int])) {
-    Write-Error "Package contract validator did not return a numeric exit code. See validator output above."
+    Write-Error "Package contract validator did not return a numeric exit code."
     $valExit = 1
-    throw "Package contract validation failed: invalid exit code"
 }
 
 if ($valExit -ne 0) {
