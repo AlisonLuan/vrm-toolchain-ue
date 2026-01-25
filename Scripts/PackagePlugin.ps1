@@ -92,15 +92,26 @@ Write-Host "✓ Raw staging cleaned" -ForegroundColor Green
 Write-Host "Running package contract validation..." -ForegroundColor Cyan
 $ValidateScript = Join-Path (Split-Path $PSScriptRoot) "Scripts\ValidatePackage.ps1"
 
-# Run validator in a separate pwsh process to ensure 'exit' codes are propagated reliably
+# Run validator in a separate pwsh process to ensure exit codes are captured reliably
 $pwshCmd = (Get-Command pwsh -ErrorAction SilentlyContinue)
-if ($pwshCmd) {
-    & $pwshCmd.Path -NoProfile -NonInteractive -File $ValidateScript -PackagePath $OutPkg
-    $valExit = $LASTEXITCODE
-} else {
-    # Fall back to Windows PowerShell if pwsh is not available
-    & powershell -NoProfile -NonInteractive -File $ValidateScript -PackagePath $OutPkg
-    $valExit = $LASTEXITCODE
+$valExit = $null
+try {
+    if ($pwshCmd) {
+        $proc = Start-Process -FilePath $pwshCmd.Path -ArgumentList @('-NoProfile','-NonInteractive','-File',$ValidateScript,'-PackagePath',$OutPkg) -NoNewWindow -Wait -PassThru
+        $valExit = $proc.ExitCode
+    } else {
+        # Fall back to Windows PowerShell if pwsh is not available
+        $proc = Start-Process -FilePath (Get-Command powershell).Path -ArgumentList @('-NoProfile','-NonInteractive','-File',$ValidateScript,'-PackagePath',$OutPkg) -NoNewWindow -Wait -PassThru
+        $valExit = $proc.ExitCode
+    }
+} catch {
+    Write-Error "Failed to run validator subprocess: $_"
+    $valExit = 1
+}
+
+if (-not ($valExit -is [int])) {
+    Write-Error "Package contract validator did not return a numeric exit code. Treating as failure.";
+    throw "Package contract validation failed (invalid exit: $valExit)"
 }
 
 if ($valExit -ne 0) {
