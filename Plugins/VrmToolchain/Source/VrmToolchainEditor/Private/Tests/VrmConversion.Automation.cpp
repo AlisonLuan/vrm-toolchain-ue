@@ -2,6 +2,7 @@
 
 #include "Misc/AutomationTest.h"
 #include "VrmConversionService.h"
+#include "VrmGltfParser.h"
 #include "VrmSourceAsset.h"
 #include "Engine/SkeletalMesh.h"
 class USkeleton;
@@ -58,6 +59,42 @@ bool FVrmConversionPathDerivationTest::RunTest(const FString& Parameters)
 	Options.bOverwriteExisting = false;
 	bool bOk2 = FVrmConversionService::ConvertSourceToPlaceholderSkeletalMesh(Source, Options, Mesh2, Skeleton2, Error);
 	TestFalse(TEXT("Conversion without overwrite should fail when assets exist"), bOk2);
+
+	// Test applying a simple GLTF skeleton via JSON string
+	{
+		// Minimal GLTF JSON with two nodes: root (0) and child (1)
+		FString Json = R"({
+		  "nodes": [
+		    { "name": "Hips", "translation": [0,0,0], "children": [1] },
+		    { "name": "Spine", "translation": [0,10,0] }
+		  ]
+		})";
+
+		FVrmGltfSkeleton Skel;
+		FString ParseErr;
+		bool bParsed = FVrmGltfParser::ExtractSkeletonFromGltfJsonString(Json, Skel, ParseErr);
+		TestTrue(TEXT("Parse GLTF JSON string succeeds"), bParsed);
+		TestEqual(TEXT("Parsed bone count"), Skel.Bones.Num(), 2);
+
+		// Create fresh generated assets to apply to
+		USkeletalMesh* MeshA = nullptr;
+		USkeleton* SkeletonA = nullptr;
+		FVrmConvertOptions Opts;
+		Opts.bOverwriteExisting = true;
+		FVrmConvertOptions TmpOptions = Opts;
+		// Use the existing source to create assets
+		bool bConv = FVrmConversionService::ConvertSourceToPlaceholderSkeletalMesh(Source, TmpOptions, MeshA, SkeletonA, Error);
+		TestTrue(TEXT("Created placeholder assets for apply test"), bConv);
+		TestNotNull(TEXT("MeshA not null"), MeshA);
+		TestNotNull(TEXT("SkeletonA not null"), SkeletonA);
+
+		FString ApplyErr;
+		bool bApplied = FVrmConversionService::ApplyGltfSkeletonToAssets(Skel, SkeletonA, MeshA, ApplyErr);
+		TestTrue(TEXT("Apply GLTF skeleton succeeds"), bApplied);
+		TestEqual(TEXT("Ref skeleton bone count matches"), MeshA->GetRefSkeleton().GetNum(), Skel.Bones.Num());
+		TestEqual(TEXT("First bone name"), MeshA->GetRefSkeleton().GetBoneName(0).ToString(), FString(TEXT("Hips")));
+		TestEqual(TEXT("Second bone name"), MeshA->GetRefSkeleton().GetBoneName(1).ToString(), FString(TEXT("Spine")));
+	}
 
 	return true;
 }

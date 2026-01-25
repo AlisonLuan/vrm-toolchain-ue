@@ -10,7 +10,10 @@
 #include "Misc/PackageName.h"
 #include "UObject/Package.h"
 #include "Engine/SkeletalMesh.h"
-class USkeleton;
+#include "Animation/ReferenceSkeleton.h"
+#include "Animation/ReferenceSkeletonModifier.h"
+#include "Engine/Skeleton.h"
+#include "VrmGltfParser.h"
 #include "Misc/MessageDialog.h"
 #include "Misc/Paths.h"
 
@@ -59,6 +62,68 @@ bool FVrmConversionService::DeriveGeneratedPaths(UVrmSourceAsset* Source, FStrin
 	}
 
 	OutFolderPath = FolderPath / (OutBaseName + TEXT("_Generated"));
+	return true;
+}
+
+// Editor-only helper: apply parsed GLTF skeleton to generated assets (mutates mesh ref-skeleton in-place)
+static bool ApplyGltfBonesToGeneratedAssets(
+	const FVrmGltfSkeleton& GltfSkel,
+	USkeleton* TargetSkeleton,
+	USkeletalMesh* TargetMesh,
+	FString& OutError)
+{
+	OutError.Reset();
+
+	if (!TargetSkeleton || !TargetMesh)
+	{
+		OutError = TEXT("TargetSkeleton/TargetMesh is null.");
+		return false;
+	}
+
+	if (GltfSkel.Bones.Num() == 0)
+	{
+		OutError = TEXT("GLTF skeleton had zero bones.");
+		return false;
+	}
+
+	// Mutate mesh's ref skeleton in-place (editor-only).
+	FReferenceSkeleton& RefSkel = const_cast<FReferenceSkeleton&>(TargetMesh->GetRefSkeleton());
+
+	// Overwrite semantics: clear then add
+	RefSkel = FReferenceSkeleton();
+
+	FReferenceSkeletonModifier Modifier(RefSkel, *TargetSkeleton);
+
+	for (int32 i = 0; i < GltfSkel.Bones.Num(); ++i)
+	{
+		const FVrmGltfBone& B = GltfSkel.Bones[i];
+
+		const FName BoneName = B.Name.IsNone() ? FName(*FString::Printf(TEXT("node_%d"), i)) : B.Name;
+
+		int32 ParentIndex = B.ParentIndex;
+		if (ParentIndex < 0 || ParentIndex >= RefSkel.GetNum())
+		{
+			ParentIndex = INDEX_NONE;
+		}
+
+		FMeshBoneInfo BoneInfo(BoneName, BoneName.ToString(), ParentIndex);
+		Modifier.Add(BoneInfo, B.LocalTransform);
+	}
+
+	// Sync the USkeleton from the mesh
+	TargetSkeleton->MergeAllBonesToBoneTree(TargetMesh);
+
+	// Ensure the mesh points at the skeleton
+	TargetMesh->SetSkeleton(TargetSkeleton);
+
+	TargetSkeleton->MarkPackageDirty();
+	TargetMesh->MarkPackageDirty();
+
+#if WITH_EDITOR
+	TargetSkeleton->PostEditChange();
+	TargetMesh->PostEditChange();
+#endif
+
 	return true;
 }
 
@@ -160,8 +225,52 @@ bool FVrmConversionService::ConvertSourceToPlaceholderSkeletalMesh(UVrmSourceAss
 	// Add provenance note: (UPackage does not expose SetMetaData; skip explicit package metadata write)
 	// Consider attaching a dedicated UAssetUserData if persistent provenance is required later.
 
+	// Optionally parse GLB/Vrm source and apply bone hierarchy to generated assets
+	if (Options.bApplyGltfSkeleton)
+	{
+		FString SourceFilePath = Source->SourceFilename;
+		if (SourceFilePath.IsEmpty() && Source->AssetImportData && Source->AssetImportData->GetSourceData().SourceFiles.Num() > 0)
+		{
+			SourceFilePath = Source->AssetImportData->GetSourceData().SourceFiles[0].AbsoluteFilename;
+		}
+
+		if (SourceFilePath.IsEmpty())
+		{
+			OutError = TEXT("No source file path available to extract skeleton from.");
+			return false;
+		}
+
+		FString Ext = FPaths::GetExtension(SourceFilePath).ToLower();
+		if (Ext != TEXT("glb") && Ext != TEXT("vrm"))
+		{
+			OutError = TEXT("Source file is not a GLB/VRM file.");
+			return false;
+		}
+
+		FVrmGltfSkeleton GltfSkel;
+		FString ParseError;
+		if (!FVrmGltfParser::ExtractSkeletonFromGlbFile(SourceFilePath, GltfSkel, ParseError))
+		{
+			OutError = FString::Printf(TEXT("Failed to parse GLB skeleton: %s"), *ParseError);
+			return false;
+		}
+
+		FString ApplyError;
+		if (!ApplyGltfBonesToGeneratedAssets(GltfSkel, NewSkeleton, NewMesh, ApplyError))
+		{
+			OutError = FString::Printf(TEXT("Failed to apply GLTF skeleton: %s"), *ApplyError);
+			return false;
+		}
+	}
+
 	OutSkeletalMesh = NewMesh;
 	OutSkeleton = NewSkeleton;
 
 	return true;
-} 
+}
+
+bool FVrmConversionService::ApplyGltfSkeletonToAssets(const FVrmGltfSkeleton& GltfSkel, USkeleton* TargetSkeleton, USkeletalMesh* TargetMesh, FString& OutError)
+{
+	return ApplyGltfBonesToGeneratedAssets(GltfSkel, TargetSkeleton, TargetMesh, OutError);
+}
+ 
