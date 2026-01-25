@@ -16,7 +16,8 @@
 
 #if WITH_EDITOR
 // Editor-only APIs are needed for applying skeletons in a follow-up PR; keep includes minimal here
-#include "Engine/Skeleton.h"
+#include "ReferenceSkeleton.h"
+#include "Animation/Skeleton.h"
 #endif
 
 
