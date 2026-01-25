@@ -10,12 +10,16 @@
 #include "Misc/PackageName.h"
 #include "UObject/Package.h"
 #include "Engine/SkeletalMesh.h"
-#include "Animation/ReferenceSkeleton.h"
-#include "Animation/ReferenceSkeletonModifier.h"
-#include "Engine/Skeleton.h"
 #include "VrmGltfParser.h"
 #include "Misc/MessageDialog.h"
 #include "Misc/Paths.h"
+
+#if WITH_EDITOR
+#include "Animation/ReferenceSkeleton.h"
+#include "Animation/ReferenceSkeletonModifier.h"
+#include "Engine/Skeleton.h"
+#endif
+
 
 bool FVrmConversionService::DeriveGeneratedPaths(UVrmSourceAsset* Source, FString& OutFolderPath, FString& OutBaseName, FString& OutError)
 {
