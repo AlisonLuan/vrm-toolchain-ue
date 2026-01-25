@@ -5,6 +5,9 @@
 #include "VrmGltfParser.h"
 #include "VrmSourceAsset.h"
 #include "Engine/SkeletalMesh.h"
+#if WITH_EDITOR
+#include "ReferenceSkeleton.h"
+#endif
 class USkeleton;
 #include "VrmToolchain/VrmMetadataAsset.h"
 
@@ -60,21 +63,67 @@ bool FVrmConversionPathDerivationTest::RunTest(const FString& Parameters)
 	bool bOk2 = FVrmConversionService::ConvertSourceToPlaceholderSkeletalMesh(Source, Options, Mesh2, Skeleton2, Error);
 	TestFalse(TEXT("Conversion without overwrite should fail when assets exist"), bOk2);
 
-	// Note: skeleton application test deferred to follow-up; keep parser JSON test only
+// Editor-only test: parse and apply skeleton to generated placeholder assets
 	{
 		// Minimal GLTF JSON with two nodes: root (0) and child (1)
 		FString Json = R"({
-		  "nodes": [
-		    { "name": "Hips", "translation": [0,0,0], "children": [1] },
-		    { "name": "Spine", "translation": [0,10,0] }
-		  ]
-		})";
+	  "nodes": [
+	    { "name": "Hips", "translation": [0,0,0], "children": [1] },
+	    { "name": "Spine", "translation": [0,10,0] }
+	  ]
+	})";
 
 		FVrmGltfSkeleton Skel;
 		FString ParseErr;
 		bool bParsed = FVrmGltfParser::ExtractSkeletonFromGltfJsonString(Json, Skel, ParseErr);
 		TestTrue(TEXT("Parse GLTF JSON string succeeds"), bParsed);
 		TestEqual(TEXT("Parsed bone count"), Skel.Bones.Num(), 2);
+
+#if WITH_EDITOR
+		// Build an explicit skeleton structure programmatically (same as JSON above)
+		FVrmGltfSkeleton ApplySkel;
+		{
+			FVrmGltfBone Root;
+			Root.Name = FName(TEXT("Hips"));
+			Root.ParentIndex = INDEX_NONE;
+			Root.LocalTransform = FTransform::Identity;
+			ApplySkel.Bones.Add(Root);
+
+			FVrmGltfBone Child;
+			Child.Name = FName(TEXT("Spine"));
+			Child.ParentIndex = 0;
+			Child.LocalTransform = FTransform(FRotator::ZeroRotator, FVector(0,10,0));
+			ApplySkel.Bones.Add(Child);
+		}
+
+		// Create transient source & generated placeholders
+		UPackage* Pkg2 = CreatePackage(TEXT("/Game/TestAssets/Test_VrmSource_Apply"));
+		UVrmSourceAsset* Source2 = NewObject<UVrmSourceAsset>(Pkg2, TEXT("Test_VrmSource_Apply"), RF_Public | RF_Standalone);
+		UVrmMetadataAsset* Desc2 = NewObject<UVrmMetadataAsset>(Pkg2, TEXT("Test_Metadata_Apply"), RF_Public | RF_Standalone);
+		Source2->Descriptor = Desc2;
+
+		USkeletalMesh* MeshOut = nullptr;
+		USkeleton* SkeletonOut = nullptr;
+		FVrmConvertOptions Opts;
+		Opts.bOverwriteExisting = true;
+		FString ConvErr;
+		bool bConv = FVrmConversionService::ConvertSourceToPlaceholderSkeletalMesh(Source2, Opts, MeshOut, SkeletonOut, ConvErr);
+		TestTrue(TEXT("Placeholder creation succeeded"), bConv);
+		TestNotNull(TEXT("MeshOut created"), MeshOut);
+		TestNotNull(TEXT("SkeletonOut created"), SkeletonOut);
+
+		// Apply GLTF skeleton to generated assets
+		FString ApplyErr;
+		bool bApplied = FVrmConversionService::ApplyGltfSkeletonToAssets(ApplySkel, SkeletonOut, MeshOut, ApplyErr);
+		TestTrue(TEXT("ApplyGltfSkeletonToAssets should succeed in editor"), bApplied);
+
+		const FReferenceSkeleton& Ref = MeshOut->GetRefSkeleton();
+		TestEqual(TEXT("Ref bone count matches"), Ref.GetNum(), ApplySkel.Bones.Num());
+		for (int32 I = 0; I < ApplySkel.Bones.Num(); ++I)
+		{
+			TestEqual(FString::Printf(TEXT("Bone name %d"), I), Ref.GetBoneName(I).ToString(), ApplySkel.Bones[I].Name.ToString());
+		}
+#endif
 	}
 
 	return true;
