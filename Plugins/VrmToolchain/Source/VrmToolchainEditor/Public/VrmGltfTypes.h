@@ -16,6 +16,9 @@ struct FVrmGltfBone
 
     UPROPERTY()
     FTransform LocalTransform = FTransform::Identity;
+
+    UPROPERTY()
+    int32 GltfNodeIndex = INDEX_NONE;
 };
 
 USTRUCT()
