@@ -18,6 +18,7 @@
 // Editor-only APIs are needed for applying skeletons in a follow-up PR; keep includes minimal here
 #include "ReferenceSkeleton.h"
 #include "Animation/Skeleton.h"
+#include "ReferenceSkeletonModifier.h"
 #endif
 
 
@@ -184,7 +185,47 @@ bool FVrmConversionService::ConvertSourceToPlaceholderSkeletalMesh(UVrmSourceAss
 
 bool FVrmConversionService::ApplyGltfSkeletonToAssets(const FVrmGltfSkeleton& GltfSkel, USkeleton* TargetSkeleton, USkeletalMesh* TargetMesh, FString& OutError)
 {
-	OutError = TEXT("ApplyGltfSkeletonToAssets is deferred to a follow-up PR (editor-only implementation)");
+#if WITH_EDITOR
+	OutError.Reset();
+	if (!TargetSkeleton || !TargetMesh)
+	{
+		OutError = TEXT("TargetSkeleton or TargetMesh is null");
+		return false;
+	}
+
+	if (GltfSkel.Bones.Num() == 0)
+	{
+		OutError = TEXT("GLTF skeleton contains no bones");
+		return false;
+	}
+
+	// Modify the mesh's reference skeleton in-place using the modifier, then sync to the USkeleton
+	FReferenceSkeleton& MeshRefSkel = TargetMesh->GetRefSkeleton();
+	FReferenceSkeletonModifier RefSkelModifier(MeshRefSkel, TargetSkeleton);
+
+	// Add bones in order from the parsed GLTF skeleton
+	for (int32 Index = 0; Index < GltfSkel.Bones.Num(); ++Index)
+	{
+		const FVrmGltfBone& Bone = GltfSkel.Bones[Index];
+		FName BoneName = Bone.Name;
+		FName ParentName = NAME_None;
+		if (Bone.ParentIndex != INDEX_NONE && GltfSkel.Bones.IsValidIndex(Bone.ParentIndex))
+		{
+			ParentName = GltfSkel.Bones[Bone.ParentIndex].Name;
+		}
+
+		// FMeshBoneInfo: (Name, ParentName, ParentIndex)
+		FMeshBoneInfo BoneInfo(BoneName, ParentName, Bone.ParentIndex);
+		RefSkelModifier.Add(BoneInfo, Bone.LocalTransform);
+	}
+
+	// Ensure the skeleton asset is aware of bones added to the mesh
+	TargetSkeleton->MergeAllBonesToBoneTree(TargetMesh);
+
+	return true;
+#else
+	OutError = TEXT("ApplyGltfSkeletonToAssets is editor-only");
 	return false;
+#endif
 }
  
