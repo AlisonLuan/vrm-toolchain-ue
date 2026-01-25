@@ -213,8 +213,8 @@ bool FVrmConversionService::ApplyGltfSkeletonToAssets(const FVrmGltfSkeleton& Gl
 			ParentName = GltfSkel.Bones[Bone.ParentIndex].Name;
 		}
 
-		// FMeshBoneInfo: (Name, ParentName, ParentIndex)
-		FMeshBoneInfo BoneInfo(BoneName, ParentName, Bone.ParentIndex);
+		// FMeshBoneInfo: (Name, ExportName, ParentIndex)
+		FMeshBoneInfo BoneInfo(BoneName, BoneName.ToString(), Bone.ParentIndex);
 		RefSkelModifier.Add(BoneInfo, Bone.LocalTransform);
 	}
 
