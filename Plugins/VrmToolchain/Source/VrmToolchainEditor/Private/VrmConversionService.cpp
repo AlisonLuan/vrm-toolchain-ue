@@ -15,7 +15,10 @@
 #include "Misc/Paths.h"
 
 #if WITH_EDITOR
+// Try both include styles; some build environments resolve one or the other
+#include "ReferenceSkeleton.h"
 #include "Animation/ReferenceSkeleton.h"
+#include "ReferenceSkeletonModifier.h"
 #include "Animation/ReferenceSkeletonModifier.h"
 #include "Engine/Skeleton.h"
 #endif
