@@ -11,4 +11,7 @@ public:
 
     // High-level helper: read GLB JSON chunk from disk and then parse
     static bool ExtractSkeletonFromGlbFile(const FString& FilePath, FVrmGltfSkeleton& OutSkeleton, FString& OutError);
+
+    // Extract skin joints from GLB JSON
+    static bool TryExtractSkin0Joints(const TSharedPtr<FJsonObject>& Root, TArray<int32>& OutJoints);
 };

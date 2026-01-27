@@ -36,6 +36,7 @@ public class VrmToolchainEditor : ModuleRules
             "ContentBrowser",
             "AssetTools",
             "AssetRegistry",
+            "AssetDefinition",
             "EditorSubsystem",
             "EditorFramework",
             "UnrealEd",
@@ -46,7 +47,13 @@ public class VrmToolchainEditor : ModuleRules
             "DeveloperSettings",
             // Ensure animation/reference skeleton headers are resolvable in editor builds
             "AnimationCore",
-            "Engine"
+            "Engine",
+            // B2: Mesh utilities for skeletal mesh building
+            "MeshUtilities",
+            "SkeletalMeshUtilitiesCommon",
+            "MeshDescription",
+            "StaticMeshDescription",
+            "RenderCore"
         });
     }
 }

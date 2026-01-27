@@ -2,6 +2,21 @@
 #include "CoreMinimal.h"
 #include "UObject/Object.h"
 #include "UObject/SoftObjectPtr.h"
+
+#if WITH_EDITOR
+  #if __has_include("AssetRegistry/AssetRegistryTagsContext.h")
+    #include "AssetRegistry/AssetRegistryTagsContext.h"
+    #define VRM_HAS_TAGS_CONTEXT 1
+  #else
+    #define VRM_HAS_TAGS_CONTEXT 0
+  #endif
+
+  #include "Misc/Paths.h"
+
+  // Forward declare the tag type so we can use it in signatures without forcing an include here
+  struct FAssetRegistryTag;
+#endif
+
 #include "VrmSourceAsset.generated.h"
 
 class UAssetImportData;
@@ -35,8 +50,37 @@ public:
 
     /** Runtime-safe metadata descriptor created alongside this source asset. */
     UPROPERTY(VisibleAnywhere, Category="Import")
-    TSoftObjectPtr<UVrmMetadataAsset> Descriptor;
+    UVrmMetadataAsset* Descriptor;
 
+    /** Convenience: VRM spec major version (0 = VRM0, 1 = VRM1, -1 = Unknown) */
+    UPROPERTY(VisibleAnywhere, Category="VRM")
+    int32 VrmSpecVersionMajor = -1;
+
+    /** Convenience: detected file extension (lowercase, e.g. "vrm" or "glb") */
+    UPROPERTY(VisibleAnywhere, Category="VRM")
+    FString DetectedVrmExtension;
+
+#if WITH_EDITOR
+    // Expose useful tags to the Asset Registry so filters and searches can see VRM metadata without loading the whole asset.
+  #if VRM_HAS_TAGS_CONTEXT
+    virtual void GetAssetRegistryTags(FAssetRegistryTagsContext Context) const override;
+  #endif
+    virtual void GetAssetRegistryTags(TArray<FAssetRegistryTag>& OutTags) const override;
+
+    // Editor-only: deterministically compute VRM spec version from JSON (files[0].vrm.version)
+    // No-op if already set; call EditorRecomputeSpecVersionForce() to force re-computation.
+    UFUNCTION(CallInEditor, BlueprintCallable, Category="VRM")
+    bool EditorRecomputeSpecVersion();
+
+    // Editor-only: force re-computation of VRM spec version from JSON (files[0].vrm.version)
+    // Always runs vrm_validate.exe, ignoring cached value.
+    UFUNCTION(CallInEditor, BlueprintCallable, Category="VRM")
+    bool EditorRecomputeSpecVersionForce();
+
+    // Editor-only convenience: backfill derived fields (callable from Python/Editor)
+    UFUNCTION(CallInEditor, BlueprintCallable, Category="VRM")
+    void EditorBackfillDerivedFields();
+#endif
     /** Non-fatal issues encountered during import/parsing. */
     UPROPERTY(VisibleAnywhere, Category="Import")
     TArray<FString> ImportWarnings;

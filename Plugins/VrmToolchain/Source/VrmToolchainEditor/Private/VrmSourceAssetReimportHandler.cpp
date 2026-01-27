@@ -146,7 +146,7 @@ bool FVrmSourceAssetReimportHandler::RefreshFromFile(UVrmSourceAsset* Source, co
     }
 
     // Update sibling metadata asset if present
-    UVrmMetadataAsset* MetaAsset = Source->Descriptor.Get();
+    UVrmMetadataAsset* MetaAsset = Source->Descriptor;
     if (MetaAsset)
     {
         const FVrmMetadata Parsed = FVrmParser::ExtractVrmMetadata(Filename);
