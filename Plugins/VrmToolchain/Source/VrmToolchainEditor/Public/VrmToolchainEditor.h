@@ -18,6 +18,9 @@ public:
     // Returns true when the optional developer validation tool is available on disk.
     bool IsValidationToolAvailable() const { return bValidationCliAvailable; }
 
+    // Returns the path to vrm_validate.exe if available, empty string otherwise.
+    FString GetValidationToolPath() const { return ValidationCliExePath; }
+
 private:
     // Track whether the optional CLI validation tool is present and its path.
     bool bValidationCliAvailable = false;

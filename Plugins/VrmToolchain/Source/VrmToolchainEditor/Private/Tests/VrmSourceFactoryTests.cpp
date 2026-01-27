@@ -59,12 +59,23 @@ bool FVrmSourceFactory_CreatesSourceAndMetadata::RunTest(const FString& Paramete
     }
 #endif
 
-    UVrmMetadataAsset* Meta = Source ? Source->Descriptor.Get() : nullptr;
+    UVrmMetadataAsset* Meta = Source ? Source->Descriptor : nullptr;
     TestNotNull(TEXT("Created metadata descriptor"), Meta);
 
     if (Source && Source->AssetImportData)
     {
         TestTrue(TEXT("ImportData has filename"), !Source->AssetImportData->GetFirstFilename().IsEmpty());
+    }
+
+    // New checks: convenience properties (verify factory set them)
+    if (Source && Meta)
+    {
+        int32 ExpectedMajor = -1;
+        if (Meta->SpecVersion == EVrmVersion::VRM0) ExpectedMajor = 0;
+        else if (Meta->SpecVersion == EVrmVersion::VRM1) ExpectedMajor = 1;
+
+        TestEqual(TEXT("VrmSpecVersionMajor matches metadata"), Source->VrmSpecVersionMajor, ExpectedMajor);
+        TestEqual(TEXT("DetectedVrmExtension is vrm"), Source->DetectedVrmExtension.ToLower(), FString(TEXT("vrm")));
     }
 
     return true;

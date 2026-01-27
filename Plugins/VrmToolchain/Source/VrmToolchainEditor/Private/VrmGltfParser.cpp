@@ -5,7 +5,7 @@
 #include "Containers/Set.h"
 #include "Containers/Map.h"
 
-static bool TryExtractSkin0Joints(const TSharedPtr<FJsonObject>& Root, TArray<int32>& OutJoints)
+bool FVrmGltfParser::TryExtractSkin0Joints(const TSharedPtr<FJsonObject>& Root, TArray<int32>& OutJoints)
 {
 	OutJoints.Reset();
 

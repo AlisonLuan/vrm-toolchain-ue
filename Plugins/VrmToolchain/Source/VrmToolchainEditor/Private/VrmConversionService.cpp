@@ -11,6 +11,8 @@
 #include "UObject/Package.h"
 #include "Engine/SkeletalMesh.h"
 #include "VrmGltfParser.h"
+#include "VrmGlbAccessorReader.h"
+#include "VrmSkeletalMeshBuilder.h"
 #include "Misc/MessageDialog.h"
 #include "Misc/Paths.h"
 
@@ -20,6 +22,8 @@
 #include "Animation/Skeleton.h"
 #include "EditorFramework/AssetImportData.h"
 #endif
+
+#include "VrmGltfParser.h"
 
 
 bool FVrmConversionService::DeriveGeneratedPaths(UVrmSourceAsset* Source, FString& OutFolderPath, FString& OutBaseName, FString& OutError)
@@ -106,8 +110,8 @@ bool FVrmConversionService::ConvertSourceToPlaceholderSkeletalMesh(UVrmSourceAss
 		FAssetRegistryModule& ARM = FModuleManager::LoadModuleChecked<FAssetRegistryModule>(TEXT("AssetRegistry"));
 		if (!Options.bOverwriteExisting)
 		{
-			if (ARM.Get().GetAssetByObjectPath(*FString::Printf(TEXT("%s.%s"), *SkeletonPackageName, *SkeletonName)).IsValid() ||
-				ARM.Get().GetAssetByObjectPath(*FString::Printf(TEXT("%s.%s"), *MeshPackageName, *MeshName)).IsValid())
+			if (ARM.Get().GetAssetByObjectPath(FSoftObjectPath(SkeletonPackageName + TEXT(".") + SkeletonName)).IsValid() ||
+				ARM.Get().GetAssetByObjectPath(FSoftObjectPath(MeshPackageName + TEXT(".") + MeshName)).IsValid())
 			{
 				OutError = TEXT("Target assets already exist");
 				return false;
@@ -152,7 +156,7 @@ bool FVrmConversionService::ConvertSourceToPlaceholderSkeletalMesh(UVrmSourceAss
 	{
 		FVrmMetadata Parsed;
 
-		if (UVrmMetadataAsset* Desc = Source->Descriptor.Get())
+		if (UVrmMetadataAsset* Desc = Source->Descriptor)
 		{
 			Parsed.Version = Desc->SpecVersion;
 			Parsed.Name = Desc->Metadata.Title;
@@ -231,6 +235,125 @@ bool FVrmConversionService::ConvertSourceToPlaceholderSkeletalMesh(UVrmSourceAss
 		}
 
 		Source->MarkPackageDirty();
+	}
+
+	// B2: Build actual skinned mesh geometry using MeshUtilities
+	if (Options.bApplyGltfSkeleton)
+	{
+		auto ResolveSourcePath = [](UVrmSourceAsset* InSource, FString& OutPath) -> bool
+		{
+			OutPath.Reset();
+			if (!InSource)
+			{
+				return false;
+			}
+
+			if (!InSource->SourceFilename.IsEmpty())
+			{
+				OutPath = InSource->SourceFilename;
+				return true;
+			}
+
+			if (InSource->AssetImportData)
+			{
+				const FString First = InSource->AssetImportData->GetFirstFilename();
+				if (!First.IsEmpty())
+				{
+					OutPath = First;
+					return true;
+				}
+			}
+
+			return false;
+		};
+
+		FString SourcePath;
+		if (!ResolveSourcePath(Source, SourcePath))
+		{
+			Source->ImportWarnings.Add(TEXT("B2: Mesh not built (no source path resolved)."));
+		}
+		else
+		{
+			// Load and decode GLB data
+			FVrmGlbAccessorReader AccessorReader;
+			FString JsonString;
+			
+			FVrmGlbAccessorReader::FDecodeResult LoadResult = AccessorReader.LoadGlbFile(SourcePath, JsonString);
+			if (!LoadResult.bSuccess)
+			{
+				Source->ImportWarnings.Add(FString::Printf(TEXT("B2: Mesh not built (GLB load failed): %s"), *LoadResult.ErrorMessage));
+			}
+			else
+			{
+				FVrmGlbAccessorReader::FDecodeResult DecodeResult = AccessorReader.DecodeAccessors(JsonString);
+				if (!DecodeResult.bSuccess)
+				{
+					Source->ImportWarnings.Add(FString::Printf(TEXT("B2: Mesh not built (accessor decode failed): %s"), *DecodeResult.ErrorMessage));
+				}
+				else
+				{
+					// Compute joint ordinal to bone index mapping
+					TMap<int32, int32> JointOrdinalToBoneIndex;
+					
+					// Parse JSON to extract skin joints
+					TSharedPtr<FJsonObject> RootObject;
+					TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonString);
+					
+					if (FJsonSerializer::Deserialize(Reader, RootObject) && RootObject.IsValid())
+					{
+						TArray<int32> SkinJoints;
+						if (FVrmGltfParser::TryExtractSkin0Joints(RootObject, SkinJoints))
+						{
+							// Get the skeleton we applied to build node index to bone index mapping
+							FVrmGltfSkeleton GltfSkel;
+							FString ParseError;
+							if (FVrmGltfParser::ExtractSkeletonFromGlbFile(SourcePath, GltfSkel, ParseError))
+							{
+								// Build node index to bone index mapping
+								TMap<int32, int32> NodeToBoneIndex;
+								for (int32 BoneIndex = 0; BoneIndex < GltfSkel.Bones.Num(); ++BoneIndex)
+								{
+									NodeToBoneIndex.Add(GltfSkel.Bones[BoneIndex].GltfNodeIndex, BoneIndex);
+								}
+								
+								// Map skin joint node indices to bone indices
+								for (int32 JointOrdinal = 0; JointOrdinal < SkinJoints.Num(); ++JointOrdinal)
+								{
+									int32 NodeIndex = SkinJoints[JointOrdinal];
+									const int32* BoneIndexPtr = NodeToBoneIndex.Find(NodeIndex);
+									if (BoneIndexPtr)
+									{
+										JointOrdinalToBoneIndex.Add(JointOrdinal, *BoneIndexPtr);
+									}
+								}
+							}
+						}
+					}
+					
+					if (JointOrdinalToBoneIndex.Num() == 0)
+					{
+						Source->ImportWarnings.Add(TEXT("B2: Mesh not built (no joint mapping available)."));
+					}
+					else
+					{
+						// Build the mesh
+						FVrmSkeletalMeshBuilder::FBuildResult BuildResult = FVrmSkeletalMeshBuilder::BuildLod0SkinnedPrimitive(
+							AccessorReader, NewSkeleton, JointOrdinalToBoneIndex, MeshPackageName, MeshName);
+							
+						if (!BuildResult.bSuccess)
+						{
+							Source->ImportWarnings.Add(FString::Printf(TEXT("B2: Mesh build failed: %s"), *BuildResult.ErrorMessage));
+						}
+						else
+						{
+							// Replace the placeholder mesh with the built mesh
+							NewMesh = BuildResult.BuiltMesh;
+							OutSkeletalMesh = NewMesh;
+						}
+					}
+				}
+			}
+		}
 	}
 
 	OutSkeletalMesh = NewMesh;
