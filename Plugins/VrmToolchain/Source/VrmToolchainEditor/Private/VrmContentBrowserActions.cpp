@@ -6,7 +6,7 @@
 #include "IContentBrowserSingleton.h"
 #include "Engine/SkeletalMesh.h"
 #include "EditorFramework/AssetImportData.h"
-#include "VrmSourceAsset.h"
+#include "VrmToolchain/VrmSourceAsset.h"
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
 #include "ToolMenus.h"

@@ -27,6 +27,17 @@ public class VrmToolchain : ModuleRules
             "JsonUtilities"
         });
 
+        // Editor-only dependencies for UVrmSourceAsset editor methods (AssetRegistry tags, etc.)
+        if (Target.bBuildEditor)
+        {
+            PrivateDependencyModuleNames.AddRange(new string[]
+            {
+                "UnrealEd",
+                "AssetRegistry",
+                "EditorFramework"
+            });
+        }
+
 string sdkRoot = LocateVrmSdkRoot();
         
         // 1. Fixed Include Path (Matches your C:\VRM_SDK\include)

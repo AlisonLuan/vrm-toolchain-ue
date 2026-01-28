@@ -1,6 +1,6 @@
 #include "VrmSourceFactory.h"
 
-#include "VrmSourceAsset.h"
+#include "VrmToolchain/VrmSourceAsset.h"
 
 // Runtime-side types we create/populate:
 #include "VrmToolchain/VrmMetadata.h"
@@ -15,6 +15,9 @@
 #include "VrmToolchainEditor.h"
 #include "UObject/UnrealType.h"
 #include "UObject/SoftObjectPtr.h"
+#include "AssetRegistry/AssetRegistryModule.h"
+#include "EditorSubsystem.h"
+#include "Subsystems/ImportSubsystem.h"
 
 // Diagnostic scanner: recursively inspect object and container properties inside a package
 // and report any property that references the CDO's AssetImportData (which causes SavePackage to fail).
@@ -235,12 +238,11 @@ UObject* UVrmSourceFactory::FactoryCreateFile(
     }
 
     const EObjectFlags AssetFlags = Flags | RF_Public | RF_Standalone;
-    const FString BaseName = InName.ToString();
 
-    // Create Source asset (primary return)
-    const FString SourceName = BaseName + TEXT("_VrmSource");
+    // Create Source asset with same name as package (required for Content Browser visibility)
+    // Previously used BaseName + "_VrmSource" but that causes package/asset name mismatch
     UVrmSourceAsset* Source = NewObject<UVrmSourceAsset>(
-        InParent, UVrmSourceAsset::StaticClass(), *SourceName, AssetFlags);
+        InParent, UVrmSourceAsset::StaticClass(), InName, AssetFlags);
 
 #if WITH_EDITOR
     UE_LOG(LogVrmToolchainEditor, Display, TEXT("VrmSourceFactory: Created Source Name='%s' Path='%s' Outer='%s'"), *Source->GetName(), *Source->GetPathName(), *Source->GetOuter()->GetName());
@@ -250,7 +252,7 @@ UObject* UVrmSourceFactory::FactoryCreateFile(
     Source->ImportTime = FDateTime::UtcNow();
 
 #if WITH_EDITORONLY_DATA
-    Source->SourceBytes = Bytes;
+    Source->SetSourceBytes(MoveTemp(Bytes));
 #endif
 
     // Create AssetImportData if needed (must be done after removing constructor initialization to avoid CDO reference)
@@ -315,6 +317,20 @@ UObject* UVrmSourceFactory::FactoryCreateFile(
     Source->MarkPackageDirty();
 
 #if WITH_EDITOR
+    // Ensure immediate Content Browser visibility and asset registry updates
+    Source->PostEditChange();
+    FAssetRegistryModule::AssetCreated(Source);
+
+    // Broadcast import completion to subsystems (UI updates, automations, etc.)
+    if (GEditor)
+    {
+        UImportSubsystem* ImportSubsystem = GEditor->GetEditorSubsystem<UImportSubsystem>();
+        if (ImportSubsystem)
+        {
+            ImportSubsystem->BroadcastAssetPostImport(this, Source);
+        }
+    }
+
     // DISABLED: Diagnostic scan causes crashes when accessing certain native properties
     // Run diagnostic scan to detect any references to the class default AssetImportData
     /*

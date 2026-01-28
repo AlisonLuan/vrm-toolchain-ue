@@ -7,7 +7,7 @@
 #include "EditorFramework/AssetImportData.h"
 
 #include "VrmSourceFactory.h"
-#include "VrmSourceAsset.h"
+#include "VrmToolchain/VrmSourceAsset.h"
 #include "VrmToolchain/VrmMetadataAsset.h"
 
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmSourceFactory_CreatesSourceAndMetadata,
@@ -55,7 +55,7 @@ bool FVrmSourceFactory_CreatesSourceAndMetadata::RunTest(const FString& Paramete
 #if WITH_EDITORONLY_DATA
     if (Source)
     {
-        TestTrue(TEXT("Captured SourceBytes"), Source->SourceBytes.Num() > 0);
+        TestTrue(TEXT("Captured SourceBytes"), Source->GetSourceBytes().Num() > 0);
     }
 #endif
 

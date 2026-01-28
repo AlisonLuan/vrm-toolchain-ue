@@ -34,6 +34,7 @@ public class VrmToolchainEditor : ModuleRules
             "LevelEditor",
             "ToolMenus",
             "ContentBrowser",
+            "ContentBrowserData",
             "AssetTools",
             "AssetRegistry",
             "AssetDefinition",

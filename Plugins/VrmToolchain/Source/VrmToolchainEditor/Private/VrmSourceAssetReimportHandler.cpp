@@ -1,6 +1,6 @@
 #include "VrmSourceAssetReimportHandler.h"
 
-#include "VrmSourceAsset.h"
+#include "VrmToolchain/VrmSourceAsset.h"
 
 #include "VrmToolchain/VrmMetadata.h"
 #include "VrmToolchain/VrmMetadataAsset.h"
@@ -135,7 +135,7 @@ bool FVrmSourceAssetReimportHandler::RefreshFromFile(UVrmSourceAsset* Source, co
     }
 
 #if WITH_EDITORONLY_DATA
-    Source->SourceBytes = MoveTemp(Bytes);
+    Source->SetSourceBytes(MoveTemp(Bytes));
 #endif
 
     Source->SourceFilename = Filename;

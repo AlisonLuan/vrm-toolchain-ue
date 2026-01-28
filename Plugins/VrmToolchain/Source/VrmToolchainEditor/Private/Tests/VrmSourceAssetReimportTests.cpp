@@ -7,7 +7,7 @@
 #include "Misc/Guid.h"
 #include "HAL/FileManager.h"
 
-#include "VrmSourceAsset.h"
+#include "VrmToolchain/VrmSourceAsset.h"
 #include "VrmSourceAssetReimportHandler.h"
 #include "VrmToolchain/VrmMetadataAsset.h"
 #include "EditorFramework/AssetImportData.h"
@@ -61,7 +61,7 @@ bool FVrmSourceAssetReimport_RefreshesBytes::RunTest(const FString& Parameters)
     TestTrue(TEXT("Reimport succeeded"), Result == EReimportResult::Succeeded);
 
 #if WITH_EDITORONLY_DATA
-    TestEqual(TEXT("Bytes updated"), Source->SourceBytes.Num(), BytesB.Num());
+    TestEqual(TEXT("Bytes updated"), Source->GetSourceBytes().Num(), BytesB.Num());
 #endif
 
     return true;
