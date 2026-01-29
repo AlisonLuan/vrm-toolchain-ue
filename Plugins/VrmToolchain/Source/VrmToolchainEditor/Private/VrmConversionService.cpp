@@ -1,5 +1,5 @@
 #include "VrmConversionService.h"
-#include "VrmNaming.h"
+#include "VrmAssetNaming.h"
 #include "VrmToolchain/VrmSourceAsset.h"
 #include "VrmToolchain/VrmMetadataAsset.h"
 #include "VrmToolchain/VrmMetadata.h"
@@ -63,9 +63,16 @@ bool FVrmConversionService::DeriveGeneratedPaths(UVrmSourceAsset* Source, FStrin
 		FolderPath = TEXT("/Game/Generated");
 	}
 
-	// Derive base name from object name
+	// Derive base name from object name or package name (they should match now)
 	// Strip trailing _VrmSource suffix (standard naming convention)
-	OutBaseName = FVrmNaming::StripVrmSourceSuffix(ObjectName);
+	OutBaseName = FVrmAssetNaming::StripVrmSourceSuffix(ObjectName);
+	
+	// Fallback: try package name if object name stripping yields nothing useful
+	if (OutBaseName.IsEmpty() || OutBaseName == ObjectName)
+	{
+		FString PackageShortName = FPackageName::GetShortName(PackagePath);
+		OutBaseName = FVrmAssetNaming::StripVrmSourceSuffix(PackageShortName);
+	}
 
 	OutFolderPath = FolderPath / (OutBaseName + TEXT("_Generated"));
 	return true;

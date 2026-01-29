@@ -2,7 +2,7 @@
 
 #include "Misc/AutomationTest.h"
 #include "VrmConversionService.h"
-#include "VrmNaming.h"
+#include "VrmAssetNaming.h"
 #include "VrmGltfParser.h"
 #include "VrmToolchain/VrmSourceAsset.h"
 #include "Engine/SkeletalMesh.h"
@@ -17,10 +17,18 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmConversionPathDerivationTest, "VrmToolchain
 bool FVrmConversionPathDerivationTest::RunTest(const FString& Parameters)
 {
 	// Create a transient source asset in a /Game/ path by creating a package
-	// Package path uses base name; asset object name uses _VrmSource suffix
-	UPackage* Pkg = CreatePackage(TEXT("/Game/TestAssets/TestVrm"));
-	UVrmSourceAsset* Source = NewObject<UVrmSourceAsset>(Pkg, *FVrmNaming::MakeVrmSourceAssetName(TEXT("TestVrm")), RF_Public | RF_Standalone);
+	// Package and asset names must BOTH use _VrmSource suffix for Content Browser visibility
+	const FString BaseName = TEXT("TestVrm");
+	const FString PackagePath = FVrmAssetNaming::MakeVrmSourcePackagePath(TEXT("/Game/TestAssets"), BaseName);
+	const FString AssetName = FVrmAssetNaming::MakeVrmSourceAssetName(BaseName);
+	
+	UPackage* Pkg = CreatePackage(*PackagePath);
+	UVrmSourceAsset* Source = NewObject<UVrmSourceAsset>(Pkg, *AssetName, RF_Public | RF_Standalone);
 	TestNotNull(TEXT("Source created"), Source);
+	
+	// Verify package and asset names match (critical for Content Browser)
+	FString ShortPackageName = FPackageName::GetShortName(Pkg->GetName());
+	TestEqual(TEXT("Package name matches asset name"), ShortPackageName, Source->GetName());
 
 	// Create and attach a descriptor metadata asset to the source so conversion attaches it
 	UVrmMetadataAsset* Desc = NewObject<UVrmMetadataAsset>(Pkg, TEXT("Test_Metadata"), RF_Public | RF_Standalone);
@@ -33,15 +41,14 @@ bool FVrmConversionPathDerivationTest::RunTest(const FString& Parameters)
 
 	Source->Descriptor = Desc;
 
-	FString FolderPath, BaseName, Error;
-	bool bOk = false;
+	FString Error;
 	// Derive using the public Convert function indirectly
 	USkeletalMesh* Mesh = nullptr;
 	USkeleton* Skeleton = nullptr;
 	FVrmConvertOptions Options;
 	Options.bOverwriteExisting = true;
 
-	bOk = FVrmConversionService::ConvertSourceToPlaceholderSkeletalMesh(Source, Options, Mesh, Skeleton, Error);
+	bool bOk = FVrmConversionService::ConvertSourceToPlaceholderSkeletalMesh(Source, Options, Mesh, Skeleton, Error);
 
 	TestTrue(TEXT("Conversion should succeed for transient source"), bOk);
 	TestNotNull(TEXT("Mesh created"), Mesh);
@@ -53,12 +60,16 @@ bool FVrmConversionPathDerivationTest::RunTest(const FString& Parameters)
 	UVrmMetadataAsset* Attached = Mesh->GetAssetUserData<UVrmMetadataAsset>();
 	TestNotNull(TEXT("Metadata user data attached"), Attached);
 
-	// Names and packages - source uses _VrmSource suffix convention
+	// Names and packages - source uses _VrmSource suffix, base name stripped for generated assets
 	TestEqual(TEXT("Mesh name should match pattern"), Mesh->GetName(), FString(TEXT("TestVrm_SK")));
 	TestEqual(TEXT("Skeleton name should match pattern"), Skeleton->GetName(), FString(TEXT("TestVrm_Skeleton")));
 
 	FString MeshPkg = Mesh->GetOutermost()->GetName();
 	TestTrue(TEXT("Mesh package should be in Generated folder"), MeshPkg.Contains(TEXT("/Game/TestAssets/TestVrm_Generated")));
+	
+	// Verify base name stripping works correctly
+	FString StrippedBase = FVrmAssetNaming::StripVrmSourceSuffix(Source->GetName());
+	TestEqual(TEXT("Stripped base name"), StrippedBase, FString(TEXT("TestVrm")));
 
 	// Re-run without overwrite should return error
 	USkeletalMesh* Mesh2 = nullptr;
@@ -101,9 +112,13 @@ bool FVrmConversionPathDerivationTest::RunTest(const FString& Parameters)
 		}
 
 		// Create transient source & generated placeholders
-		// Package path uses base name; asset object name uses _VrmSource suffix
-		UPackage* Pkg2 = CreatePackage(TEXT("/Game/TestAssets/TestVrmApply"));
-		UVrmSourceAsset* Source2 = NewObject<UVrmSourceAsset>(Pkg2, *FVrmNaming::MakeVrmSourceAssetName(TEXT("TestVrmApply")), RF_Public | RF_Standalone);
+		// Package and asset names must BOTH use _VrmSource suffix for Content Browser visibility
+		const FString BaseName2 = TEXT("TestVrmApply");
+		const FString PackagePath2 = FVrmAssetNaming::MakeVrmSourcePackagePath(TEXT("/Game/TestAssets"), BaseName2);
+		const FString AssetName2 = FVrmAssetNaming::MakeVrmSourceAssetName(BaseName2);
+		
+		UPackage* Pkg2 = CreatePackage(*PackagePath2);
+		UVrmSourceAsset* Source2 = NewObject<UVrmSourceAsset>(Pkg2, *AssetName2, RF_Public | RF_Standalone);
 		UVrmMetadataAsset* Desc2 = NewObject<UVrmMetadataAsset>(Pkg2, TEXT("Test_Metadata_Apply"), RF_Public | RF_Standalone);
 		Source2->Descriptor = Desc2;
 

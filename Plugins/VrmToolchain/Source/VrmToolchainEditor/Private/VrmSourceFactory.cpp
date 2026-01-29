@@ -1,7 +1,7 @@
 #include "VrmSourceFactory.h"
 
 #include "VrmToolchain/VrmSourceAsset.h"
-#include "VrmNaming.h"
+#include "VrmAssetNaming.h"
 
 // Runtime-side types we create/populate:
 #include "VrmToolchain/VrmMetadata.h"
@@ -241,14 +241,49 @@ UObject* UVrmSourceFactory::FactoryCreateFile(
         return nullptr;
     }
 
-    const EObjectFlags AssetFlags = Flags | RF_Public | RF_Standalone;
+    const EObjectFlags AssetFlags = Flags | RF_Public | RF_Standalone | RF_Transactional;
 
-    // Create Source asset with same name as package (required for Content Browser visibility)
+    // Extract base name from the incoming asset name (strip path if present)
+    FString BaseName = InName.ToString();
+    
+    // Derive folder path from InParent (the package)
+    FString ParentPath = InParent->GetName();
+    FString FolderPath = ParentPath.Contains(TEXT("/")) 
+        ? ParentPath.Left(ParentPath.Find(TEXT("/"), ESearchCase::IgnoreCase, ESearchDir::FromEnd))
+        : TEXT("/Game/VRM_");
+    
+    // Generate package path and asset name with "_VrmSource" suffix (both must match)
+    FString FullPackagePath = FVrmAssetNaming::MakeVrmSourcePackagePath(FolderPath, BaseName);
+    FString AssetName = FVrmAssetNaming::MakeVrmSourceAssetName(BaseName);
+    
+    // Create the package with the suffixed name
+    UPackage* Package = CreatePackage(*FullPackagePath);
+    if (!Package)
+    {
+        Warn->Logf(ELogVerbosity::Error, TEXT("VRM import: failed to create package: %s"), *FullPackagePath);
+        return nullptr;
+    }
+    
+    Package->FullyLoad();
+    
+    // Create Source asset with matching name (package name == asset name for CB visibility)
     UVrmSourceAsset* Source = NewObject<UVrmSourceAsset>(
-        InParent, UVrmSourceAsset::StaticClass(), InName, AssetFlags);
+        Package, UVrmSourceAsset::StaticClass(), *AssetName, AssetFlags);
 
 #if WITH_EDITOR
-    UE_LOG(LogVrmToolchainEditor, Display, TEXT("VrmSourceFactory: Created Source Name='%s' Path='%s' Outer='%s'"), *Source->GetName(), *Source->GetPathName(), *Source->GetOuter()->GetName());
+    UE_LOG(LogVrmToolchainEditor, Display, TEXT("VrmSourceFactory: Created VRM Source Asset"));
+    UE_LOG(LogVrmToolchainEditor, Display, TEXT("  Package Path: %s"), *Package->GetName());
+    UE_LOG(LogVrmToolchainEditor, Display, TEXT("  Asset Name:   %s"), *Source->GetName());
+    UE_LOG(LogVrmToolchainEditor, Display, TEXT("  Object Path:  %s"), *Source->GetPathName());
+    UE_LOG(LogVrmToolchainEditor, Display, TEXT("  Outer Name:   %s"), *Source->GetOuter()->GetName());
+    
+    // Verify name matching (critical for Content Browser visibility)
+    FString ShortPackageName = FPackageName::GetShortName(Package->GetName());
+    if (ShortPackageName != Source->GetName())
+    {
+        UE_LOG(LogVrmToolchainEditor, Warning, TEXT("VrmSourceFactory: Name mismatch detected! Package='%s' vs Asset='%s' - Content Browser may not show asset!"), 
+            *ShortPackageName, *Source->GetName());
+    }
 #endif
 
     Source->SourceFilename = Filename;
@@ -320,18 +355,19 @@ UObject* UVrmSourceFactory::FactoryCreateFile(
     Source->MarkPackageDirty();
 
 #if WITH_EDITOR
-    // Mark the outermost package dirty to ensure proper saving and registry updates
+    // Mark package dirty for proper saving
     Source->GetOutermost()->MarkPackageDirty();
 
-    // Notify Asset Registry to ensure proper CB visibility
+    // Notify Asset Registry BEFORE any UI operations (critical ordering)
     FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
     AssetRegistryModule.Get().AssetCreated(Source);
     
-    UE_LOG(LogVrmToolchainEditor, Display, TEXT("VrmSourceFactory: AssetCreated notification sent for '%s' in package '%s'"), 
-        *Source->GetPathName(), *Source->GetOutermost()->GetName());
+    UE_LOG(LogVrmToolchainEditor, Display, TEXT("VrmSourceFactory: AssetCreated notification sent"));
 
-    // Force synchronous scan of the VRM folder as a fallback to ensure registry visibility
-    AssetRegistryModule.Get().ScanPathsSynchronous({ TEXT("/Game/VRM_") }, true);
+    // PostEditChange to finalize property initialization (call AFTER AssetCreated)
+    Source->PostEditChange();
+    
+    UE_LOG(LogVrmToolchainEditor, Display, TEXT("VrmSourceFactory: PostEditChange completed"));
 
     // Sync Content Browser UI to the newly created asset for immediate visibility
     FContentBrowserModule& ContentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
@@ -340,10 +376,7 @@ UObject* UVrmSourceFactory::FactoryCreateFile(
     AssetsToSync.Add(FAssetData(Source));
     ContentBrowser.SyncBrowserToAssets(AssetsToSync);
     
-    UE_LOG(LogVrmToolchainEditor, Display, TEXT("VrmSourceFactory: Content Browser synced to '%s'"), *Source->GetPathName());
-
-    // DISABLED: PostEditChange can cause UI freezes during import
-    // Source->PostEditChange();
+    UE_LOG(LogVrmToolchainEditor, Display, TEXT("VrmSourceFactory: Content Browser synced"));
 
     // Broadcast import completion to subsystems (UI updates, automations, etc.)
     if (GEditor)
@@ -352,6 +385,7 @@ UObject* UVrmSourceFactory::FactoryCreateFile(
         if (ImportSubsystem)
         {
             ImportSubsystem->BroadcastAssetPostImport(this, Source);
+            UE_LOG(LogVrmToolchainEditor, Display, TEXT("VrmSourceFactory: BroadcastAssetPostImport completed"));
         }
     }
 
