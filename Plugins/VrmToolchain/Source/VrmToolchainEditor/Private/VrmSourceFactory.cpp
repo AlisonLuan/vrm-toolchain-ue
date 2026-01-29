@@ -1,6 +1,7 @@
 #include "VrmSourceFactory.h"
 
 #include "VrmToolchain/VrmSourceAsset.h"
+#include "VrmNaming.h"
 
 // Runtime-side types we create/populate:
 #include "VrmToolchain/VrmMetadata.h"
@@ -16,6 +17,9 @@
 #include "UObject/UnrealType.h"
 #include "UObject/SoftObjectPtr.h"
 #include "AssetRegistry/AssetRegistryModule.h"
+#include "AssetRegistry/AssetData.h"
+#include "ContentBrowserModule.h"
+#include "IContentBrowserSingleton.h"
 #include "EditorSubsystem.h"
 #include "Subsystems/ImportSubsystem.h"
 
@@ -240,7 +244,6 @@ UObject* UVrmSourceFactory::FactoryCreateFile(
     const EObjectFlags AssetFlags = Flags | RF_Public | RF_Standalone;
 
     // Create Source asset with same name as package (required for Content Browser visibility)
-    // Previously used BaseName + "_VrmSource" but that causes package/asset name mismatch
     UVrmSourceAsset* Source = NewObject<UVrmSourceAsset>(
         InParent, UVrmSourceAsset::StaticClass(), InName, AssetFlags);
 
@@ -317,9 +320,30 @@ UObject* UVrmSourceFactory::FactoryCreateFile(
     Source->MarkPackageDirty();
 
 #if WITH_EDITOR
-    // Ensure immediate Content Browser visibility and asset registry updates
-    Source->PostEditChange();
-    FAssetRegistryModule::AssetCreated(Source);
+    // Mark the outermost package dirty to ensure proper saving and registry updates
+    Source->GetOutermost()->MarkPackageDirty();
+
+    // Notify Asset Registry to ensure proper CB visibility
+    FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+    AssetRegistryModule.Get().AssetCreated(Source);
+    
+    UE_LOG(LogVrmToolchainEditor, Display, TEXT("VrmSourceFactory: AssetCreated notification sent for '%s' in package '%s'"), 
+        *Source->GetPathName(), *Source->GetOutermost()->GetName());
+
+    // Force synchronous scan of the VRM folder as a fallback to ensure registry visibility
+    AssetRegistryModule.Get().ScanPathsSynchronous({ TEXT("/Game/VRM_") }, true);
+
+    // Sync Content Browser UI to the newly created asset for immediate visibility
+    FContentBrowserModule& ContentBrowserModule = FModuleManager::LoadModuleChecked<FContentBrowserModule>("ContentBrowser");
+    IContentBrowserSingleton& ContentBrowser = ContentBrowserModule.Get();
+    TArray<FAssetData> AssetsToSync;
+    AssetsToSync.Add(FAssetData(Source));
+    ContentBrowser.SyncBrowserToAssets(AssetsToSync);
+    
+    UE_LOG(LogVrmToolchainEditor, Display, TEXT("VrmSourceFactory: Content Browser synced to '%s'"), *Source->GetPathName());
+
+    // DISABLED: PostEditChange can cause UI freezes during import
+    // Source->PostEditChange();
 
     // Broadcast import completion to subsystems (UI updates, automations, etc.)
     if (GEditor)

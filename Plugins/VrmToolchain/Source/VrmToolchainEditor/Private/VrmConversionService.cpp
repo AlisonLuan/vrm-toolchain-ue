@@ -1,4 +1,5 @@
 #include "VrmConversionService.h"
+#include "VrmNaming.h"
 #include "VrmToolchain/VrmSourceAsset.h"
 #include "VrmToolchain/VrmMetadataAsset.h"
 #include "VrmToolchain/VrmMetadata.h"
@@ -63,14 +64,8 @@ bool FVrmConversionService::DeriveGeneratedPaths(UVrmSourceAsset* Source, FStrin
 	}
 
 	// Derive base name from object name
-	// For backward compatibility, strip trailing _VrmSource if present (legacy naming)
-	// New assets use package name directly (no suffix)
-	OutBaseName = ObjectName;
-	const FString LegacySuffix = TEXT("_VrmSource");
-	if (OutBaseName.EndsWith(LegacySuffix))
-	{
-		OutBaseName = OutBaseName.LeftChop(LegacySuffix.Len());
-	}
+	// Strip trailing _VrmSource suffix (standard naming convention)
+	OutBaseName = FVrmNaming::StripVrmSourceSuffix(ObjectName);
 
 	OutFolderPath = FolderPath / (OutBaseName + TEXT("_Generated"));
 	return true;

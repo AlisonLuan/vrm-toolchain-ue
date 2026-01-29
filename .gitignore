@@ -137,3 +137,5 @@ tmp_run_*.log
 
 !/RELEASES/
 !/RELEASES/*.sha256
+/HostProject/Content
+/HostProject/Content

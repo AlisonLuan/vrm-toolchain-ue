@@ -2,6 +2,7 @@
 
 #include "Misc/AutomationTest.h"
 #include "VrmConversionService.h"
+#include "VrmNaming.h"
 #include "VrmGltfParser.h"
 #include "VrmToolchain/VrmSourceAsset.h"
 #include "Engine/SkeletalMesh.h"
@@ -16,9 +17,9 @@ IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmConversionPathDerivationTest, "VrmToolchain
 bool FVrmConversionPathDerivationTest::RunTest(const FString& Parameters)
 {
 	// Create a transient source asset in a /Game/ path by creating a package
-	// Package and asset names must match for Content Browser visibility
+	// Package path uses base name; asset object name uses _VrmSource suffix
 	UPackage* Pkg = CreatePackage(TEXT("/Game/TestAssets/TestVrm"));
-	UVrmSourceAsset* Source = NewObject<UVrmSourceAsset>(Pkg, TEXT("TestVrm"), RF_Public | RF_Standalone);
+	UVrmSourceAsset* Source = NewObject<UVrmSourceAsset>(Pkg, *FVrmNaming::MakeVrmSourceAssetName(TEXT("TestVrm")), RF_Public | RF_Standalone);
 	TestNotNull(TEXT("Source created"), Source);
 
 	// Create and attach a descriptor metadata asset to the source so conversion attaches it
@@ -52,7 +53,7 @@ bool FVrmConversionPathDerivationTest::RunTest(const FString& Parameters)
 	UVrmMetadataAsset* Attached = Mesh->GetAssetUserData<UVrmMetadataAsset>();
 	TestNotNull(TEXT("Metadata user data attached"), Attached);
 
-	// Names and packages - now uses asset name directly (no _VrmSource suffix)
+	// Names and packages - source uses _VrmSource suffix convention
 	TestEqual(TEXT("Mesh name should match pattern"), Mesh->GetName(), FString(TEXT("TestVrm_SK")));
 	TestEqual(TEXT("Skeleton name should match pattern"), Skeleton->GetName(), FString(TEXT("TestVrm_Skeleton")));
 
@@ -100,9 +101,9 @@ bool FVrmConversionPathDerivationTest::RunTest(const FString& Parameters)
 		}
 
 		// Create transient source & generated placeholders
-		// Package and asset names must match for Content Browser visibility
+		// Package path uses base name; asset object name uses _VrmSource suffix
 		UPackage* Pkg2 = CreatePackage(TEXT("/Game/TestAssets/TestVrmApply"));
-		UVrmSourceAsset* Source2 = NewObject<UVrmSourceAsset>(Pkg2, TEXT("TestVrmApply"), RF_Public | RF_Standalone);
+		UVrmSourceAsset* Source2 = NewObject<UVrmSourceAsset>(Pkg2, *FVrmNaming::MakeVrmSourceAssetName(TEXT("TestVrmApply")), RF_Public | RF_Standalone);
 		UVrmMetadataAsset* Desc2 = NewObject<UVrmMetadataAsset>(Pkg2, TEXT("Test_Metadata_Apply"), RF_Public | RF_Standalone);
 		Source2->Descriptor = Desc2;
 
