@@ -3,11 +3,11 @@
 #include "CoreMinimal.h"
 #include "AssetTypeActions_Base.h"
 #include "VrmToolchain/VrmSourceAsset.h"
-#include "VrmSourceAssetEditorToolkit.h"
+#include "VrmToolchainEditorSubsystem.h"
 
 /**
  * Classic AssetTypeActions for UVrmSourceAsset
- * Provides Content Browser visibility and opens custom filtered asset editor
+ * Provides Content Browser visibility and opens custom filtered asset editor via subsystem
  */
 class FAssetTypeActions_VrmSourceAsset : public FAssetTypeActions_Base
 {
@@ -20,10 +20,13 @@ public:
 
 	virtual void OpenAssetEditor(const TArray<UObject*>& InObjects, TSharedPtr<IToolkitHost> EditWithinLevelEditor) override
 	{
-		EToolkitMode::Type Mode = EditWithinLevelEditor.IsValid() ? EToolkitMode::WorldCentric : EToolkitMode::Standalone;
-		
-		// Use custom toolkit with filtered Details panel (hides SourceBytes to prevent UI freeze)
-		TSharedRef<FVrmSourceAssetEditorToolkit> EditorToolkit = MakeShared<FVrmSourceAssetEditorToolkit>();
-		EditorToolkit->InitEditor(Mode, EditWithinLevelEditor, InObjects);
+		// Use the editor subsystem to manage toolkit lifetime (prevents premature destruction)
+		if (GEditor)
+		{
+			if (UVrmToolchainEditorSubsystem* Subsystem = GEditor->GetEditorSubsystem<UVrmToolchainEditorSubsystem>())
+			{
+				Subsystem->OpenVrmSourceAssetEditor(InObjects, EditWithinLevelEditor);
+			}
+		}
 	}
 };
