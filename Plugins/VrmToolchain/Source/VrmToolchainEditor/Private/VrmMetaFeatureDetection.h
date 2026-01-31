@@ -3,6 +3,9 @@
 #include "CoreMinimal.h"
 #include "VrmToolchain/VrmMetadata.h"
 
+// Forward declaration (global scope to avoid namespace confusion)
+class UVrmMetaAsset;
+
 namespace VrmMetaDetection
 {
     /**
@@ -54,4 +57,18 @@ namespace VrmMetaDetection
      * @return A compact diagnostic string suitable for logging
      */
     FString FormatMetaFeaturesForDiagnostics(const FVrmMetaFeatures& Features);
-}
+
+    /**
+     * Apply detected VRM features to a meta asset.
+     * 
+     * Assigns the 5 feature fields from the detected features struct to the meta asset.
+     * This is the single source of truth for how detection results map to meta asset fields.
+     * 
+     * If Meta is nullptr, does nothing (safe no-op).
+     * 
+     * @param Meta The UVrmMetaAsset to assign fields to
+     * @param Features The FVrmMetaFeatures struct to assign from
+     */
+    void ApplyFeaturesToMetaAsset(UVrmMetaAsset* Meta, const FVrmMetaFeatures& Features);
+
+} // namespace VrmMetaDetection

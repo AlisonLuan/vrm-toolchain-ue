@@ -381,11 +381,8 @@ UObject* UVrmSourceFactory::FactoryCreateFile(
             UVrmMetaAsset* Meta = NewObject<UVrmMetaAsset>(MetaPackage, *MetaAssetName, AssetFlags);
             if (Meta)
             {
-                Meta->SpecVersion = MetaVer;
-                Meta->bHasHumanoid = bHasHumanoid;
-                Meta->bHasSpringBones = bHasSpring;
-                Meta->bHasBlendShapesOrExpressions = bHasBlendOrExpr;
-                Meta->bHasThumbnail = bHasThumb;
+                // Apply detected features to meta asset (single source of truth)
+                VrmMetaDetection::ApplyFeaturesToMetaAsset(Meta, Features);
                 Meta->SourceFilename = Filename;
 
                 // Naming invariant check

@@ -26,18 +26,6 @@ static UVrmMetaAsset* MakeMetaAsset(UPackage* Outer)
 	return NewObject<UVrmMetaAsset>(Outer ? Outer : GetTransientPackage(), TEXT("MetaAsset"), RF_Transient);
 }
 
-/**
- * Helper: Apply detected features to meta asset (mirrors factory assignment pattern)
- */
-static void ApplyFeatures(UVrmMetaAsset* Meta, const FVrmMetaFeatures& Features)
-{
-	Meta->SpecVersion = Features.SpecVersion;
-	Meta->bHasHumanoid = Features.bHasHumanoid;
-	Meta->bHasSpringBones = Features.bHasSpringBones;
-	Meta->bHasBlendShapesOrExpressions = Features.bHasBlendShapesOrExpressions;
-	Meta->bHasThumbnail = Features.bHasThumbnail;
-}
-
 IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmMetaAssetInvariants_Vrm0AllFeatures, "VrmToolchain.MetaAssetInvariants.Vrm0AllFeatures", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
 
 bool FVrmMetaAssetInvariants_Vrm0AllFeatures::RunTest(const FString& Parameters)
@@ -65,8 +53,8 @@ bool FVrmMetaAssetInvariants_Vrm0AllFeatures::RunTest(const FString& Parameters)
 	UVrmMetaAsset* MetaAsset = MakeMetaAsset(TestPackage);
 	TestNotNull(TEXT("Meta asset created"), MetaAsset);
 
-	// Apply feature detection results (mirrors factory assignment pattern)
-	ApplyFeatures(MetaAsset, Features);
+	// Apply feature detection results using shared helper
+	ApplyFeaturesToMetaAsset(MetaAsset, Features);
 
 	// Verify invariants: Meta asset fields match detected features
 	TestEqual(TEXT("SpecVersion invariant"), MetaAsset->SpecVersion, Features.SpecVersion);
@@ -99,7 +87,7 @@ bool FVrmMetaAssetInvariants_Vrm0Minimal::RunTest(const FString& Parameters)
 	UVrmMetaAsset* MetaAsset = MakeMetaAsset(TestPackage);
 	TestNotNull(TEXT("Meta asset created"), MetaAsset);
 
-	ApplyFeatures(MetaAsset, Features);
+	ApplyFeaturesToMetaAsset(MetaAsset, Features);
 
 	TestEqual(TEXT("SpecVersion invariant"), MetaAsset->SpecVersion, Features.SpecVersion);
 	TestFalse(TEXT("Humanoid invariant"), MetaAsset->bHasHumanoid);
@@ -136,7 +124,7 @@ bool FVrmMetaAssetInvariants_Vrm1AllFeatures::RunTest(const FString& Parameters)
 	UVrmMetaAsset* MetaAsset = MakeMetaAsset(TestPackage);
 	TestNotNull(TEXT("Meta asset created"), MetaAsset);
 
-	ApplyFeatures(MetaAsset, Features);
+	ApplyFeaturesToMetaAsset(MetaAsset, Features);
 
 	TestEqual(TEXT("SpecVersion invariant"), MetaAsset->SpecVersion, Features.SpecVersion);
 	TestEqual(TEXT("Humanoid invariant"), MetaAsset->bHasHumanoid, Features.bHasHumanoid);
@@ -169,7 +157,7 @@ bool FVrmMetaAssetInvariants_Vrm1Minimal::RunTest(const FString& Parameters)
 	UVrmMetaAsset* MetaAsset = MakeMetaAsset(TestPackage);
 	TestNotNull(TEXT("Meta asset created"), MetaAsset);
 
-	ApplyFeatures(MetaAsset, Features);
+	ApplyFeaturesToMetaAsset(MetaAsset, Features);
 
 	TestEqual(TEXT("SpecVersion invariant"), MetaAsset->SpecVersion, Features.SpecVersion);
 	TestFalse(TEXT("Humanoid invariant"), MetaAsset->bHasHumanoid);
@@ -204,7 +192,7 @@ bool FVrmMetaAssetInvariants_Vrm1PartialFeatures::RunTest(const FString& Paramet
 	UVrmMetaAsset* MetaAsset = MakeMetaAsset(TestPackage);
 	TestNotNull(TEXT("Meta asset created"), MetaAsset);
 
-	ApplyFeatures(MetaAsset, Features);
+	ApplyFeaturesToMetaAsset(MetaAsset, Features);
 
 	TestEqual(TEXT("SpecVersion invariant"), MetaAsset->SpecVersion, Features.SpecVersion);
 	TestEqual(TEXT("Humanoid invariant"), MetaAsset->bHasHumanoid, Features.bHasHumanoid);

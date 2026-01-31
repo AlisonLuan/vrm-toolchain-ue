@@ -1,6 +1,7 @@
 #include "VrmMetaFeatureDetection.h"
 #include "Serialization/JsonSerializer.h"
 #include "Dom/JsonObject.h"
+#include "VrmToolchain/VrmMetaAsset.h"
 
 namespace VrmMetaDetection
 {
@@ -107,4 +108,19 @@ namespace VrmMetaDetection
             Features.bHasThumbnail ? 1 : 0
         );
     }
-}
+
+    void ApplyFeaturesToMetaAsset(UVrmMetaAsset* Meta, const FVrmMetaFeatures& Features)
+    {
+        if (!Meta)
+        {
+            return;
+        }
+
+        Meta->SpecVersion = Features.SpecVersion;
+        Meta->bHasHumanoid = Features.bHasHumanoid;
+        Meta->bHasSpringBones = Features.bHasSpringBones;
+        Meta->bHasBlendShapesOrExpressions = Features.bHasBlendShapesOrExpressions;
+        Meta->bHasThumbnail = Features.bHasThumbnail;
+    }
+
+} // namespace VrmMetaDetection
