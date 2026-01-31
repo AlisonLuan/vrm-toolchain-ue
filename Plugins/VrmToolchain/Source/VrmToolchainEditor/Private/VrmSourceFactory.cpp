@@ -2,6 +2,7 @@
 
 #include "VrmToolchain/VrmSourceAsset.h"
 #include "VrmAssetNaming.h"
+#include "VrmMetaFeatureDetection.h"
 
 // Runtime-side types we create/populate:
 #include "VrmToolchain/VrmMetadata.h"
@@ -22,9 +23,6 @@
 #include "IContentBrowserSingleton.h"
 #include "EditorSubsystem.h"
 #include "Subsystems/ImportSubsystem.h"
-#include "Dom/JsonObject.h"
-#include "Serialization/JsonReader.h"
-#include "Serialization/JsonSerializer.h"
 #include "VrmToolchain/VrmMetaAsset.h"
 
 // Diagnostic scanner: recursively inspect object and container properties inside a package
@@ -346,99 +344,52 @@ UObject* UVrmSourceFactory::FactoryCreateFile(
     const TArray<uint8>& SourceBytesRef = Source->GetSourceBytes();
     if (SourceBytesRef.Num() > 0 && FVrmParser::ReadGlbJsonChunkFromMemory(SourceBytesRef.GetData(), SourceBytesRef.Num(), JsonStr))
     {
-        TSharedPtr<FJsonObject> RootObj;
-        TSharedRef<TJsonReader<>> Reader = TJsonReaderFactory<>::Create(JsonStr);
-        if (FJsonSerializer::Deserialize(Reader, RootObj) && RootObj.IsValid())
+        // Parse VRM metadata features from JSON
+        VrmMetaDetection::FVrmMetaFeatures Features = VrmMetaDetection::ParseMetaFeaturesFromJson(JsonStr);
+        EVrmVersion MetaVer = Features.SpecVersion;
+        bool bHasHumanoid = Features.bHasHumanoid;
+        bool bHasSpring = Features.bHasSpringBones;
+        bool bHasBlendOrExpr = Features.bHasBlendShapesOrExpressions;
+        bool bHasThumb = Features.bHasThumbnail;
+
+        // Create the meta asset in its own package
+        const FString BaseForMeta = FVrmAssetNaming::StripKnownSuffixes(AssetName);
+        const FString MetaAssetName = FVrmAssetNaming::MakeVrmMetaAssetName(BaseForMeta);
+        const FString MetaPackagePath = FVrmAssetNaming::MakeVrmMetaPackagePath(FolderPath, BaseForMeta);
+
+        UPackage* MetaPackage = CreatePackage(*MetaPackagePath);
+        if (MetaPackage)
         {
-            // Basic detection
-            TSharedPtr<FJsonObject> ExtObj = RootObj->GetObjectField(TEXT("extensions"));
-
-            EVrmVersion MetaVer = EVrmVersion::Unknown;
-            if (ExtObj.IsValid())
+            MetaPackage->FullyLoad();
+            UVrmMetaAsset* Meta = NewObject<UVrmMetaAsset>(MetaPackage, *MetaAssetName, AssetFlags);
+            if (Meta)
             {
-                if (ExtObj->HasField(TEXT("VRM")))
-                {
-                    MetaVer = EVrmVersion::VRM0;
-                }
-                else if (ExtObj->HasField(TEXT("VRMC_vrm")))
-                {
-                    MetaVer = EVrmVersion::VRM1;
-                }
-            }
+                Meta->SpecVersion = MetaVer;
+                Meta->bHasHumanoid = bHasHumanoid;
+                Meta->bHasSpringBones = bHasSpring;
+                Meta->bHasBlendShapesOrExpressions = bHasBlendOrExpr;
+                Meta->bHasThumbnail = bHasThumb;
+                Meta->SourceFilename = Filename;
 
-            bool bHasHumanoid = false;
-            bool bHasSpring = false;
-            bool bHasBlendOrExpr = false;
-            bool bHasThumb = false;
-
-            // VRM0 checks
-            if (MetaVer == EVrmVersion::VRM0 && ExtObj.IsValid())
-            {
-                TSharedPtr<FJsonObject> Vrm = ExtObj->GetObjectField(TEXT("VRM"));
-                if (Vrm.IsValid())
-                {
-                    bHasHumanoid = Vrm->HasField(TEXT("humanoid"));
-                }
-                bHasSpring = RootObj->HasField(TEXT("secondaryAnimation"));
-                bHasBlendOrExpr = RootObj->HasField(TEXT("blendShapeMaster"));
-                bHasThumb = RootObj->HasField(TEXT("thumbnail"));
-            }
-            // VRM1 checks (best-effort)
-            else if (MetaVer == EVrmVersion::VRM1 && ExtObj.IsValid())
-            {
-                TSharedPtr<FJsonObject> Vrm1 = ExtObj->GetObjectField(TEXT("VRMC_vrm"));
-                if (Vrm1.IsValid())
-                {
-                    bHasHumanoid = Vrm1->HasField(TEXT("humanoid"));
-                    bHasBlendOrExpr = Vrm1->HasField(TEXT("expressions")) || Vrm1->HasField(TEXT("blendShapeMaster"));
-                    bHasThumb = Vrm1->HasField(TEXT("thumbnail"));
-                }
-                bHasSpring = ExtObj->HasField(TEXT("VRMC_springBone")) || (Vrm1.IsValid() && Vrm1->HasField(TEXT("springBone")));
-            }
-
-            // Create the meta asset in its own package
-            const FString BaseForMeta = FVrmAssetNaming::StripKnownSuffixes(AssetName);
-            const FString MetaAssetName = FVrmAssetNaming::MakeVrmMetaAssetName(BaseForMeta);
-            const FString MetaPackagePath = FVrmAssetNaming::MakeVrmMetaPackagePath(FolderPath, BaseForMeta);
-
-            UPackage* MetaPackage = CreatePackage(*MetaPackagePath);
-            if (MetaPackage)
-            {
-                MetaPackage->FullyLoad();
-                UVrmMetaAsset* Meta = NewObject<UVrmMetaAsset>(MetaPackage, *MetaAssetName, AssetFlags);
-                if (Meta)
-                {
-                    Meta->SpecVersion = MetaVer;
-                    Meta->bHasHumanoid = bHasHumanoid;
-                    Meta->bHasSpringBones = bHasSpring;
-                    Meta->bHasBlendShapesOrExpressions = bHasBlendOrExpr;
-                    Meta->bHasThumbnail = bHasThumb;
-                    Meta->SourceFilename = Filename;
-
-                    // Naming invariant check
-                    FString ShortPkg = FPackageName::GetShortName(MetaPackage->GetName());
-                    ensureMsgf(ShortPkg == Meta->GetName(), TEXT("VrmSourceFactory: Meta naming invariant violated! Package='%s' Short='%s' Asset='%s'"), *MetaPackage->GetName(), *ShortPkg, *Meta->GetName());
+                // Naming invariant check
+                FString ShortPkg = FPackageName::GetShortName(MetaPackage->GetName());
+                ensureMsgf(ShortPkg == Meta->GetName(), TEXT("VrmSourceFactory: Meta naming invariant violated! Package='%s' Short='%s' Asset='%s'"), *MetaPackage->GetName(), *ShortPkg, *Meta->GetName());
 
 #if WITH_EDITOR
-                    UE_LOG(LogVrmToolchainEditor, Display, TEXT("VrmSourceFactory: Created VRM Meta Asset"));
-                    UE_LOG(LogVrmToolchainEditor, Display, TEXT("  Package Path: %s"), *MetaPackage->GetName());
-                    UE_LOG(LogVrmToolchainEditor, Display, TEXT("  Asset Name:   %s"), *Meta->GetName());
-                    UE_LOG(LogVrmToolchainEditor, Display, TEXT("  Object Path:  %s"), *Meta->GetPathName());
-                    UE_LOG(LogVrmToolchainEditor, Display, TEXT("  Outer Name:   %s"), *Meta->GetOuter()->GetName());
-                    UE_LOG(LogVrmToolchainEditor, Verbose, TEXT("VrmSourceFactory: Meta detection - SpecVersion=%d, bHasHumanoid=%s, bHasSpringBones=%s, bHasBlendShapesOrExpressions=%s, bHasThumbnail=%s"),
-                        static_cast<int32>(MetaVer), bHasHumanoid ? TEXT("true") : TEXT("false"), bHasSpring ? TEXT("true") : TEXT("false"), bHasBlendOrExpr ? TEXT("true") : TEXT("false"), bHasThumb ? TEXT("true") : TEXT("false"));
-                    
-                    FAssetRegistryModule& ARM2 = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
-                    ARM2.Get().AssetCreated(Meta);
-                    MetaPackage->MarkPackageDirty();
-                    Meta->PostEditChange();
+                UE_LOG(LogVrmToolchainEditor, Display, TEXT("VrmSourceFactory: Created VRM Meta Asset"));
+                UE_LOG(LogVrmToolchainEditor, Display, TEXT("  Package Path: %s"), *MetaPackage->GetName());
+                UE_LOG(LogVrmToolchainEditor, Display, TEXT("  Asset Name:   %s"), *Meta->GetName());
+                UE_LOG(LogVrmToolchainEditor, Display, TEXT("  Object Path:  %s"), *Meta->GetPathName());
+                UE_LOG(LogVrmToolchainEditor, Display, TEXT("  Outer Name:   %s"), *Meta->GetOuter()->GetName());
+                UE_LOG(LogVrmToolchainEditor, Verbose, TEXT("VrmSourceFactory: Meta detection - SpecVersion=%d, bHasHumanoid=%s, bHasSpringBones=%s, bHasBlendShapesOrExpressions=%s, bHasThumbnail=%s"),
+                    static_cast<int32>(MetaVer), bHasHumanoid ? TEXT("true") : TEXT("false"), bHasSpring ? TEXT("true") : TEXT("false"), bHasBlendOrExpr ? TEXT("true") : TEXT("false"), bHasThumb ? TEXT("true") : TEXT("false"));
+                
+                FAssetRegistryModule& ARM2 = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
+                ARM2.Get().AssetCreated(Meta);
+                MetaPackage->MarkPackageDirty();
+                Meta->PostEditChange();
 #endif
-                }
             }
-        }
-        else
-        {
-            UE_LOG(LogVrmToolchainEditor, Verbose, TEXT("VrmSourceFactory: Failed to parse GLB JSON chunk for metadata detection"));
         }
     }
     else
