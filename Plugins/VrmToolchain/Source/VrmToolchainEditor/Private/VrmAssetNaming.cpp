@@ -37,6 +37,38 @@ bool FVrmAssetNaming::IsVrmSourceAssetName(const FString& Name)
 	return Name.EndsWith(VrmSourceSuffix);
 }
 
+FString FVrmAssetNaming::MakeVrmMetaAssetName(const FString& BaseName)
+{
+	FString Sanitized = SanitizeBaseName(BaseName);
+	return FString::Printf(TEXT("%s%s"), *Sanitized, VrmMetaSuffix);
+}
+
+FString FVrmAssetNaming::MakeVrmMetaPackagePath(const FString& FolderPath, const FString& BaseName)
+{
+	FString AssetName = MakeVrmMetaAssetName(BaseName);
+
+	FString Folder = FolderPath;
+	if (Folder.EndsWith(TEXT("/")))
+	{
+		Folder = Folder.LeftChop(1);
+	}
+
+	return FString::Printf(TEXT("%s/%s"), *Folder, *AssetName);
+}
+
+FString FVrmAssetNaming::StripKnownSuffixes(const FString& Name)
+{
+	FString Result = Name;
+	if (Result.EndsWith(VrmSourceSuffix))
+	{
+		Result = Result.LeftChop(FCString::Strlen(VrmSourceSuffix));
+	}
+	if (Result.EndsWith(VrmMetaSuffix))
+	{
+		Result = Result.LeftChop(FCString::Strlen(VrmMetaSuffix));
+	}
+	return Result;
+}
 FString FVrmAssetNaming::SanitizeBaseName(const FString& BaseName)
 {
 	FString Result = BaseName;

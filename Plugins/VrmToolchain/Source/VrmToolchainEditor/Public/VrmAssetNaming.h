@@ -1,6 +1,8 @@
 // Copyright (c) 2024-2026 VRM Consortium; Copyright (c) 2025 Aliso Softworks LLC. All Rights Reserved.
 #pragma once
 
+// Naming contract: see Plugins/VrmToolchain/Docs/Naming.md
+
 #include "CoreMinimal.h"
 
 /**
@@ -18,6 +20,28 @@ struct VRMTOOLCHAINEDITOR_API FVrmAssetNaming
 {
 	/** Standard suffix for VRM source assets (applied to both package and asset names) */
 	static constexpr const TCHAR* VrmSourceSuffix = TEXT("_VrmSource");
+	/** Suffix for VRM meta assets */
+	static constexpr const TCHAR* VrmMetaSuffix = TEXT("_VrmMeta");
+
+	/**
+	 * Generates the standard VRM meta asset/package name by appending the suffix.
+	 * @param BaseName - The base name (e.g., "teucu")
+	 * @return The name with "_VrmMeta" suffix (e.g., "teucu_VrmMeta")
+	 */
+	static FString MakeVrmMetaAssetName(const FString& BaseName);
+
+	/**
+	 * Generates the full package path for a VRM meta asset.
+	 * @param FolderPath - The folder path (e.g., "/Game/VRM_")
+	 * @param BaseName - The base name (e.g., "teucu")
+	 * @return Full package path (e.g., "/Game/VRM_/teucu_VrmMeta")
+	 */
+	static FString MakeVrmMetaPackagePath(const FString& FolderPath, const FString& BaseName);
+
+	/**
+	 * Strip known suffixes (_VrmSource, _VrmMeta) returning base name
+	 */
+	static FString StripKnownSuffixes(const FString& Name);
 
 	/**
 	 * Generates the standard VRM source asset/package name by appending the suffix.

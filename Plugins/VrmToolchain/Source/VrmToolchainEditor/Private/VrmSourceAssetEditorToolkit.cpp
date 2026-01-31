@@ -87,7 +87,7 @@ void FVrmSourceAssetEditorToolkit::InitEditor(
 				)
 			);
 
-	UE_LOG(LogVrmToolchainEditor, Display, TEXT("[VrmSourceAssetEditor] InitEditor: DetailsTabId=%s, LayoutName=%s (expected 'Standalone_VrmSourceAssetEditor_v1')"), *DetailsTabId.ToString(), *LayoutNameStr);
+	UE_LOG(LogVrmToolchainEditor, Display, TEXT("[VrmSourceAssetEditor] InitEditor: DetailsTabId=%s, LayoutName=%s"), *DetailsTabId.ToString(), *LayoutNameStr);
 
 	// Initialize the asset editor - RegisterTabSpawners will be called automatically
 	FAssetEditorToolkit::InitAssetEditor(
