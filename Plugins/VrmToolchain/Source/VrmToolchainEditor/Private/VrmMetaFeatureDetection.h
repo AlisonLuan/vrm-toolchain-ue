@@ -8,11 +8,11 @@ class UVrmMetaAsset;
 
 namespace VrmMetaDetection
 {
-    /**
-     * Result struct from parsing VRM metadata features from a JSON chunk.
-     * Represents detected SpecVersion and feature flags extracted from a GLB JSON chunk.
-     */
-    struct FVrmMetaFeatures
+	/**
+	 * Result struct from parsing VRM metadata features from a JSON chunk.
+	 * Represents detected SpecVersion and feature flags extracted from a GLB JSON chunk.
+	 */
+	struct FVrmMetaFeatures
     {
         /** Detected VRM version (VRM0, VRM1, or Unknown) */
         EVrmVersion SpecVersion = EVrmVersion::Unknown;
@@ -70,5 +70,49 @@ namespace VrmMetaDetection
      * @param Features The FVrmMetaFeatures struct to assign from
      */
     void ApplyFeaturesToMetaAsset(UVrmMetaAsset* Meta, const FVrmMetaFeatures& Features);
+
+    /**
+     * Deterministic import summary formatter.
+     * 
+     * Produces a stable summary string suitable for MessageLog display,
+     * encoding the VRM version and feature flags in human-readable format.
+     * 
+     * Output format: "Imported VRM (spec=vrm0) humanoid=1 spring=1 blendOrExpr=1 thumb=0"
+     * 
+     * @param Features The detected features to summarize
+     * @return A formatted summary string (deterministic, no timestamps)
+     */
+    FString FormatImportSummary(const FVrmMetaFeatures& Features);
+
+	/**
+	 * Report struct containing import summary and warnings.
+	 * Suitable for storing on UVrmMetaAsset and displaying in MessageLog.
+	 */
+	struct FVrmImportReport
+	{
+		FString Summary;
+		TArray<FString> Warnings;
+	};
+
+	/**
+	 * Build a deterministic import report from detected features.
+	 * 
+	 * Generates both a human-readable summary and a list of warnings
+	 * (e.g., "Missing humanoid definition") for missing features.
+	 * 
+	 * Output is stable and suitable for CI assertions.
+	 * 
+	 * @param Features The detected VRM features
+	 * @return Report struct with Summary and Warnings
+	 */
+	FVrmImportReport BuildImportReport(const FVrmMetaFeatures& Features);
+
+	/**
+	 * Convert EVrmVersion enum to stable string representation.
+	 * 
+	 * @param Version The version to convert
+	 * @return "vrm0", "vrm1", or "unknown"
+	 */
+	FString VrmVersionToStableString(EVrmVersion Version);
 
 } // namespace VrmMetaDetection

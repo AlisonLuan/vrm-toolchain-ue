@@ -27,6 +27,15 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VRM")
 	bool bHasThumbnail = false;
 
+#if WITH_EDITORONLY_DATA
+	// Deterministic post-import report for CI + UX (do not cook into runtime builds)
+	UPROPERTY(VisibleAnywhere, Category="VrmToolchain|Import")
+	FString ImportSummary;
+
+	UPROPERTY(VisibleAnywhere, Category="VrmToolchain|Import")
+	TArray<FString> ImportWarnings;
+#endif
+
 	// Convenience copy of source filename (not bulk data)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "VRM")
 	FString SourceFilename;

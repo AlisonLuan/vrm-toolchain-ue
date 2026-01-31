@@ -170,6 +170,18 @@ bool FVrmImportMetaPropagation_VRM0AllFeatures::RunTest(const FString& Parameter
 	TestTrue(TEXT("VRM0 bHasBlendShapesOrExpressions"), MetaAsset->bHasBlendShapesOrExpressions);
 	TestTrue(TEXT("VRM0 bHasThumbnail"), MetaAsset->bHasThumbnail);
 
+#if WITH_EDITORONLY_DATA
+	// E2E assert: import report stored on asset (real signal, not just helper function)
+	TestTrue(TEXT("VRM0 ImportSummary not empty"), !MetaAsset->ImportSummary.IsEmpty());
+	TestTrue(TEXT("VRM0 ImportSummary contains spec=vrm0"), MetaAsset->ImportSummary.Contains(TEXT("spec=vrm0")));
+	TestEqual(
+		TEXT("VRM0 ImportSummary exact"),
+		MetaAsset->ImportSummary,
+		TEXT("Imported VRM (spec=vrm0) humanoid=1 spring=1 blendOrExpr=1 thumb=1")
+	);
+	TestEqual(TEXT("VRM0 ImportWarnings count"), MetaAsset->ImportWarnings.Num(), 0);
+#endif
+
 	return true;
 }
 
@@ -268,6 +280,18 @@ bool FVrmImportMetaPropagation_VRM1AllFeatures::RunTest(const FString& Parameter
 	TestTrue(TEXT("VRM1 bHasSpringBones"), MetaAsset->bHasSpringBones);
 	TestTrue(TEXT("VRM1 bHasBlendShapesOrExpressions"), MetaAsset->bHasBlendShapesOrExpressions);
 	TestTrue(TEXT("VRM1 bHasThumbnail"), MetaAsset->bHasThumbnail);
+
+#if WITH_EDITORONLY_DATA
+	// E2E assert: import report stored on asset (real signal, not just helper function)
+	TestTrue(TEXT("VRM1 ImportSummary not empty"), !MetaAsset->ImportSummary.IsEmpty());
+	TestTrue(TEXT("VRM1 ImportSummary contains spec=vrm1"), MetaAsset->ImportSummary.Contains(TEXT("spec=vrm1")));
+	TestEqual(
+		TEXT("VRM1 ImportSummary exact"),
+		MetaAsset->ImportSummary,
+		TEXT("Imported VRM (spec=vrm1) humanoid=1 spring=1 blendOrExpr=1 thumb=1")
+	);
+	TestEqual(TEXT("VRM1 ImportWarnings count"), MetaAsset->ImportWarnings.Num(), 0);
+#endif
 
 	return true;
 }

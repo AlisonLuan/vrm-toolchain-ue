@@ -5,6 +5,51 @@
 
 namespace VrmMetaDetection
 {
+FString VrmVersionToStableString(EVrmVersion Version)
+{
+	switch (Version)
+	{
+	case EVrmVersion::VRM0: return TEXT("vrm0");
+	case EVrmVersion::VRM1: return TEXT("vrm1");
+	default: return TEXT("unknown");
+	}
+}
+
+FVrmImportReport BuildImportReport(const FVrmMetaFeatures& Features)
+{
+	FVrmImportReport Out;
+
+	const FString Spec = VrmVersionToStableString(Features.SpecVersion);
+
+	Out.Summary = FString::Printf(
+		TEXT("Imported VRM (spec=%s) humanoid=%d spring=%d blendOrExpr=%d thumb=%d"),
+		*Spec,
+		Features.bHasHumanoid ? 1 : 0,
+		Features.bHasSpringBones ? 1 : 0,
+		Features.bHasBlendShapesOrExpressions ? 1 : 0,
+		Features.bHasThumbnail ? 1 : 0
+	);
+
+	// Deterministic warning order (stable output for CI)
+	if (!Features.bHasHumanoid)
+	{
+		Out.Warnings.Add(TEXT("Missing humanoid definition"));
+	}
+	if (!Features.bHasSpringBones)
+	{
+		Out.Warnings.Add(TEXT("No spring bones found"));
+	}
+	if (!Features.bHasBlendShapesOrExpressions)
+	{
+		Out.Warnings.Add(TEXT("No blendshapes/expressions found"));
+	}
+	if (!Features.bHasThumbnail)
+	{
+		Out.Warnings.Add(TEXT("No thumbnail found"));
+	}
+
+	return Out;
+}
     FVrmMetaFeatures ParseMetaFeaturesFromJson(const FString& JsonStr)
     {
         FVrmMetaFeatures Result;
@@ -121,6 +166,20 @@ namespace VrmMetaDetection
         Meta->bHasSpringBones = Features.bHasSpringBones;
         Meta->bHasBlendShapesOrExpressions = Features.bHasBlendShapesOrExpressions;
         Meta->bHasThumbnail = Features.bHasThumbnail;
+    }
+
+    FString FormatImportSummary(const FVrmMetaFeatures& Features)
+    {
+        return FString::Printf(
+            TEXT("Imported VRM (spec=%s) humanoid=%d spring=%d blendOrExpr=%d thumb=%d"),
+            Features.SpecVersion == EVrmVersion::VRM0 ? TEXT("vrm0") :
+            Features.SpecVersion == EVrmVersion::VRM1 ? TEXT("vrm1") :
+            TEXT("unknown"),
+            Features.bHasHumanoid ? 1 : 0,
+            Features.bHasSpringBones ? 1 : 0,
+            Features.bHasBlendShapesOrExpressions ? 1 : 0,
+            Features.bHasThumbnail ? 1 : 0
+        );
     }
 
 } // namespace VrmMetaDetection

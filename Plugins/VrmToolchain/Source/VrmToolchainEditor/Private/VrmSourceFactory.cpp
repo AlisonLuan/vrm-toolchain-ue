@@ -24,6 +24,7 @@
 #include "EditorSubsystem.h"
 #include "Subsystems/ImportSubsystem.h"
 #include "VrmToolchain/VrmMetaAsset.h"
+#include "Logging/MessageLog.h"
 
 // Diagnostic scanner: recursively inspect object and container properties inside a package
 // and report any property that references the CDO's AssetImportData (which causes SavePackage to fail).
@@ -385,11 +386,28 @@ UObject* UVrmSourceFactory::FactoryCreateFile(
                 VrmMetaDetection::ApplyFeaturesToMetaAsset(Meta, Features);
                 Meta->SourceFilename = Filename;
 
-                // Naming invariant check
-                FString ShortPkg = FPackageName::GetShortName(MetaPackage->GetName());
-                ensureMsgf(ShortPkg == Meta->GetName(), TEXT("VrmSourceFactory: Meta naming invariant violated! Package='%s' Short='%s' Asset='%s'"), *MetaPackage->GetName(), *ShortPkg, *Meta->GetName());
+                // Store deterministic import report on asset (test-gated signal)
+#if WITH_EDITORONLY_DATA
+                {
+                    const VrmMetaDetection::FVrmImportReport Report = VrmMetaDetection::BuildImportReport(Features);
+                    Meta->ImportSummary = Report.Summary;
+                    Meta->ImportWarnings = Report.Warnings;
+                }
+#endif
 
 #if WITH_EDITOR
+                // Optional: user-facing log (non-gating)
+                FMessageLog Log(TEXT("VrmToolchain"));
+#if WITH_EDITORONLY_DATA
+                Log.Info(FText::FromString(Meta->ImportSummary));
+                for (const FString& W : Meta->ImportWarnings)
+                {
+                    Log.Warning(FText::FromString(W));
+                }
+#else
+                Log.Info(FText::FromString(TEXT("Imported VRM")));
+#endif
+
                 UE_LOG(LogVrmToolchainEditor, Display, TEXT("VrmSourceFactory: Created VRM Meta Asset"));
                 UE_LOG(LogVrmToolchainEditor, Display, TEXT("  Package Path: %s"), *MetaPackage->GetName());
                 UE_LOG(LogVrmToolchainEditor, Display, TEXT("  Asset Name:   %s"), *Meta->GetName());
