@@ -82,4 +82,29 @@ namespace VrmMetaDetection
 
         return Result;
     }
+
+    FString FormatMetaFeaturesForDiagnostics(const FVrmMetaFeatures& Features)
+    {
+        const TCHAR* SpecStr = TEXT("unknown");
+        switch (Features.SpecVersion)
+        {
+            case EVrmVersion::VRM0:
+                SpecStr = TEXT("vrm0");
+                break;
+            case EVrmVersion::VRM1:
+                SpecStr = TEXT("vrm1");
+                break;
+            default:
+                break;
+        }
+
+        return FString::Printf(
+            TEXT("spec=%s humanoid=%d spring=%d blendOrExpr=%d thumb=%d"),
+            SpecStr,
+            Features.bHasHumanoid ? 1 : 0,
+            Features.bHasSpringBones ? 1 : 0,
+            Features.bHasBlendShapesOrExpressions ? 1 : 0,
+            Features.bHasThumbnail ? 1 : 0
+        );
+    }
 }

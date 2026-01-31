@@ -41,4 +41,17 @@ namespace VrmMetaDetection
      *         On parse failure (invalid JSON), all fields are set to Unknown/false (conservative defaults).
      */
     FVrmMetaFeatures ParseMetaFeaturesFromJson(const FString& JsonStr);
+
+    /**
+     * Format detected VRM metadata features into a compact, deterministic single-line diagnostic string.
+     * 
+     * Output format: "spec=vrm0 humanoid=1 spring=1 blendOrExpr=1 thumb=0"
+     * - SpecVersion is one of: vrm0, vrm1, unknown
+     * - Feature flags are 0 or 1
+     * - Uses stable keys for consistent parsing and logging
+     * 
+     * @param Features The FVrmMetaFeatures struct to format
+     * @return A compact diagnostic string suitable for logging
+     */
+    FString FormatMetaFeaturesForDiagnostics(const FVrmMetaFeatures& Features);
 }

@@ -240,4 +240,84 @@ bool FVrmMetaDetection_VrmcVrmNotObject::RunTest(const FString& Parameters)
 	return true;
 }
 
+// Formatter tests
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmMetaDetection_FormatterVrm0Full, "VrmToolchain.MetaDetection.FormatterVrm0Full", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FVrmMetaDetection_FormatterVrm0Full::RunTest(const FString& Parameters)
+{
+	using namespace VrmMetaDetection;
+
+	FVrmMetaFeatures Features;
+	Features.SpecVersion = EVrmVersion::VRM0;
+	Features.bHasHumanoid = true;
+	Features.bHasSpringBones = true;
+	Features.bHasBlendShapesOrExpressions = true;
+	Features.bHasThumbnail = true;
+
+	FString Result = FormatMetaFeaturesForDiagnostics(Features);
+	FString Expected = TEXT("spec=vrm0 humanoid=1 spring=1 blendOrExpr=1 thumb=1");
+	
+	TestEqual(TEXT("VRM0 with all features should format correctly"), Result, Expected);
+
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmMetaDetection_FormatterVrm1Partial, "VrmToolchain.MetaDetection.FormatterVrm1Partial", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FVrmMetaDetection_FormatterVrm1Partial::RunTest(const FString& Parameters)
+{
+	using namespace VrmMetaDetection;
+
+	FVrmMetaFeatures Features;
+	Features.SpecVersion = EVrmVersion::VRM1;
+	Features.bHasHumanoid = true;
+	Features.bHasSpringBones = false;
+	Features.bHasBlendShapesOrExpressions = true;
+	Features.bHasThumbnail = false;
+
+	FString Result = FormatMetaFeaturesForDiagnostics(Features);
+	FString Expected = TEXT("spec=vrm1 humanoid=1 spring=0 blendOrExpr=1 thumb=0");
+	
+	TestEqual(TEXT("VRM1 partial features should format correctly"), Result, Expected);
+
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmMetaDetection_FormatterUnknownAllFalse, "VrmToolchain.MetaDetection.FormatterUnknownAllFalse", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FVrmMetaDetection_FormatterUnknownAllFalse::RunTest(const FString& Parameters)
+{
+	using namespace VrmMetaDetection;
+
+	FVrmMetaFeatures Features;
+	// SpecVersion defaults to Unknown
+	// All booleans default to false
+
+	FString Result = FormatMetaFeaturesForDiagnostics(Features);
+	FString Expected = TEXT("spec=unknown humanoid=0 spring=0 blendOrExpr=0 thumb=0");
+	
+	TestEqual(TEXT("Unknown version with no features should format correctly"), Result, Expected);
+
+	return true;
+}
+
+IMPLEMENT_SIMPLE_AUTOMATION_TEST(FVrmMetaDetection_FormatterVrm0NoFeatures, "VrmToolchain.MetaDetection.FormatterVrm0NoFeatures", EAutomationTestFlags::EditorContext | EAutomationTestFlags::EngineFilter)
+
+bool FVrmMetaDetection_FormatterVrm0NoFeatures::RunTest(const FString& Parameters)
+{
+	using namespace VrmMetaDetection;
+
+	FVrmMetaFeatures Features;
+	Features.SpecVersion = EVrmVersion::VRM0;
+	// All features default to false
+
+	FString Result = FormatMetaFeaturesForDiagnostics(Features);
+	FString Expected = TEXT("spec=vrm0 humanoid=0 spring=0 blendOrExpr=0 thumb=0");
+	
+	TestEqual(TEXT("VRM0 with no features should format correctly"), Result, Expected);
+
+	return true;
+}
+
 #endif // WITH_DEV_AUTOMATION_TESTS

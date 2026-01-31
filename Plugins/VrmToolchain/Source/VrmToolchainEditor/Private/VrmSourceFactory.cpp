@@ -352,6 +352,23 @@ UObject* UVrmSourceFactory::FactoryCreateFile(
         bool bHasBlendOrExpr = Features.bHasBlendShapesOrExpressions;
         bool bHasThumb = Features.bHasThumbnail;
 
+        // Log metadata detection diagnostics (canonical single-line format)
+        FString DiagnosticsStr = VrmMetaDetection::FormatMetaFeaturesForDiagnostics(Features);
+        UE_LOG(LogVrmToolchainEditor, Verbose, TEXT("VrmSourceFactory: VRM meta detection - file=%s %s"), *FPaths::GetCleanFilename(Filename), *DiagnosticsStr);
+
+        // Detect parse failure or missing VRM extensions
+        const bool bJsonBlank = JsonStr.TrimStartAndEnd().IsEmpty();
+        const bool bLooksNonVrm = (MetaVer == EVrmVersion::Unknown) && !bHasHumanoid && !bHasSpring && !bHasBlendOrExpr && !bHasThumb;
+
+        if (bJsonBlank)
+        {
+            UE_LOG(LogVrmToolchainEditor, Verbose, TEXT("VrmSourceFactory: VRM meta detection - missing/blank JSON chunk"));
+        }
+        else if (bLooksNonVrm)
+        {
+            UE_LOG(LogVrmToolchainEditor, Verbose, TEXT("VrmSourceFactory: VRM meta detection - no VRM extensions detected"));
+        }
+
         // Create the meta asset in its own package
         const FString BaseForMeta = FVrmAssetNaming::StripKnownSuffixes(AssetName);
         const FString MetaAssetName = FVrmAssetNaming::MakeVrmMetaAssetName(BaseForMeta);
@@ -381,8 +398,6 @@ UObject* UVrmSourceFactory::FactoryCreateFile(
                 UE_LOG(LogVrmToolchainEditor, Display, TEXT("  Asset Name:   %s"), *Meta->GetName());
                 UE_LOG(LogVrmToolchainEditor, Display, TEXT("  Object Path:  %s"), *Meta->GetPathName());
                 UE_LOG(LogVrmToolchainEditor, Display, TEXT("  Outer Name:   %s"), *Meta->GetOuter()->GetName());
-                UE_LOG(LogVrmToolchainEditor, Verbose, TEXT("VrmSourceFactory: Meta detection - SpecVersion=%d, bHasHumanoid=%s, bHasSpringBones=%s, bHasBlendShapesOrExpressions=%s, bHasThumbnail=%s"),
-                    static_cast<int32>(MetaVer), bHasHumanoid ? TEXT("true") : TEXT("false"), bHasSpring ? TEXT("true") : TEXT("false"), bHasBlendOrExpr ? TEXT("true") : TEXT("false"), bHasThumb ? TEXT("true") : TEXT("false"));
                 
                 FAssetRegistryModule& ARM2 = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
                 ARM2.Get().AssetCreated(Meta);
