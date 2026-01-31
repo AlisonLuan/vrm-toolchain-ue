@@ -77,6 +77,7 @@ if (Test-Path $uat) {
         $runArgs += "-reportoutputpath=`"$ReportOutputPath`""
         $runArgs += "-log=`"$logPath`""
 
+        $ExecutedCommandLine = '& "' + $uat + '" ' + (($runArgs | ForEach-Object { if ($_ -match ' ') { '"' + $_ + '"' } else { $_ } }) -join ' ')
         Write-Host "Using RunUAT: $uat $($runArgs -join ' ')"
         & $uat @runArgs
         $exitCode = $LASTEXITCODE
@@ -97,6 +98,7 @@ if (Test-Path $uat) {
         $dtArgs += "-reportoutputpath=`"$ReportOutputPath`""
         $dtArgs += "-log=`"$logPath`""
 
+        $ExecutedCommandLine = '& dotnet "' + $automationDll + '" ' + (($dtArgs | ForEach-Object { if ($_ -match ' ') { '"' + $_ + '"' } else { $_ } }) -join ' ')
         Write-Host "Invoking AutomationTool.dll via dotnet: $automationDll $($dtArgs -join ' ')"
         & $dotnet "$automationDll" @dtArgs
         $exitCode = $LASTEXITCODE
@@ -116,6 +118,7 @@ if (Test-Path $uat) {
     $editorExeToUse = if (Test-Path $editorCmdCandidate) { $editorCmdCandidate } else { $EditorPath }
     Write-Host "Launching: $editorExeToUse"
 
+    $ExecutedCommandLine = '& "' + $editorExeToUse + '" ' + $editorArgs
     $proc = Start-Process -FilePath $editorExeToUse -ArgumentList $editorArgs -NoNewWindow -PassThru
     try {
         $proc | Wait-Process -Timeout (New-TimeSpan -Seconds $TimeoutSeconds) -ErrorAction Stop
@@ -160,6 +163,7 @@ if ($exitCode -ne $null -and $exitCode -ne 0) {
     $editorExeToUse = if (Test-Path $editorCmdCandidate) { $editorCmdCandidate } else { $EditorPath }
     Write-Host "Launching fallback editor: $editorExeToUse with args: $editorArgs"
 
+    $ExecutedCommandLine = '& "' + $editorExeToUse + '" ' + $editorArgs
     $proc = Start-Process -FilePath $editorExeToUse -ArgumentList $editorArgs -NoNewWindow -PassThru
     try {
         $proc | Wait-Process -Timeout (New-TimeSpan -Seconds $TimeoutSeconds) -ErrorAction Stop
@@ -285,6 +289,51 @@ function Detect-TestFailures($logText) {
     return $failures
 }
 
+# Helper: Extract up to 3 failed test names from JSON report (multiple shapes)
+function Get-FailedTestNames($reportObj, $maxNames = 3) {
+    if ($null -eq $reportObj) { return @() }
+    
+    $failedTests = @()
+    try {
+        # Try multiple likely report structures
+        $testsList = $reportObj.Results.Tests  # Shape 1
+        if ($null -eq $testsList) { $testsList = $reportObj.Tests }  # Shape 2
+        if ($null -eq $testsList) { $testsList = $reportObj.Report.Tests }  # Shape 3
+        if ($null -eq $testsList) { $testsList = $reportObj.Results }  # Shape 4 (Results as tests)
+        
+        if ($testsList -is [array]) {
+            foreach ($test in $testsList) {
+                # Check various status field names
+                $isFailed = $false
+                if ($null -ne $test.State -and $test.State -match 'fail') { $isFailed = $true }
+                if ($null -ne $test.Result -and $test.Result -match 'fail') { $isFailed = $true }
+                if ($null -ne $test.Status -and $test.Status -match 'fail') { $isFailed = $true }
+                if ($null -ne $test.Succeeded -and $test.Succeeded -eq $false) { $isFailed = $true }
+                if ($null -ne $test.bSucceeded -and $test.bSucceeded -eq $false) { $isFailed = $true }
+                if ($null -ne $test.Errors -and ($test.Errors -is [array] -and $test.Errors.Count -gt 0)) { $isFailed = $true }
+                
+                if ($isFailed) {
+                    # Prefer FullTestPath, fallback to TestName, then Name
+                    $testName = $test.FullTestPath
+                    if (-not $testName) { $testName = $test.TestName }
+                    if (-not $testName) { $testName = $test.Name }
+                    if (-not $testName) { $testName = $test.DisplayName }
+                    if (-not $testName) { $testName = $test.Test }
+                    
+                    if ($testName) {
+                        $failedTests += $testName
+                        if ($failedTests.Count -ge $maxNames) { break }
+                    }
+                }
+            }
+        }
+    } catch {
+        # Silently fail; will use log fallback
+    }
+    
+    return $failedTests -ne $null ? $failedTests : @()
+}
+
 # Extract pass/fail counts from log using regex (if not already from JSON)
 if ($null -eq $passed -or $null -eq $failed) {
     if ($log) {
@@ -312,6 +361,15 @@ if ($null -eq $passed -and $null -eq $failed) {
 $passed = $passed -as [int]
 $failed = $failed -as [int]
 
+# Extract failed test names for actionable CI output
+$failedTestNames = @()
+if ($report -ne $null) {
+    $failedTestNames = Get-FailedTestNames $report 3
+}
+if ($failedTestNames.Count -eq 0 -and $explicitFailures.Count -gt 0) {
+    $failedTestNames = @($explicitFailures | Select-Object -First 3 | ForEach-Object { $_.Trim() })
+}
+
 # Final validation: if explicit failures detected, ensure failed >= 1
 if ($explicitFailures.Count -gt 0) {
     Write-Host "Detected explicit test failures in log:" -ForegroundColor Red
@@ -334,6 +392,38 @@ Write-Host "::notice file=$logPath::Automation log generated"
 if ($reportFile) { Write-Host "::notice file=$($reportFile.FullName)::Automation JSON report generated" }
 
 if ($failed -gt 0) {
+    # Actionable CI output: failed test names and rerun command
+    if ($failedTestNames.Count -gt 0) {
+        Write-Host ""
+        Write-Host "========== Failing Tests (first $($failedTestNames.Count)) =========="
+        $failedTestNames | ForEach-Object { Write-Host "- $_" }
+        Write-Host "=========================================="
+        Write-Host ""
+    }
+    
+    # Print rerun command if available
+    if ($ExecutedCommandLine) {
+        Write-Host "========== Automation Test Rerun =========="
+        Write-Host $ExecutedCommandLine
+        Write-Host "=========================================="
+        Write-Host ""
+        Write-Host "::notice::Rerun locally: $ExecutedCommandLine"
+    }
+    
+    # GitHub error annotations (with normalized paths for runner compatibility)
+    $logFull = if (Test-Path $logPath) { (Resolve-Path $logPath).Path } else { $logPath }
+    if ($failedTestNames.Count -gt 0) {
+        $failedList = $failedTestNames -join ', '
+        Write-Host "::error file=$logFull::Automation failed. Failing tests: $failedList"
+    } else {
+        Write-Host "::error file=$logFull::Automation failed (Failed=$failed)."
+    }
+    if ($reportFile) {
+        $reportFull = $reportFile.FullName
+        if (Test-Path $reportFull) { $reportFull = (Resolve-Path $reportFull).Path }
+        Write-Host "::error file=$reportFull::See JSON report for details"
+    }
+    
     Write-Error "One or more automation tests failed (Failed=$failed). Failing CI step."
     exit 1
 }
