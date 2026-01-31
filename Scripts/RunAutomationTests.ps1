@@ -5,7 +5,8 @@ param(
     [Parameter(Mandatory=$true)]
     [string]$ProjectPath,
 
-    [string]$TestFilter = "All",
+    # Explicit test filter with VrmToolchain as default for CI gates
+    [string]$TestFilter = "VrmToolchain",
 
     # UAT/AutomationTool test selector (default preserves historical behavior)
     [string]$UATTest = "EditorTest.EditorTestNode",
@@ -17,7 +18,8 @@ param(
 
     [string]$ReportOutputPath = "$PSScriptRoot\AutomationReports",
 
-    [int]$TimeoutSeconds = 600
+    # Timeout in seconds (30 minutes default for headless automation)
+    [int]$TimeoutSeconds = 1800
 )
 
 # Ensure paths
@@ -208,18 +210,18 @@ if ($reportFile) {
             $passed = $report.Summary.Passed -as [int]
             $failed = $report.Summary.Failed -as [int]
         }
-        if (-not $passed -and $report.Passed -ne $null) {
+        if ($null -eq $passed -and $report.Passed -ne $null) {
             $passed = $report.Passed -as [int]
         }
-        if (-not $failed -and $report.Failed -ne $null) {
+        if ($null -eq $failed -and $report.Failed -ne $null) {
             $failed = $report.Failed -as [int]
         }
         # Fallback: inspect test list
-        if (($passed -eq $null -or $failed -eq $null) -and $report.Results -ne $null) {
+        if (($null -eq $passed -or $null -eq $failed) -and $report.Results -ne $null) {
             $passed = ($report.Results | Where-Object { $_.Status -match 'Success|Passed' }).Count
             $failed = ($report.Results | Where-Object { $_.Status -match 'Fail|Failed|Error' }).Count
         }
-        if ($passed -ne $null -and $failed -ne $null) {
+        if ($null -ne $passed -and $null -ne $failed) {
             Write-Host "Parsed JSON report: Passed=$passed, Failed=$failed"
         } else {
             Write-Host "Unable to parse pass/fail counts from JSON report."
@@ -257,14 +259,48 @@ function Get-Number($text, $patterns) {
     return $null
 }
 
-if (-not $passed -or -not $failed) {
+# Robust failure detection: explicitly scan logs for failure markers
+function Detect-TestFailures($logText) {
+    if (-not $logText) { return @() }
+    
+    $failurePatterns = @(
+        'Automation Test \(.*\) Failed',
+        'Test Failed:',
+        'ERROR: Automation test.*failed',
+        '\[FAILED\]',
+        'FAILURE:.*Automation',
+        'Assertion failed:',
+        'Test\s+.*\s+failed'
+    )
+    
+    $failures = @()
+    foreach ($line in ($logText -split "\r?\n")) {
+        foreach ($pattern in $failurePatterns) {
+            if ($line -match $pattern) {
+                $failures += $line.Trim()
+                break
+            }
+        }
+    }
+    return $failures
+}
+
+# Extract pass/fail counts from log using regex (if not already from JSON)
+if ($null -eq $passed -or $null -eq $failed) {
     if ($log) {
         $passed = Get-Number $log @("Passed:\s*(\d+)", "(\d+) passed", "Passed\s*:\s*(\d+)")
         $failed = Get-Number $log @("Failed:\s*(\d+)", "(\d+) failed", "Failed\s*:\s*(\d+)")
     }
 }
 
-if (-not $passed -and -not $failed) {
+# Strong failure detection: explicitly scan log for test failures if not caught above
+$explicitFailures = @()
+if ($log) {
+    $explicitFailures = Detect-TestFailures $log
+}
+
+# If still no counts found, error out
+if ($null -eq $passed -and $null -eq $failed) {
     # As a final fallback, scan for summary lines
     if ($log) {
         $summaryLine = ($log -split "\r?\n") | Where-Object { $_ -match "Automation Test" -or $_ -match "Summary" } | Select-Object -First 1
@@ -276,16 +312,31 @@ if (-not $passed -and -not $failed) {
 $passed = $passed -as [int]
 $failed = $failed -as [int]
 
-Write-Host "Automation results: Passed=$passed, Failed=$failed"
+# Final validation: if explicit failures detected, ensure failed >= 1
+if ($explicitFailures.Count -gt 0) {
+    Write-Host "Detected explicit test failures in log:" -ForegroundColor Red
+    $explicitFailures | ForEach-Object { Write-Host "  $_" -ForegroundColor Red }
+    $failed = [math]::Max([int]$failed, 1)
+}
+
+# Emit comprehensive summary
+Write-Host ""
+Write-Host "========== Automation Test Summary =========="
+Write-Host "Test Filter: $TestFilter"
+Write-Host "Passed: $passed"
+Write-Host "Failed: $failed"
+Write-Host "Total: $($passed + $failed)"
+Write-Host "=========================================="
+Write-Host ""
 
 # Emit locations for CI capture
 Write-Host "::notice file=$logPath::Automation log generated"
 if ($reportFile) { Write-Host "::notice file=$($reportFile.FullName)::Automation JSON report generated" }
 
 if ($failed -gt 0) {
-    Write-Host "One or more automation tests failed. Failing CI step."
+    Write-Error "One or more automation tests failed (Failed=$failed). Failing CI step."
     exit 1
 }
 
-Write-Host "All automation tests passed."
+Write-Host "All automation tests passed (Passed=$passed, Failed=0)." -ForegroundColor Green
 exit 0
