@@ -119,7 +119,10 @@ build/
 /releases/
 *.zip
 
+# Local build logs (root level only)
 build_log.txt
+build.log
+
 _codeql_detected_source_root
 
 BuildOutput*.log

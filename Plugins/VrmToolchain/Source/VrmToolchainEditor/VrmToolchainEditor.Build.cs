@@ -54,7 +54,10 @@ public class VrmToolchainEditor : ModuleRules
             "SkeletalMeshUtilitiesCommon",
             "MeshDescription",
             "StaticMeshDescription",
-            "RenderCore"
+            "RenderCore",
+            // Details panel customization for UVrmMetaAsset (PR-12)
+            "PropertyEditor",
+            "ApplicationCore"
         });
     }
 }
