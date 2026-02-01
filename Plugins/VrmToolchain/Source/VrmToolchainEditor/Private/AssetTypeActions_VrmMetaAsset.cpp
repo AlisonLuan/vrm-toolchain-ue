@@ -1,0 +1,190 @@
+#include "AssetTypeActions_VrmMetaAsset.h"
+
+#include "VrmToolchain/VrmMetaAsset.h"
+#include "HAL/PlatformApplicationMisc.h"
+#include "Framework/MultiBox/MultiBoxBuilder.h"
+
+#define LOCTEXT_NAMESPACE "VrmMetaAssetTypeActions"
+
+FText FAssetTypeActions_VrmMetaAsset::GetName() const
+{
+	return LOCTEXT("VrmMetaAssetTypeName", "VRM Meta");
+}
+
+FColor FAssetTypeActions_VrmMetaAsset::GetTypeColor() const
+{
+	return FColor(200, 100, 255);
+}
+
+UClass* FAssetTypeActions_VrmMetaAsset::GetSupportedClass() const
+{
+	return UVrmMetaAsset::StaticClass();
+}
+
+uint32 FAssetTypeActions_VrmMetaAsset::GetCategories()
+{
+	return EAssetTypeCategories::Misc;
+}
+
+FString FAssetTypeActions_VrmMetaAsset::SanitizeForClipboardSingleLine(const FString& In)
+{
+	FString Out = In;
+	Out.ReplaceInline(TEXT("\r"), TEXT(" "));
+	Out.ReplaceInline(TEXT("\n"), TEXT(" "));
+	Out.TrimStartAndEndInline();
+	return Out;
+}
+
+UVrmMetaAsset* FAssetTypeActions_VrmMetaAsset::GetSingleMeta(const TArray<UObject*>& Objects)
+{
+	UVrmMetaAsset* Result = nullptr;
+	for (UObject* Obj : Objects)
+	{
+		if (UVrmMetaAsset* Meta = Cast<UVrmMetaAsset>(Obj))
+		{
+			if (Result != nullptr)
+			{
+				return nullptr; // more than one
+			}
+			Result = Meta;
+		}
+	}
+	return Result;
+}
+
+void FAssetTypeActions_VrmMetaAsset::CollectMetas(const TArray<UObject*>& Objects, TArray<UVrmMetaAsset*>& OutMetas)
+{
+	for (UObject* Obj : Objects)
+	{
+		if (UVrmMetaAsset* Meta = Cast<UVrmMetaAsset>(Obj))
+		{
+			OutMetas.Add(Meta);
+		}
+	}
+}
+
+void FAssetTypeActions_VrmMetaAsset::GetActions(const TArray<UObject*>& InObjects, FMenuBuilder& MenuBuilder)
+{
+	FAssetTypeActions_Base::GetActions(InObjects, MenuBuilder);
+
+#if WITH_EDITORONLY_DATA
+	TArray<UVrmMetaAsset*> Metas;
+	CollectMetas(InObjects, Metas);
+	if (Metas.Num() == 0)
+	{
+		return;
+	}
+
+	MenuBuilder.BeginSection(NAME_None, LOCTEXT("ImportReportSection", "Import Report"));
+
+	// For Summary/Warnings, only enable for single-selection to avoid ambiguity.
+	const bool bSingle = (Metas.Num() == 1);
+	TArray<UObject*> ObjectsCopy = InObjects;  // Copy for lambda capture
+
+	MenuBuilder.AddMenuEntry(
+		LOCTEXT("CopySummary", "Copy Summary"),
+		LOCTEXT("CopySummaryTooltip", "Copy import summary to clipboard (single selection)"),
+		FSlateIcon(),
+		FUIAction(
+			FExecuteAction::CreateLambda([this, ObjectsCopy]() { CopyImportSummary(ObjectsCopy); }),
+			FCanExecuteAction::CreateLambda([bSingle]() { return bSingle; })
+		)
+	);
+
+	MenuBuilder.AddMenuEntry(
+		LOCTEXT("CopyWarnings", "Copy Warnings"),
+		LOCTEXT("CopyWarningsTooltip", "Copy import warnings to clipboard (single selection)"),
+		FSlateIcon(),
+		FUIAction(
+			FExecuteAction::CreateLambda([this, ObjectsCopy]() { CopyImportWarnings(ObjectsCopy); }),
+			FCanExecuteAction::CreateLambda([bSingle]() { return bSingle; })
+		)
+	);
+
+	// Full report can support multi-select safely (include separators).
+	MenuBuilder.AddMenuEntry(
+		LOCTEXT("CopyFullReport", "Copy Full Report"),
+		LOCTEXT("CopyFullReportTooltip", "Copy summary + warnings to clipboard (supports multi-selection)"),
+		FSlateIcon(),
+		FUIAction(FExecuteAction::CreateLambda([this, ObjectsCopy]() { CopyFullImportReport(ObjectsCopy); }))
+	);
+
+	MenuBuilder.EndSection();
+#endif
+}
+
+void FAssetTypeActions_VrmMetaAsset::CopyImportSummary(const TArray<UObject*>& Objects)
+{
+#if WITH_EDITORONLY_DATA
+	if (UVrmMetaAsset* Meta = GetSingleMeta(Objects))
+	{
+		const FString Text = SanitizeForClipboardSingleLine(Meta->ImportSummary);
+		FPlatformApplicationMisc::ClipboardCopy(*Text);
+	}
+#endif
+}
+
+void FAssetTypeActions_VrmMetaAsset::CopyImportWarnings(const TArray<UObject*>& Objects)
+{
+#if WITH_EDITORONLY_DATA
+	if (UVrmMetaAsset* Meta = GetSingleMeta(Objects))
+	{
+		FString Text;
+		if (Meta->ImportWarnings.Num() == 0)
+		{
+			Text = TEXT("(no warnings)");
+		}
+		else
+		{
+			for (const FString& W : Meta->ImportWarnings)
+			{
+				Text += TEXT("- ") + SanitizeForClipboardSingleLine(W) + TEXT("\n");
+			}
+		}
+		FPlatformApplicationMisc::ClipboardCopy(*Text);
+	}
+#endif
+}
+
+void FAssetTypeActions_VrmMetaAsset::CopyFullImportReport(const TArray<UObject*>& Objects)
+{
+#if WITH_EDITORONLY_DATA
+	TArray<UVrmMetaAsset*> Metas;
+	CollectMetas(Objects, Metas);
+	if (Metas.Num() == 0)
+	{
+		return;
+	}
+
+	FString Out;
+	for (int32 i = 0; i < Metas.Num(); ++i)
+	{
+		UVrmMetaAsset* Meta = Metas[i];
+
+		// Separator for multi-select
+		if (i > 0)
+		{
+			Out += TEXT("\n----------------------------------------\n");
+		}
+
+		Out += SanitizeForClipboardSingleLine(Meta->ImportSummary) + TEXT("\n");
+
+		if (Meta->ImportWarnings.Num() > 0)
+		{
+			Out += TEXT("Warnings:\n");
+			for (const FString& W : Meta->ImportWarnings)
+			{
+				Out += TEXT("- ") + SanitizeForClipboardSingleLine(W) + TEXT("\n");
+			}
+		}
+		else
+		{
+			Out += TEXT("(no warnings)\n");
+		}
+	}
+
+	FPlatformApplicationMisc::ClipboardCopy(*Out);
+#endif
+}
+
+#undef LOCTEXT_NAMESPACE
