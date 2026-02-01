@@ -57,9 +57,7 @@ public class VrmToolchainEditor : ModuleRules
             "RenderCore",
             // Details panel customization for UVrmMetaAsset (PR-12)
             "PropertyEditor",
-            "ApplicationCore",
-            // Notifications for import report toast (PR-17)
-            "Slate"
+            "ApplicationCore"
         });
     }
 }
