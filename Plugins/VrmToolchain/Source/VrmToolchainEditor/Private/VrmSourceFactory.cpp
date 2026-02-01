@@ -399,8 +399,8 @@ UObject* UVrmSourceFactory::FactoryCreateFile(
 #endif
 
 #if WITH_EDITOR
-                // Optional: toast when warnings exist (UX only; skipped in automation/commandlets)
-                if (!IsRunningCommandlet() && !GIsAutomationTesting)
+                // Optional: toast when warnings exist (UX only; skipped in automation/commandlets/headless)
+                if (!IsRunningCommandlet() && !GIsAutomationTesting && !FApp::IsUnattended())
                 {
 #if WITH_EDITORONLY_DATA
                     const int32 WarningCount = Meta->ImportWarnings.Num();
