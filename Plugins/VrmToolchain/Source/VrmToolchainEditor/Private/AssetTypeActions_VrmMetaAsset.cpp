@@ -1,8 +1,12 @@
 #include "AssetTypeActions_VrmMetaAsset.h"
 
 #include "VrmToolchain/VrmMetaAsset.h"
+#include "VrmMetaFeatureDetection.h"
 #include "HAL/PlatformApplicationMisc.h"
 #include "Framework/MultiBox/MultiBoxBuilder.h"
+#include "Notifications/NotificationManager.h"
+#include "Widgets/Notifications/SNotificationList.h"
+#include "Misc/App.h"
 
 #define LOCTEXT_NAMESPACE "VrmMetaAssetTypeActions"
 
@@ -109,6 +113,15 @@ void FAssetTypeActions_VrmMetaAsset::GetActions(const TArray<UObject*>& InObject
 		FUIAction(FExecuteAction::CreateLambda([this, ObjectsCopy]() { CopyFullImportReport(ObjectsCopy); }))
 	);
 
+	MenuBuilder.AddMenuEntry(
+		LOCTEXT("RecomputeReport", "Recompute Import Report"),
+		LOCTEXT("RecomputeReportTooltip", "Rebuild ImportSummary/Warnings from stored feature flags (useful after upgrading)"),
+		FSlateIcon(),
+		FUIAction(
+			FExecuteAction::CreateLambda([this, ObjectsCopy]() { RecomputeImportReport(ObjectsCopy); })
+		)
+	);
+
 	MenuBuilder.EndSection();
 #endif
 }
@@ -184,6 +197,62 @@ void FAssetTypeActions_VrmMetaAsset::CopyFullImportReport(const TArray<UObject*>
 	}
 
 	FPlatformApplicationMisc::ClipboardCopy(*Out);
+#endif
+}
+
+void FAssetTypeActions_VrmMetaAsset::RecomputeImportReport(const TArray<UObject*>& Objects)
+{
+#if WITH_EDITORONLY_DATA
+	TArray<UVrmMetaAsset*> Metas;
+	CollectMetas(Objects, Metas);
+	if (Metas.Num() == 0)
+	{
+		return;
+	}
+
+	// Optional: keep any UI notifications out of automation/unattended contexts
+	const bool bInteractive =
+		!IsRunningCommandlet() && !GIsAutomationTesting && !FApp::IsUnattended();
+
+	int32 UpdatedCount = 0;
+
+	for (UVrmMetaAsset* Meta : Metas)
+	{
+		if (!Meta)
+		{
+			continue;
+		}
+
+		Meta->Modify();
+
+		VrmMetaDetection::FVrmMetaFeatures Features;
+		Features.SpecVersion = Meta->SpecVersion;
+		Features.bHasHumanoid = Meta->bHasHumanoid;
+		Features.bHasSpringBones = Meta->bHasSpringBones;
+		Features.bHasBlendShapesOrExpressions = Meta->bHasBlendShapesOrExpressions;
+		Features.bHasThumbnail = Meta->bHasThumbnail;
+
+		const VrmMetaDetection::FVrmImportReport Report =
+			VrmMetaDetection::BuildImportReport(Features);
+
+		Meta->ImportSummary = Report.Summary;
+		Meta->ImportWarnings = Report.Warnings;
+
+		Meta->MarkPackageDirty();
+		Meta->PostEditChange();
+
+		++UpdatedCount;
+	}
+
+	// Optional toast (only in interactive contexts)
+	if (bInteractive && UpdatedCount > 0)
+	{
+		FNotificationInfo Info(FText::FromString(
+			FString::Printf(TEXT("Recomputed import report for %d meta asset(s)"), UpdatedCount)
+		));
+		Info.ExpireDuration = 3.0f;
+		FSlateNotificationManager::Get().AddNotification(Info);
+	}
 #endif
 }
 
