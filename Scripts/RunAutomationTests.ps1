@@ -331,7 +331,7 @@ function Get-FailedTestNames($reportObj, $maxNames = 3) {
         # Silently fail; will use log fallback
     }
     
-    return if ($failedTests -ne $null) { $failedTests } else { @() }
+    return $failedTests -ne $null ? $failedTests : @()
 }
 
 # Extract pass/fail counts from log using regex (if not already from JSON)
