@@ -67,6 +67,11 @@ jobs:
           # Ensure the step exits cleanly even if last git grep had no matches earlier
           $global:LASTEXITCODE = 0
 
+      - name: PS script guard (no ternary)
+        shell: pwsh
+        run: |
+          ./Scripts/CheckPowerShellNoTernary.ps1
+
       - name: Runtime must not reference editor-only modules
         shell: pwsh
         run: |
