@@ -11,6 +11,7 @@
 #include "EditorFramework/AssetImportData.h"
 #include "Misc/FileHelper.h"
 #include "Misc/Paths.h"
+#include "Misc/App.h"
 #include "UObject/Package.h"
 
 #if WITH_EDITOR
