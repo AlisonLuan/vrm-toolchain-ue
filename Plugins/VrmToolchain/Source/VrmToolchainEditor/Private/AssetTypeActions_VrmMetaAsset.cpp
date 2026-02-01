@@ -4,7 +4,7 @@
 #include "VrmMetaFeatureDetection.h"
 #include "HAL/PlatformApplicationMisc.h"
 #include "Framework/MultiBox/MultiBoxBuilder.h"
-#include "Notifications/NotificationManager.h"
+#include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
 #include "Misc/App.h"
 
