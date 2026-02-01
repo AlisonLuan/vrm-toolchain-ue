@@ -16,6 +16,7 @@
 
 #if WITH_EDITOR
 #include "VrmToolchainEditor.h"
+#include "VrmMetaAssetImportReportHelper.h"
 #include "UObject/UnrealType.h"
 #include "UObject/SoftObjectPtr.h"
 #include "AssetRegistry/AssetRegistryModule.h"
@@ -409,20 +410,8 @@ UObject* UVrmSourceFactory::FactoryCreateFile(
                     {
                         const FString Title = FString::Printf(TEXT("VRM imported with %d warning(s)"), WarningCount);
 
-                        // Build copy payload (summary + warnings), sanitize newlines defensively
-                        FString CopyText = Meta->ImportSummary;
-                        CopyText.ReplaceInline(TEXT("\r"), TEXT(" "));
-                        // Keep real newlines for clipboard readability
-                        CopyText += TEXT("\n");
-
-                        for (const FString& W : Meta->ImportWarnings)
-                        {
-                            FString Clean = W;
-                            Clean.ReplaceInline(TEXT("\r"), TEXT(" "));
-                            // Warnings should be single-line already, but belt-and-suspenders:
-                            Clean.ReplaceInline(TEXT("\n"), TEXT(" "));
-                            CopyText += TEXT("- ") + Clean + TEXT("\n");
-                        }
+                        // Build copy payload using shared formatter
+                        const FString CopyText = FVrmMetaAssetImportReportHelper::BuildCopyText(Meta->ImportSummary, Meta->ImportWarnings);
 
                         FNotificationInfo Info(FText::FromString(Title));
                         Info.SubText = FText::FromString(TEXT("See Meta asset Details → Import Report"));

@@ -9,6 +9,7 @@
 #include "Widgets/Layout/SBox.h"
 
 #include "VrmToolchain/VrmMetaAsset.h"
+#include "VrmMetaAssetImportReportHelper.h"
 #include "HAL/PlatformApplicationMisc.h"
 #include "UObject/WeakObjectPtrTemplates.h"
 
@@ -31,21 +32,7 @@ static UVrmMetaAsset* GetSingleMetaAsset(IDetailLayoutBuilder& DetailBuilder)
 
 FString FVrmMetaAssetDetails::BuildCopyText(const FString& Summary, const TArray<FString>& Warnings)
 {
-	FString Out = Summary;
-
-	if (Warnings.Num() > 0)
-	{
-		Out += TEXT("\n\nWarnings:");
-		for (const FString& W : Warnings)
-		{
-			// Single-line guarantee, but keep it defensive
-			FString Clean = W;
-			Clean.ReplaceInline(TEXT("\r"), TEXT(" "));
-			Clean.ReplaceInline(TEXT("\n"), TEXT(" "));
-			Out += TEXT("\n- ") + Clean;
-		}
-	}
-	return Out;
+	return FVrmMetaAssetImportReportHelper::BuildCopyText(Summary, Warnings);
 }
 
 void FVrmMetaAssetDetails::CustomizeDetails(IDetailLayoutBuilder& DetailBuilder)
