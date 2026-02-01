@@ -25,6 +25,9 @@
 #include "Subsystems/ImportSubsystem.h"
 #include "VrmToolchain/VrmMetaAsset.h"
 #include "Logging/MessageLog.h"
+#include "Framework/Notifications/NotificationManager.h"
+#include "Widgets/Notifications/SNotificationList.h"
+#include "HAL/PlatformApplicationMisc.h"
 
 // Diagnostic scanner: recursively inspect object and container properties inside a package
 // and report any property that references the CDO's AssetImportData (which causes SavePackage to fail).
@@ -394,6 +397,53 @@ UObject* UVrmSourceFactory::FactoryCreateFile(
                     Meta->ImportWarnings = Report.Warnings;
                 }
 #endif
+
+#if WITH_EDITOR
+                // Optional: toast when warnings exist (UX only; skipped in automation/commandlets)
+                if (!IsRunningCommandlet() && !GIsAutomationTesting)
+                {
+#if WITH_EDITORONLY_DATA
+                    const int32 WarningCount = Meta->ImportWarnings.Num();
+                    if (WarningCount > 0)
+                    {
+                        const FString Title = FString::Printf(TEXT("VRM imported with %d warning(s)"), WarningCount);
+
+                        // Build copy payload (summary + warnings), sanitize newlines defensively
+                        FString CopyText = Meta->ImportSummary;
+                        CopyText.ReplaceInline(TEXT("\r"), TEXT(" "));
+                        // Keep real newlines for clipboard readability
+                        CopyText += TEXT("\n");
+
+                        for (const FString& W : Meta->ImportWarnings)
+                        {
+                            FString Clean = W;
+                            Clean.ReplaceInline(TEXT("\r"), TEXT(" "));
+                            // Warnings should be single-line already, but belt-and-suspenders:
+                            Clean.ReplaceInline(TEXT("\n"), TEXT(" "));
+                            CopyText += TEXT("- ") + Clean + TEXT("\n");
+                        }
+
+                        FNotificationInfo Info(FText::FromString(Title));
+                        Info.SubText = FText::FromString(TEXT("See Meta asset Details → Import Report"));
+                        Info.bFireAndForget = true;
+                        Info.ExpireDuration = 6.0f;
+                        Info.bUseLargeFont = false;
+
+                        // Button: Copy report
+                        Info.ButtonDetails.Add(FNotificationButtonInfo(
+                            FText::FromString(TEXT("Copy Report")),
+                            FText::FromString(TEXT("Copy summary and warnings to clipboard")),
+                            FSimpleDelegate::CreateLambda([CopyText]()
+                            {
+                                FPlatformApplicationMisc::ClipboardCopy(*CopyText);
+                            })
+                        ));
+
+                        FSlateNotificationManager::Get().AddNotification(Info);
+                    }
+#endif // WITH_EDITORONLY_DATA
+                }
+#endif // WITH_EDITOR
 
 #if WITH_EDITOR
                 // Optional: user-facing log (non-gating)
