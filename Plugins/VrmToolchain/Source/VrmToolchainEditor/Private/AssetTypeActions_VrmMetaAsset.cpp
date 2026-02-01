@@ -1,6 +1,7 @@
 #include "AssetTypeActions_VrmMetaAsset.h"
 
 #include "VrmToolchain/VrmMetaAsset.h"
+#include "VrmMetaAssetImportReportHelper.h"
 #include "VrmMetaFeatureDetection.h"
 #include "HAL/PlatformApplicationMisc.h"
 #include "Framework/MultiBox/MultiBoxBuilder.h"
@@ -32,11 +33,7 @@ uint32 FAssetTypeActions_VrmMetaAsset::GetCategories()
 
 FString FAssetTypeActions_VrmMetaAsset::SanitizeForClipboardSingleLine(const FString& In)
 {
-	FString Out = In;
-	Out.ReplaceInline(TEXT("\r"), TEXT(" "));
-	Out.ReplaceInline(TEXT("\n"), TEXT(" "));
-	Out.TrimStartAndEndInline();
-	return Out;
+	return FVrmMetaAssetImportReportHelper::SanitizeForClipboardSingleLine(In);
 }
 
 UVrmMetaAsset* FAssetTypeActions_VrmMetaAsset::GetSingleMeta(const TArray<UObject*>& Objects)
