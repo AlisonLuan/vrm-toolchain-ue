@@ -24,4 +24,5 @@ private:
 	void CopyImportSummary(const TArray<UObject*>& Objects);
 	void CopyImportWarnings(const TArray<UObject*>& Objects);
 	void CopyFullImportReport(const TArray<UObject*>& Objects);
+	void RecomputeImportReport(const TArray<UObject*>& Objects);
 };
