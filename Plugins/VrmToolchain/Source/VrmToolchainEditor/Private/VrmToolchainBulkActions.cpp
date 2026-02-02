@@ -4,7 +4,7 @@
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
 #include "VrmToolchain/VrmMetaAsset.h"
-#include "VrmToolchain/VrmMetaDetection.h"
+#include "VrmMetaFeatureDetection.h"
 
 static bool VrmToolchain_CanShowUi()
 {

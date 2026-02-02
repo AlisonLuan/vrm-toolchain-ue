@@ -16,8 +16,8 @@ void FVrmToolchainEditorCommands::RegisterCommands()
 {
 	UI_COMMAND(
 		RecomputeAllImportReports,
-		TEXT("Recompute All Import Reports"),
-		TEXT("Recomputes import reports for all VRM Meta Assets in the project."),
+		"Recompute All Import Reports",
+		"Recomputes import reports for all VRM Meta Assets in the project.",
 		EUserInterfaceActionType::Button,
 		FInputChord());
 }
