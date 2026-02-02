@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 
 #include "CoreMinimal.h"
 #include "Modules/ModuleInterface.h"
@@ -22,9 +22,14 @@ public:
     FString GetValidationToolPath() const { return ValidationCliExePath; }
 
 private:
+    void RegisterMenus();
+
     // Track whether the optional CLI validation tool is present and its path.
     bool bValidationCliAvailable = false;
     FString ValidationCliExePath;
+
+    // PR-19: Bulk actions menu integration
+    TSharedPtr<FUICommandList> CommandList;
 };
 
 // Dedicated log category for the editor module
