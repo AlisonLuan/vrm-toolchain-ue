@@ -1,7 +1,7 @@
 #include "VrmToolchainEditorCommands.h"
 #include "Styling/AppStyle.h"
 
-#define LLOCTEXT_NAMESPACE "VrmToolchainEditor"
+#define LOCTEXT_NAMESPACE "VrmToolchainEditor"
 
 FVrmToolchainEditorCommands::FVrmToolchainEditorCommands()
 	: TCommands<FVrmToolchainEditorCommands>(
@@ -22,4 +22,4 @@ void FVrmToolchainEditorCommands::RegisterCommands()
 		FInputChord());
 }
 
-#undef LLOCTEXT_NAMESPACE
+#undef LOCTEXT_NAMESPACE
