@@ -29,11 +29,16 @@ void FVrmToolchainBulkActions::RecomputeAllImportReports()
 	int32 Failed = 0;
 
 	FScopedSlowTask SlowTask(Total, FText::FromString("Recomputing import reports..."));
-	SlowTask.MakeDialog();
+	SlowTask.MakeDialog(true);
 
 	for (const FAssetData& AssetData : Assets)
 	{
-		SlowTask.EnterProgressFrame();
+		SlowTask.EnterProgressFrame(1.0f, FText::FromString("Recomputing import reports..."));
+
+		if (SlowTask.ShouldCancel())
+		{
+			break;
+		}
 
 		if (!AssetData.IsValid())
 		{
@@ -44,11 +49,9 @@ void FVrmToolchainBulkActions::RecomputeAllImportReports()
 		UVrmMetaAsset* Meta = Cast<UVrmMetaAsset>(AssetData.GetAsset());
 		if (!Meta)
 		{
-			Skipped++;
+			Failed++;
 			continue;
 		}
-
-		Meta->Modify();
 
 		VrmMetaDetection::FVrmMetaFeatures Features;
 		Features.SpecVersion = Meta->SpecVersion;
@@ -64,16 +67,19 @@ void FVrmToolchainBulkActions::RecomputeAllImportReports()
 			(Meta->ImportSummary != Report.Summary) ||
 			(Meta->ImportWarnings != Report.Warnings);
 
-		Meta->ImportSummary = Report.Summary;
-		Meta->ImportWarnings = Report.Warnings;
-
 		if (bChanged)
 		{
+			Meta->Modify();
+			Meta->ImportSummary = Report.Summary;
+			Meta->ImportWarnings = Report.Warnings;
+			Meta->MarkPackageDirty();
+			Meta->PostEditChange();
 			Changed++;
 		}
-
-		Meta->MarkPackageDirty();
-		Meta->PostEditChange();
+		else
+		{
+			Skipped++;
+		}
 	}
 
 	if (VrmToolchain_CanShowUi())
