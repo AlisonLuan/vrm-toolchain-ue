@@ -2,7 +2,7 @@
 
 #include "VrmToolchain/VrmMetaAsset.h"
 #include "VrmMetaAssetImportReportHelper.h"
-#include "VrmMetaFeatureDetection.h"
+#include "VrmMetaAssetRecomputeHelper.h"
 #include "HAL/PlatformApplicationMisc.h"
 #include "Framework/MultiBox/MultiBoxBuilder.h"
 #include "Framework/Notifications/NotificationManager.h"
@@ -220,25 +220,13 @@ void FAssetTypeActions_VrmMetaAsset::RecomputeImportReport(const TArray<UObject*
 			continue;
 		}
 
-		Meta->Modify();
+		using namespace VrmMetaAssetRecomputeHelper;
+		ERecomputeResult Result = RecomputeSingleMetaAsset(Meta);
 
-		VrmMetaDetection::FVrmMetaFeatures Features;
-		Features.SpecVersion = Meta->SpecVersion;
-		Features.bHasHumanoid = Meta->bHasHumanoid;
-		Features.bHasSpringBones = Meta->bHasSpringBones;
-		Features.bHasBlendShapesOrExpressions = Meta->bHasBlendShapesOrExpressions;
-		Features.bHasThumbnail = Meta->bHasThumbnail;
-
-		const VrmMetaDetection::FVrmImportReport Report =
-			VrmMetaDetection::BuildImportReport(Features);
-
-		Meta->ImportSummary = Report.Summary;
-		Meta->ImportWarnings = Report.Warnings;
-
-		Meta->MarkPackageDirty();
-		Meta->PostEditChange();
-
-		++UpdatedCount;
+		if (Result != ERecomputeResult::Failed)
+		{
+			++UpdatedCount;
+		}
 	}
 
 	// Optional toast (only in interactive contexts)

@@ -4,7 +4,7 @@
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
 #include "VrmToolchain/VrmMetaAsset.h"
-#include "VrmMetaFeatureDetection.h"
+#include "VrmMetaAssetRecomputeHelper.h"
 
 static bool VrmToolchain_CanShowUi()
 {
@@ -53,32 +53,20 @@ void FVrmToolchainBulkActions::RecomputeAllImportReports()
 			continue;
 		}
 
-		VrmMetaDetection::FVrmMetaFeatures Features;
-		Features.SpecVersion = Meta->SpecVersion;
-		Features.bHasHumanoid = Meta->bHasHumanoid;
-		Features.bHasSpringBones = Meta->bHasSpringBones;
-		Features.bHasBlendShapesOrExpressions = Meta->bHasBlendShapesOrExpressions;
-		Features.bHasThumbnail = Meta->bHasThumbnail;
+		using namespace VrmMetaAssetRecomputeHelper;
+		ERecomputeResult Result = RecomputeSingleMetaAsset(Meta);
 
-		const VrmMetaDetection::FVrmImportReport Report =
-			VrmMetaDetection::BuildImportReport(Features);
-
-		const bool bChanged =
-			(Meta->ImportSummary != Report.Summary) ||
-			(Meta->ImportWarnings != Report.Warnings);
-
-		if (bChanged)
+		switch (Result)
 		{
-			Meta->Modify();
-			Meta->ImportSummary = Report.Summary;
-			Meta->ImportWarnings = Report.Warnings;
-			Meta->MarkPackageDirty();
-			Meta->PostEditChange();
+		case ERecomputeResult::Success:
 			Changed++;
-		}
-		else
-		{
+			break;
+		case ERecomputeResult::Unchanged:
 			Skipped++;
+			break;
+		case ERecomputeResult::Failed:
+			Failed++;
+			break;
 		}
 	}
 
