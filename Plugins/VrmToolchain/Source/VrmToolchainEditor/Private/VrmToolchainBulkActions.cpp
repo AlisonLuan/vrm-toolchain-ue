@@ -54,19 +54,19 @@ void FVrmToolchainBulkActions::RecomputeAllImportReports()
 		}
 
 		using namespace VrmMetaAssetRecomputeHelper;
-		ERecomputeResult Result = RecomputeSingleMetaAsset(Meta);
+		FVrmRecomputeMetaResult Result = RecomputeSingleMetaAsset(Meta);
 
-		switch (Result)
+		if (Result.bFailed)
 		{
-		case ERecomputeResult::Success:
-			Changed++;
-			break;
-		case ERecomputeResult::Unchanged:
-			Skipped++;
-			break;
-		case ERecomputeResult::Failed:
 			Failed++;
-			break;
+		}
+		else if (Result.bChanged)
+		{
+			Changed++;
+		}
+		else
+		{
+			Skipped++;
 		}
 	}
 

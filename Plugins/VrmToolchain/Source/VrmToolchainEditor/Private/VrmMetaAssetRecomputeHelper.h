@@ -14,11 +14,11 @@ namespace VrmMetaAssetRecomputeHelper
 	/**
 	 * Result of a single meta asset recompute operation.
 	 */
-	enum class ERecomputeResult : uint8
+	struct FVrmRecomputeMetaResult
 	{
-		Success,     // Report was updated
-		Unchanged,   // Report was already up-to-date
-		Failed       // Asset was null or invalid
+		bool bChanged = false;   // Report was updated
+		bool bFailed = false;    // Asset was null or invalid
+		FString Error;           // Error message if failed
 	};
 
 	/**
@@ -29,8 +29,8 @@ namespace VrmMetaAssetRecomputeHelper
 	 * If changed, calls Modify(), updates ImportSummary/ImportWarnings, and MarkPackageDirty().
 	 * 
 	 * @param Meta The meta asset to recompute (may be nullptr)
-	 * @return Result indicating success, unchanged, or failed
+	 * @return Result with bChanged/bFailed flags and optional error message
 	 */
-	ERecomputeResult RecomputeSingleMetaAsset(UVrmMetaAsset* Meta);
+	FVrmRecomputeMetaResult RecomputeSingleMetaAsset(UVrmMetaAsset* Meta);
 
 } // namespace VrmMetaAssetRecomputeHelper

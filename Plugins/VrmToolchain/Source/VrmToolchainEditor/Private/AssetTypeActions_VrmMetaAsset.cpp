@@ -221,9 +221,9 @@ void FAssetTypeActions_VrmMetaAsset::RecomputeImportReport(const TArray<UObject*
 		}
 
 		using namespace VrmMetaAssetRecomputeHelper;
-		ERecomputeResult Result = RecomputeSingleMetaAsset(Meta);
+		FVrmRecomputeMetaResult Result = RecomputeSingleMetaAsset(Meta);
 
-		if (Result != ERecomputeResult::Failed)
+		if (!Result.bFailed)
 		{
 			++UpdatedCount;
 		}

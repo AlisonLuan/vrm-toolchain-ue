@@ -18,45 +18,29 @@ int32 UVrmToolchainRecomputeImportReportsCommandlet::Main(const FString& Params)
 {
 	UE_LOG(LogTemp, Log, TEXT("VrmToolchainRecomputeImportReportsCommandlet starting..."));
 
-	// Parse flags
-	bool bSave = false;
-	bool bFailOnChanges = false;
-	bool bFailOnFailed = true; // default true
+	// Parse flags using Unreal-standard FParse
+	bool bSave = FParse::Param(*Params, TEXT("Save"));
+	bool bFailOnChanges = FParse::Param(*Params, TEXT("FailOnChanges"));
+	bool bFailOnFailed = !FParse::Param(*Params, TEXT("NoFailOnFailed")); // default true
 	FString RootPath = TEXT("/Game");
+	FParse::Value(*Params, TEXT("Root="), RootPath);
 
-	TArray<FString> Tokens;
-	TArray<FString> Switches;
-	TMap<FString, FString> ParamsMap;
-	ParseCommandLine(*Params, Tokens, Switches);
-
-	if (Switches.Contains(TEXT("Save")))
+	if (bSave)
 	{
-		bSave = true;
 		UE_LOG(LogTemp, Log, TEXT("  -Save flag detected: will save changed packages"));
 	}
 
-	if (Switches.Contains(TEXT("FailOnChanges")))
+	if (bFailOnChanges)
 	{
-		bFailOnChanges = true;
 		UE_LOG(LogTemp, Log, TEXT("  -FailOnChanges flag detected"));
 	}
 
-	if (Switches.Contains(TEXT("NoFailOnFailed")))
+	if (!bFailOnFailed)
 	{
-		bFailOnFailed = false;
 		UE_LOG(LogTemp, Log, TEXT("  -NoFailOnFailed flag detected"));
 	}
 
-	// Parse -Root= parameter
-	for (const FString& Token : Tokens)
-	{
-		if (Token.StartsWith(TEXT("Root=")))
-		{
-			RootPath = Token.Mid(5); // Skip "Root="
-			UE_LOG(LogTemp, Log, TEXT("  -Root=%s detected"), *RootPath);
-			break;
-		}
-	}
+	UE_LOG(LogTemp, Log, TEXT("  -Root=%s"), *RootPath);
 
 	// Enumerate VRM meta assets via AssetRegistry
 	FAssetRegistryModule& AssetRegistryModule = FModuleManager::LoadModuleChecked<FAssetRegistryModule>("AssetRegistry");
@@ -96,28 +80,26 @@ int32 UVrmToolchainRecomputeImportReportsCommandlet::Main(const FString& Params)
 		}
 
 		using namespace VrmMetaAssetRecomputeHelper;
-		ERecomputeResult Result = RecomputeSingleMetaAsset(Meta);
+		FVrmRecomputeMetaResult Result = RecomputeSingleMetaAsset(Meta);
 
-		switch (Result)
+		if (Result.bFailed)
 		{
-		case ERecomputeResult::Success:
+			UE_LOG(LogTemp, Warning, TEXT("  [Failed] %s: %s"), *AssetData.PackageName.ToString(), *Result.Error);
+			Failed++;
+		}
+		else if (Result.bChanged)
+		{
 			UE_LOG(LogTemp, Display, TEXT("  [Changed] %s"), *AssetData.PackageName.ToString());
 			Changed++;
 			if (bSave)
 			{
 				PackagesToSave.AddUnique(Meta->GetPackage());
 			}
-			break;
-
-		case ERecomputeResult::Unchanged:
+		}
+		else
+		{
 			UE_LOG(LogTemp, Verbose, TEXT("  [Unchanged] %s"), *AssetData.PackageName.ToString());
 			Skipped++;
-			break;
-
-		case ERecomputeResult::Failed:
-			UE_LOG(LogTemp, Warning, TEXT("  [Failed] %s"), *AssetData.PackageName.ToString());
-			Failed++;
-			break;
 		}
 	}
 
@@ -163,16 +145,16 @@ int32 UVrmToolchainRecomputeImportReportsCommandlet::Main(const FString& Params)
 	// Determine exit code
 	int32 ExitCode = 0;
 
-	if (bFailOnChanges && Changed > 0)
+	if (bFailOnFailed && Failed > 0)
 	{
-		UE_LOG(LogTemp, Error, TEXT("FailOnChanges: %d asset(s) changed, exiting with error"), Changed);
+		UE_LOG(LogTemp, Error, TEXT("FailOnFailed: %d asset(s) failed, exiting with error code 1"), Failed);
 		ExitCode = 1;
 	}
 
-	if (bFailOnFailed && Failed > 0)
+	if (bFailOnChanges && Changed > 0)
 	{
-		UE_LOG(LogTemp, Error, TEXT("FailOnFailed: %d asset(s) failed, exiting with error"), Failed);
-		ExitCode = 1;
+		UE_LOG(LogTemp, Error, TEXT("FailOnChanges: %d asset(s) changed, exiting with error code 2"), Changed);
+		ExitCode = 2;
 	}
 
 	return ExitCode;

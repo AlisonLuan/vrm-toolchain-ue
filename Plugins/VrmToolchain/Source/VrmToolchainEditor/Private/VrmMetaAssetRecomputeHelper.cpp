@@ -6,11 +6,15 @@
 namespace VrmMetaAssetRecomputeHelper
 {
 
-ERecomputeResult RecomputeSingleMetaAsset(UVrmMetaAsset* Meta)
+FVrmRecomputeMetaResult RecomputeSingleMetaAsset(UVrmMetaAsset* Meta)
 {
+	FVrmRecomputeMetaResult Result;
+
 	if (!Meta)
 	{
-		return ERecomputeResult::Failed;
+		Result.bFailed = true;
+		Result.Error = TEXT("Null meta asset");
+		return Result;
 	}
 
 	// Build features from stored fields on the asset
@@ -37,10 +41,10 @@ ERecomputeResult RecomputeSingleMetaAsset(UVrmMetaAsset* Meta)
 		Meta->ImportWarnings = Report.Warnings;
 		Meta->MarkPackageDirty();
 		Meta->PostEditChange();
-		return ERecomputeResult::Success;
+		Result.bChanged = true;
 	}
 
-	return ERecomputeResult::Unchanged;
+	return Result;
 }
 
 } // namespace VrmMetaAssetRecomputeHelper
