@@ -289,8 +289,7 @@ void FVrmContentBrowserActions::ExecuteCreateSkeletalMeshFromSource(const TArray
 	USkeletalMesh* OutMesh = nullptr;
 	USkeleton* OutSkeleton = nullptr;
 	FString Error;
-	FVrmConvertOptions Options;
-	Options.bOverwriteExisting = false;
+	FVrmConvertOptions Options = FVrmConversionService::MakeDefaultConvertOptions();
 
 	if (!FVrmConversionService::ConvertSourceToPlaceholderSkeletalMesh(Source, Options, OutMesh, OutSkeleton, Error))
 	{

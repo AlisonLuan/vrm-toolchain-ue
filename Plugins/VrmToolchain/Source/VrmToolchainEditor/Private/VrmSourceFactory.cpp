@@ -4,6 +4,8 @@
 #include "VrmAssetNaming.h"
 #include "VrmMetaFeatureDetection.h"
 #include "VrmMetaAssetRecomputeHelper.h"
+#include "VrmConversionService.h"
+#include "VrmImportOptions.h"
 
 // Runtime-side types we create/populate:
 #include "VrmToolchain/VrmMetadata.h"
@@ -31,6 +33,12 @@
 #include "Framework/Notifications/NotificationManager.h"
 #include "Widgets/Notifications/SNotificationList.h"
 #include "HAL/PlatformApplicationMisc.h"
+#include "PropertyEditorModule.h"
+#include "Widgets/SWindow.h"
+#include "Widgets/Docking/SDockTab.h"
+#include "Framework/Application/SlateApplication.h"
+
+#define LOCTEXT_NAMESPACE "VrmToolchain"
 
 // Diagnostic scanner: recursively inspect object and container properties inside a package
 // and report any property that references the CDO's AssetImportData (which causes SavePackage to fail).
@@ -230,6 +238,52 @@ bool UVrmSourceFactory::FactoryCanImport(const FString& Filename)
     return Ext == TEXT("vrm") || Ext == TEXT("glb");
 }
 
+bool UVrmSourceFactory::ConfigureProperties()
+{
+    // Create transient import options object
+    ImportOptions = NewObject<UVrmImportOptions>(GetTransientPackage(), NAME_None, RF_Transient);
+    if (!ImportOptions)
+    {
+        UE_LOG(LogVrmToolchainEditor, Warning, TEXT("UVrmSourceFactory::ConfigureProperties: Failed to create UVrmImportOptions"));
+        return false;
+    }
+
+    // Show modal dialog with property details
+    // Use FPropertyEditorModule to display options in a details panel within a modal window
+    FPropertyEditorModule& PropertyEditorModule = FModuleManager::LoadModuleChecked<FPropertyEditorModule>("PropertyEditor");
+
+    FDetailsViewArgs DetailsViewArgs;
+    DetailsViewArgs.bAllowSearch = false;
+    DetailsViewArgs.bLockable = false;
+    DetailsViewArgs.bUpdatesFromSelection = false;
+    DetailsViewArgs.NameAreaSettings = FDetailsViewArgs::HideNameArea;
+
+    TSharedRef<IDetailsView> DetailsView = PropertyEditorModule.CreateDetailView(DetailsViewArgs);
+    DetailsView->SetObject(ImportOptions);
+
+    // Create a modal window to hold the details view
+    TSharedRef<SWindow> DialogWindow = SNew(SWindow)
+        .Title(LOCTEXT("VrmImportOptionsTitle", "VRM Import Options"))
+        .ClientSize(FVector2D(500.0f, 400.0f))
+        .SupportsMinimize(false)
+        .SupportsMaximize(false)
+        [
+            DetailsView
+        ];
+
+    // Show the dialog modally - user closes it to confirm and continue with import
+    TSharedPtr<SWindow> ParentWindow = nullptr;
+    if (FModuleManager::Get().IsModuleLoaded("MainFrame"))
+    {
+        FSlateApplication::Get().FindBestParentWindowForDialogs(ParentWindow);
+    }
+
+    GEditor->EditorAddModalWindow(DialogWindow);
+
+    // Return true to continue with the import using the configured options
+    return true;
+}
+
 UObject* UVrmSourceFactory::FactoryCreateFile(
     UClass* InClass,
     UObject* InParent,
@@ -406,6 +460,13 @@ UObject* UVrmSourceFactory::FactoryCreateFile(
                 // Optional: toast when warnings exist (UX only; skipped in automation/commandlets/headless)
                 if (!IsRunningCommandlet() && !GIsAutomationTesting && !FApp::IsUnattended())
                 {
+                    // Sync Content Browser to show freshly imported/recomputed meta asset
+                    if (GEditor)
+                    {
+                        TArray<UObject*> Objects{Meta};
+                        GEditor->SyncBrowserToObjects(Objects);
+                    }
+
 #if WITH_EDITORONLY_DATA
                     const int32 WarningCount = Meta->ImportWarnings.Num();
                     if (WarningCount > 0)
@@ -528,6 +589,68 @@ UObject* UVrmSourceFactory::FactoryCreateFile(
         }
     }
 
+    // PR-21: Optional auto-generation of SkeletalMesh + Skeleton
+    // Check if user enabled auto-generation in the import dialog
+    const bool bShouldAutoGenerate = ImportOptions && ImportOptions->bAutoCreateSkeletalMesh;
+    
+    if (bShouldAutoGenerate)
+    {
+        UE_LOG(LogVrmToolchainEditor, Display, TEXT("VrmSourceFactory: Auto-generation enabled, creating SkeletalMesh and Skeleton..."));
+        
+        USkeletalMesh* GeneratedMesh = nullptr;
+        USkeleton* GeneratedSkeleton = nullptr;
+        FString ConversionError;
+        
+		FVrmConvertOptions ConvertOptions = FVrmConversionService::MakeDefaultConvertOptions();
+		ConvertOptions.bApplyGltfSkeleton = ImportOptions->bApplyGltfSkeleton;  // Allow user override from dialog
+		
+		const bool bConversionSuccess = FVrmConversionService::ConvertSourceToPlaceholderSkeletalMesh(
+			Source, ConvertOptions, GeneratedMesh, GeneratedSkeleton, ConversionError);
+        
+        if (bConversionSuccess && GeneratedMesh && GeneratedSkeleton)
+        {
+            UE_LOG(LogVrmToolchainEditor, Display, TEXT("VrmSourceFactory: Auto-generated SkeletalMesh '%s' and Skeleton '%s'"),
+                *GeneratedMesh->GetName(), *GeneratedSkeleton->GetName());
+            
+            // Show notification only in interactive mode (skip commandlet/automation/unattended)
+            if (!IsRunningCommandlet() && !GIsAutomationTesting && !FApp::IsUnattended())
+            {
+                FNotificationInfo Info(FText::FromString(FString::Printf(TEXT("VRM Import: Created %s, %s, %s"),
+                    *Source->GetName(), *GeneratedSkeleton->GetName(), *GeneratedMesh->GetName())));
+                Info.ExpireDuration = 5.0f;
+                Info.bFireAndForget = true;
+                FSlateNotificationManager::Get().AddNotification(Info);
+            }
+        }
+        else
+        {
+            // Conversion failed, but import should still succeed for Source+Meta
+            const FString ErrorMsg = FString::Printf(TEXT("VRM Import: Created %s, but auto-generation of SkeletalMesh failed: %s"),
+                *Source->GetName(), *ConversionError);
+            
+            UE_LOG(LogVrmToolchainEditor, Warning, TEXT("VrmSourceFactory: %s"), *ErrorMsg);
+            
+            // Add warning to Source asset for user visibility
+            if (Source)
+            {
+                Source->ImportWarnings.Add(FString::Printf(TEXT("Auto-generation failed: %s"), *ConversionError));
+                Source->MarkPackageDirty();
+            }
+            
+            // Show notification only in interactive mode
+            if (!IsRunningCommandlet() && !GIsAutomationTesting && !FApp::IsUnattended())
+            {
+                FNotificationInfo Info(FText::FromString(ErrorMsg));
+                Info.ExpireDuration = 7.0f;
+                Info.bFireAndForget = true;
+                FSlateNotificationManager::Get().AddNotification(Info);
+            }
+            
+            // Log to MessageLog for user reference
+            FMessageLog("VrmToolchain").Warning(FText::FromString(ErrorMsg));
+        }
+    }
+
     // DISABLED: Diagnostic scan causes crashes when accessing certain native properties
     // Run diagnostic scan to detect any references to the class default AssetImportData
     /*
@@ -549,3 +672,5 @@ UObject* UVrmSourceFactory::FactoryCreateFile(
 
     return Source;
 }
+
+#undef LOCTEXT_NAMESPACE

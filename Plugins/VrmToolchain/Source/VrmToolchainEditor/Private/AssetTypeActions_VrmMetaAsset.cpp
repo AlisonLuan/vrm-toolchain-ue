@@ -284,6 +284,18 @@ void FAssetTypeActions_VrmMetaAsset::RecomputeImportReport(const TArray<UObject*
 	// Optional toast (only in interactive contexts)
 	if (bInteractive && UpdatedCount > 0)
 	{
+		// Sync Content Browser to show updated assets
+		if (GEditor)
+		{
+			TArray<UObject*> ObjectsToSync;
+			ObjectsToSync.Reserve(Metas.Num());
+			for (UVrmMetaAsset* Meta : Metas)
+			{
+				ObjectsToSync.Add(Meta);
+			}
+			GEditor->SyncBrowserToObjects(ObjectsToSync);
+		}
+
 		FNotificationInfo Info(FText::FromString(
 			FString::Printf(TEXT("Recomputed import report for %d meta asset(s)"), UpdatedCount)
 		));

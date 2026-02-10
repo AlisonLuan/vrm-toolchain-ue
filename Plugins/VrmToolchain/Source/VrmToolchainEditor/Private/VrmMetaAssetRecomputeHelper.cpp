@@ -20,6 +20,7 @@ FVrmRecomputeMetaResult RecomputeSingleMetaAsset(UVrmMetaAsset* Meta)
 		return Result;
 	}
 
+#if WITH_EDITORONLY_DATA
 	// Build features from stored fields on the asset
 	VrmMetaDetection::FVrmMetaFeatures Features;
 	Features.SpecVersion = Meta->SpecVersion;
@@ -40,11 +41,37 @@ FVrmRecomputeMetaResult RecomputeSingleMetaAsset(UVrmMetaAsset* Meta)
 	if (bChanged)
 	{
 		Meta->Modify();
+
 		Meta->ImportSummary = Report.Summary;
 		Meta->ImportWarnings = Report.Warnings;
+
+#if WITH_EDITOR
+		FProperty* SummaryProp = FindFProperty<FProperty>(
+			UVrmMetaAsset::StaticClass(),
+			GET_MEMBER_NAME_CHECKED(UVrmMetaAsset, ImportSummary));
+		FProperty* WarningsProp = FindFProperty<FProperty>(
+			UVrmMetaAsset::StaticClass(),
+			GET_MEMBER_NAME_CHECKED(UVrmMetaAsset, ImportWarnings));
+
+		if (SummaryProp)
+		{
+			FPropertyChangedEvent ChangeEventSummary(SummaryProp);
+			Meta->PostEditChangeProperty(ChangeEventSummary);
+		}
+
+		if (WarningsProp)
+		{
+			FPropertyChangedEvent ChangeEventWarnings(WarningsProp);
+			Meta->PostEditChangeProperty(ChangeEventWarnings);
+		}
+#endif
+
 		Meta->MarkPackageDirty();
-		Meta->PostEditChange();
 		Result.bChanged = true;
+	}
+	else
+	{
+		Result.bChanged = false;
 	}
 
 	// Diagnostic log
@@ -52,6 +79,12 @@ FVrmRecomputeMetaResult RecomputeSingleMetaAsset(UVrmMetaAsset* Meta)
 	UE_LOG(LogVrmToolchainEditor, Display, TEXT("RecomputeHelper: Meta=%s spec=%s humanoid=%d spring=%d blendOrExpr=%d thumb=%d summaryLen=%d warningsLen=%d changed=%d failed=%d"),
 		*Meta->GetPathName(), *SpecStr, Features.bHasHumanoid ? 1 : 0, Features.bHasSpringBones ? 1 : 0, Features.bHasBlendShapesOrExpressions ? 1 : 0, Features.bHasThumbnail ? 1 : 0,
 		Report.Summary.Len(), Report.Warnings.Num(), bChanged ? 1 : 0, Result.bFailed ? 1 : 0);
+
+#else
+	// In non-editoronly-data builds, nothing to recompute/persist on the asset.
+	Result.bFailed = true;
+	Result.Error = TEXT("ImportSummary/ImportWarnings are editor-only data (WITH_EDITORONLY_DATA is off).");
+#endif
 
 	return Result;
 }

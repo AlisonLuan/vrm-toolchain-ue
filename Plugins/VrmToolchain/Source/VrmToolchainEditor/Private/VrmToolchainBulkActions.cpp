@@ -28,6 +28,8 @@ void FVrmToolchainBulkActions::RecomputeAllImportReports()
 	int32 Skipped = 0;
 	int32 Failed = 0;
 
+	TArray<UObject*> RecomputedAssets; // Track for Content Browser sync
+
 	FScopedSlowTask SlowTask(Total, FText::FromString("Recomputing import reports..."));
 	SlowTask.MakeDialog(true);
 
@@ -63,6 +65,7 @@ void FVrmToolchainBulkActions::RecomputeAllImportReports()
 		else if (Result.bChanged)
 		{
 			Changed++;
+			RecomputedAssets.Add(Meta);
 		}
 		else
 		{
@@ -72,6 +75,12 @@ void FVrmToolchainBulkActions::RecomputeAllImportReports()
 
 	if (VrmToolchain_CanShowUi())
 	{
+		// Sync Content Browser to show recomputed assets
+		if (GEditor && RecomputedAssets.Num() > 0)
+		{
+			GEditor->SyncBrowserToObjects(RecomputedAssets);
+		}
+
 		FText Msg = FText::Format(
 			NSLOCTEXT("VrmToolchain", "RecomputeAllDoneFmt",
 				"Recomputed {0}/{1} VRM Meta Assets (skipped {2}, failed {3})."),

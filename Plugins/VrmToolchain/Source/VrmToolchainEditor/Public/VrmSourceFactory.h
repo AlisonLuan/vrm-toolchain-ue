@@ -28,4 +28,10 @@ public:
         const TCHAR* Parms,
         FFeedbackContext* Warn,
         bool& bOutOperationCanceled) override;
+
+    virtual bool ConfigureProperties() override;
+
+private:
+    /** Transient import options set via ConfigureProperties() dialog */
+    TObjectPtr<class UVrmImportOptions> ImportOptions;
 };

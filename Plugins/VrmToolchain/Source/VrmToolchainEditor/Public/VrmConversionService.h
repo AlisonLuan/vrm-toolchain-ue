@@ -18,6 +18,18 @@ class VRMTOOLCHAINEDITOR_API FVrmConversionService
 {
 public:
 	/**
+	 * Creates default conversion options (single source of truth for import/right-click consistency).
+	 * Always disable overwrite; apply skeleton by default (matches PR-21 import dialog default).
+	 */
+	static FVrmConvertOptions MakeDefaultConvertOptions()
+	{
+		FVrmConvertOptions Opt;
+		Opt.bOverwriteExisting = false;
+		Opt.bApplyGltfSkeleton = true;
+		return Opt;
+	}
+
+	/**
 	 * Creates generated output assets for a UVrmSourceAsset in a deterministic subfolder.
 	 * Currently creates placeholder Skeleton + SkeletalMesh and attaches metadata.
 	 */

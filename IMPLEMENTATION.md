@@ -5,7 +5,7 @@ This repository now provides a minimal Unreal Engine 5 plugin skeleton plus a li
 ## Plugin Structure
 - `Plugins/VrmToolchain/VrmToolchain.uplugin` defines two modules:
   - `VrmToolchain` (Runtime) exposes `FVrmSdkFacade`, a small wrapper API whose public headers only include `CoreMinimal` and hide SDK state behind a PIMPL (`FImpl`).
-  - `VrmToolchainEditor` (Editor) registers a stub menu entry inside the Level Editor main menu using `ToolMenus` and logs when the command executes.
+  - `VrmToolchainEditor` (Editor) provides VRM import, metadata extraction, and optional SkeletalMesh generation.
 - Both modules live under `Plugins/VrmToolchain/Source/` and follow the Unreal module convention with one public header and one private source file each.
 
 ## Runtime Module
@@ -13,8 +13,14 @@ This repository now provides a minimal Unreal Engine 5 plugin skeleton plus a li
 - `FVrmSdkFacade` offers `Initialize`, `Shutdown`, `IsAvailable`, and `GetVersion`, while `FVrmToolchainModule` handles module startup/shutdown logging.
 
 ## Editor Module
-- `VrmToolchainEditor.Build.cs` adds Slate, LevelEditor, and ToolMenus dependencies plus the runtime module.
-- The module is wrapped in `WITH_EDITOR`; when loaded it extends `LevelEditor.MainMenu.Window` with a `VRM Toolchain` menu item that logs a message via `UE_LOG`.
+- `VrmToolchainEditor.Build.cs` adds Slate, LevelEditor, ToolMenus, UnrealEd, and MeshUtilities dependencies plus the runtime module.
+- The module is wrapped in `WITH_EDITOR` and provides:
+  - **VrmSourceFactory**: Imports .vrm/.glb files into UVrmSourceAsset + UVrmMetaAsset
+  - **VrmConversionService**: Converts UVrmSourceAsset to USkeleton + USkeletalMesh
+  - **VrmSkeletalMeshBuilder**: Builds skeletal meshes from parsed GLB data using MeshUtilities
+- Import options (persisted UPROPERTY on factory):
+  - `bAutoCreateSkeletalMesh`: When enabled, automatically generates SkeletalMesh + Skeleton after import (default: OFF)
+  - `bApplyGltfSkeleton`: When auto-generation enabled, applies parsed skeleton structure (default: ON)
 
 ## Host Project
 - The `HostProject` folder contains a minimal UE5 project (`HostProject.uproject`) that enables the plugin, plus a simple game module, editor/game targets, and configuration files.
