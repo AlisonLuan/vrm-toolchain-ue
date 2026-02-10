@@ -76,7 +76,7 @@ void FAssetTypeActions_VrmMetaAsset::GetActions(const TArray<UObject*>& InObject
 		return;
 	}
 
-	MenuBuilder.BeginSection(NAME_None, LOCTEXT("ImportReportSection", "Import Report"));
+	MenuBuilder.BeginSection("VrmImportReport", LOCTEXT("ImportReportSection", "Import Report"));
 
 	// For Summary/Warnings, only enable for single-selection to avoid ambiguity.
 	const bool bSingle = (Metas.Num() == 1);
