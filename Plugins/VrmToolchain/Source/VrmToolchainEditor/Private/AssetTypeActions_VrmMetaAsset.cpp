@@ -76,50 +76,102 @@ void FAssetTypeActions_VrmMetaAsset::GetActions(const TArray<UObject*>& InObject
 		return;
 	}
 
-	MenuBuilder.BeginSection("VrmImportReport", LOCTEXT("ImportReportSection", "Import Report"));
+	// Convert to weak pointers for safe lambda capture
+	TArray<TWeakObjectPtr<UVrmMetaAsset>> WeakMetas;
+	for (UVrmMetaAsset* Meta : Metas)
+	{
+		WeakMetas.Add(Meta);
+	}
 
-	// For Summary/Warnings, only enable for single-selection to avoid ambiguity.
 	const bool bSingle = (Metas.Num() == 1);
-	TArray<UObject*> ObjectsCopy = InObjects;  // Copy for lambda capture
 
-	MenuBuilder.AddMenuEntry(
-		LOCTEXT("CopySummary", "Copy Summary"),
-		LOCTEXT("CopySummaryTooltip", "Copy import summary to clipboard (single selection)"),
-		FSlateIcon(),
-		FUIAction(
-			FExecuteAction::CreateLambda([this, ObjectsCopy]() { CopyImportSummary(ObjectsCopy); }),
-			FCanExecuteAction::CreateLambda([bSingle]() { return bSingle; })
-		)
+	MenuBuilder.AddSubMenu(
+		LOCTEXT("ImportReportSubMenu", "Import Report"),
+		LOCTEXT("ImportReportSubMenu_Tooltip", "Copy or recompute the deterministic import report stored on the VRM Meta Asset."),
+		FNewMenuDelegate::CreateLambda([this, WeakMetas, bSingle](FMenuBuilder& SubMenu)
+		{
+			SubMenu.AddMenuEntry(
+				LOCTEXT("CopySummary", "Copy Summary"),
+				LOCTEXT("CopySummaryTooltip", "Copy import summary to clipboard (single selection)"),
+				FSlateIcon(),
+				FUIAction(
+					FExecuteAction::CreateLambda([this, WeakMetas]()
+					{
+						TArray<UObject*> ValidObjects;
+						for (const TWeakObjectPtr<UVrmMetaAsset>& WeakMeta : WeakMetas)
+						{
+							if (WeakMeta.IsValid())
+							{
+								ValidObjects.Add(WeakMeta.Get());
+								break;
+							}
+						}
+						CopyImportSummary(ValidObjects);
+					}),
+					FCanExecuteAction::CreateLambda([bSingle]() { return bSingle; })
+				)
+			);
+
+			SubMenu.AddMenuEntry(
+				LOCTEXT("CopyWarnings", "Copy Warnings"),
+				LOCTEXT("CopyWarningsTooltip", "Copy import warnings to clipboard (single selection)"),
+				FSlateIcon(),
+				FUIAction(
+					FExecuteAction::CreateLambda([this, WeakMetas]()
+					{
+						TArray<UObject*> ValidObjects;
+						for (const TWeakObjectPtr<UVrmMetaAsset>& WeakMeta : WeakMetas)
+						{
+							if (WeakMeta.IsValid())
+							{
+								ValidObjects.Add(WeakMeta.Get());
+								break;
+							}
+						}
+						CopyImportWarnings(ValidObjects);
+					}),
+					FCanExecuteAction::CreateLambda([bSingle]() { return bSingle; })
+				)
+			);
+
+			// Full report can support multi-select safely (include separators).
+			SubMenu.AddMenuEntry(
+				LOCTEXT("CopyFullReport", "Copy Full Report"),
+				LOCTEXT("CopyFullReportTooltip", "Copy summary + warnings to clipboard (supports multi-selection)"),
+				FSlateIcon(),
+				FUIAction(FExecuteAction::CreateLambda([this, WeakMetas]()
+				{
+					TArray<UObject*> ValidObjects;
+					for (const TWeakObjectPtr<UVrmMetaAsset>& WeakMeta : WeakMetas)
+					{
+						if (WeakMeta.IsValid())
+						{
+							ValidObjects.Add(WeakMeta.Get());
+						}
+					}
+					CopyFullImportReport(ValidObjects);
+				}))
+			);
+
+			SubMenu.AddMenuEntry(
+				LOCTEXT("RecomputeReport", "Recompute Import Report"),
+				LOCTEXT("RecomputeReportTooltip", "Rebuild ImportSummary/Warnings from stored feature flags (useful after upgrading)"),
+				FSlateIcon(),
+				FUIAction(FExecuteAction::CreateLambda([this, WeakMetas]()
+				{
+					TArray<UObject*> ValidObjects;
+					for (const TWeakObjectPtr<UVrmMetaAsset>& WeakMeta : WeakMetas)
+					{
+						if (WeakMeta.IsValid())
+						{
+							ValidObjects.Add(WeakMeta.Get());
+						}
+					}
+					RecomputeImportReport(ValidObjects);
+				}))
+			);
+		})
 	);
-
-	MenuBuilder.AddMenuEntry(
-		LOCTEXT("CopyWarnings", "Copy Warnings"),
-		LOCTEXT("CopyWarningsTooltip", "Copy import warnings to clipboard (single selection)"),
-		FSlateIcon(),
-		FUIAction(
-			FExecuteAction::CreateLambda([this, ObjectsCopy]() { CopyImportWarnings(ObjectsCopy); }),
-			FCanExecuteAction::CreateLambda([bSingle]() { return bSingle; })
-		)
-	);
-
-	// Full report can support multi-select safely (include separators).
-	MenuBuilder.AddMenuEntry(
-		LOCTEXT("CopyFullReport", "Copy Full Report"),
-		LOCTEXT("CopyFullReportTooltip", "Copy summary + warnings to clipboard (supports multi-selection)"),
-		FSlateIcon(),
-		FUIAction(FExecuteAction::CreateLambda([this, ObjectsCopy]() { CopyFullImportReport(ObjectsCopy); }))
-	);
-
-	MenuBuilder.AddMenuEntry(
-		LOCTEXT("RecomputeReport", "Recompute Import Report"),
-		LOCTEXT("RecomputeReportTooltip", "Rebuild ImportSummary/Warnings from stored feature flags (useful after upgrading)"),
-		FSlateIcon(),
-		FUIAction(
-			FExecuteAction::CreateLambda([this, ObjectsCopy]() { RecomputeImportReport(ObjectsCopy); })
-		)
-	);
-
-	MenuBuilder.EndSection();
 #endif
 }
 

@@ -3,6 +3,7 @@
 #include "VrmToolchain/VrmSourceAsset.h"
 #include "VrmAssetNaming.h"
 #include "VrmMetaFeatureDetection.h"
+#include "VrmMetaAssetRecomputeHelper.h"
 
 // Runtime-side types we create/populate:
 #include "VrmToolchain/VrmMetadata.h"
@@ -391,12 +392,13 @@ UObject* UVrmSourceFactory::FactoryCreateFile(
                 VrmMetaDetection::ApplyFeaturesToMetaAsset(Meta, Features);
                 Meta->SourceFilename = Filename;
 
-                // Store deterministic import report on asset (test-gated signal)
+                // Populate import report using recompute helper (single code path)
 #if WITH_EDITORONLY_DATA
                 {
-                    const VrmMetaDetection::FVrmImportReport Report = VrmMetaDetection::BuildImportReport(Features);
-                    Meta->ImportSummary = Report.Summary;
-                    Meta->ImportWarnings = Report.Warnings;
+                    using namespace VrmMetaAssetRecomputeHelper;
+                    FVrmRecomputeMetaResult RecomputeResult = RecomputeSingleMetaAsset(Meta);
+                    UE_LOG(LogVrmToolchainEditor, Display, TEXT("VrmSourceFactory: Recompute helper ran - changed=%d failed=%d"),
+                        RecomputeResult.bChanged ? 1 : 0, RecomputeResult.bFailed ? 1 : 0);
                 }
 #endif
 
